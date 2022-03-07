@@ -1,0 +1,44 @@
+; Close it before opening
+2000-01-01 close Assets:Account1
+2000-01-02 open Assets:Account1
+
+; Open it twice
+2000-01-01 open Assets:Account2
+2000-01-02 open Assets:Account2
+
+; Close it twice
+2000-01-01 open Assets:Account3
+2000-01-02 close Assets:Account3
+2000-01-03 close Assets:Account3
+
+; Duplicate balance (with matching amounts)
+2000-01-01 open Assets:DuplBalance
+2000-01-02 balance Assets:DuplBalance 10 EUR
+2000-01-02 balance Assets:DuplBalance 10 EUR
+
+; Duplicate balance (in different currencies)
+2000-01-01 open Assets:DuplBalance1
+2000-01-02 balance Assets:DuplBalance1 10 EUR
+2000-01-02 balance Assets:DuplBalance1 10 USD
+
+; Duplicate balance (with different amounts)
+2000-01-01 open Assets:DuplBalance2
+2000-01-02 balance Assets:DuplBalance2 10 EUR
+2000-01-02 balance Assets:DuplBalance2 11 EUR
+
+; Duplicate commodity
+2000-01-01 commodity EUR
+2000-01-02 commodity EUR
+
+; Inactive accounts
+2000-01-01 open Assets:Inactive
+2000-01-02 close Assets:Inactive
+2000-01-03 * ""
+    Assets:Inactive                            10 EUR
+    Assets:Inactive                           -10 EUR
+
+; Unknown accounts
+2000-01-02 note Assets:Unknown "note"
+
+; Invalid account name
+2000-01-02 open NotARoot:Unknown

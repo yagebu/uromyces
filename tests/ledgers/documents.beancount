@@ -1,0 +1,8 @@
+option "documents" "documents"
+option "documents" "not_a_directory"
+
+2000-01-01 open Assets:Account1
+2000-01-01 open Assets:Account2
+2000-01-01 open Assets:Account3
+2000-01-01 open Assets:AccountWithoutDocuments
+2000-01-01 open Expenses:AccountWithoutDocuments

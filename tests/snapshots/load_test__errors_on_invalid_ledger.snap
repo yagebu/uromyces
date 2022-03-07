@@ -1,0 +1,472 @@
+---
+source: tests/load_test.rs
+expression: ledger
+---
+{
+  "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+  "entries": [
+    {
+      "t": "Open",
+      "header": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 6
+      },
+      "account": "Assets:Account2",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 10
+      },
+      "account": "Assets:Account3",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 15
+      },
+      "account": "Assets:DuplBalance",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 20
+      },
+      "account": "Assets:DuplBalance1",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 25
+      },
+      "account": "Assets:DuplBalance2",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 34
+      },
+      "account": "Assets:Inactive",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Commodity",
+      "header": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 30
+      },
+      "currency": "EUR"
+    },
+    {
+      "t": "Close",
+      "header": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 2
+      },
+      "account": "Assets:Account1"
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 3
+      },
+      "account": "Assets:Account1",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 7
+      },
+      "account": "Assets:Account2",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 44
+      },
+      "account": "NotARoot:Unknown",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 16
+      },
+      "account": "Assets:DuplBalance",
+      "amount": {
+        "number": "10",
+        "currency": "EUR"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 17
+      },
+      "account": "Assets:DuplBalance",
+      "amount": {
+        "number": "10",
+        "currency": "EUR"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 21
+      },
+      "account": "Assets:DuplBalance1",
+      "amount": {
+        "number": "10",
+        "currency": "EUR"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 22
+      },
+      "account": "Assets:DuplBalance1",
+      "amount": {
+        "number": "10",
+        "currency": "USD"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 26
+      },
+      "account": "Assets:DuplBalance2",
+      "amount": {
+        "number": "10",
+        "currency": "EUR"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 27
+      },
+      "account": "Assets:DuplBalance2",
+      "amount": {
+        "number": "11",
+        "currency": "EUR"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Commodity",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 31
+      },
+      "currency": "EUR"
+    },
+    {
+      "t": "Note",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 41
+      },
+      "account": "Assets:Unknown",
+      "comment": "note"
+    },
+    {
+      "t": "Close",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 11
+      },
+      "account": "Assets:Account3"
+    },
+    {
+      "t": "Close",
+      "header": {
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 35
+      },
+      "account": "Assets:Inactive"
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2000-01-03",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 36
+      },
+      "flag": "*",
+      "payee": null,
+      "narration": "",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+          "line": 37,
+          "meta": [],
+          "account": "Assets:Inactive",
+          "flag": null,
+          "units": {
+            "number": "10",
+            "currency": "EUR"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+          "line": 38,
+          "meta": [],
+          "account": "Assets:Inactive",
+          "flag": null,
+          "units": {
+            "number": "-10",
+            "currency": "EUR"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Close",
+      "header": {
+        "date": "2000-01-03",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 12
+      },
+      "account": "Assets:Account3"
+    }
+  ],
+  "errors": [
+    {
+      "filename": null,
+      "line": null,
+      "message": "Invalid account name 'NotARoot:Unknown' (invalid root account)."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 2,
+      "message": "Closing unopened account Assets:Account1."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 7,
+      "message": "Duplicate open directive for account Assets:Account2."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 12,
+      "message": "Duplicate close directive for account Assets:Account3."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 27,
+      "message": "Duplicate balance assertions with different amounts."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 31,
+      "message": "Duplicate commodity directive for EUR."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 41,
+      "message": "Invalid reference to unknown account Assets:Unknown."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 36,
+      "message": "Invalid reference to inactive account Assets:Inactive."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 36,
+      "message": "Invalid reference to inactive account Assets:Inactive."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 16,
+      "message": "Balance failed for 'Assets:DuplBalance': expected 10 EUR != accumulated 0 EUR (10 too little)"
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 17,
+      "message": "Balance failed for 'Assets:DuplBalance': expected 10 EUR != accumulated 0 EUR (10 too little)"
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 21,
+      "message": "Balance failed for 'Assets:DuplBalance1': expected 10 EUR != accumulated 0 EUR (10 too little)"
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 22,
+      "message": "Balance failed for 'Assets:DuplBalance1': expected 10 USD != accumulated 0 USD (10 too little)"
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 26,
+      "message": "Balance failed for 'Assets:DuplBalance2': expected 10 EUR != accumulated 0 EUR (10 too little)"
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 27,
+      "message": "Balance failed for 'Assets:DuplBalance2': expected 11 EUR != accumulated 0 EUR (11 too little)"
+    }
+  ],
+  "options": {
+    "title": "",
+    "root_accounts": {
+      "assets": "Assets",
+      "liabilities": "Liabilities",
+      "equity": "Equity",
+      "income": "Income",
+      "expenses": "Expenses"
+    },
+    "account_current_conversions": "Conversions:Current",
+    "account_current_earnings": "Earnings:Current",
+    "account_previous_balances": "Conversions:Previous",
+    "account_previous_conversions": "Earnings:Previous",
+    "account_previous_earnings": "Opening-Balances",
+    "render_commas": false,
+    "operating_currency": [],
+    "conversion_currency": "NOTHING",
+    "documents": [],
+    "booking_method": "Strict",
+    "inferred_tolerance_default": {
+      "map": {},
+      "default": "0"
+    },
+    "inferred_tolerance_multiplier": "0.5",
+    "infer_tolerance_from_cost": false,
+    "insert_pythonpath": false
+  },
+  "includes": [
+    "[REPO_DIR]/tests/ledgers/invalid-input.beancount"
+  ],
+  "plugins": []
+}

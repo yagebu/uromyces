@@ -1,0 +1,365 @@
+;; -*- mode: org; mode: beancount; -*-
+;; Birth: 1980-05-12
+;; Dates: 2022-01-01 - 2022-02-01
+;; THIS FILE HAS BEEN AUTO-GENERATED.
+* Options
+
+option "title" "Example Beancount file"
+option "operating_currency" "USD"
+
+
+
+
+* Commodities
+
+
+1792-01-01 commodity USD
+  export: "CASH"
+  name: "US Dollar"
+
+1900-01-01 commodity VMMXX
+  export: "MUTF:VMMXX (MONEY:USD)"
+
+1980-05-12 commodity VACHR
+  export: "IGNORE"
+  name: "Employer Vacation Hours"
+
+1980-05-12 commodity IRAUSD
+  export: "IGNORE"
+  name: "US 401k and IRA Contributions"
+
+1995-09-18 commodity VBMPX
+  export: "MUTF:VBMPX"
+  name: "Vanguard Total Bond Market Index Fund Institutional Plus Shares"
+  price: "USD:google/MUTF:VBMPX"
+
+2004-01-20 commodity ITOT
+  export: "NYSEARCA:ITOT"
+  name: "iShares Core S&P Total U.S. Stock Market ETF"
+  price: "USD:google/NYSEARCA:ITOT"
+
+2004-01-26 commodity VHT
+  export: "NYSEARCA:VHT"
+  name: "Vanguard Health Care ETF"
+  price: "USD:google/NYSEARCA:VHT"
+
+2004-11-01 commodity GLD
+  export: "NYSEARCA:GLD"
+  name: "SPDR Gold Trust (ETF)"
+  price: "USD:google/NYSEARCA:GLD"
+
+2007-07-20 commodity VEA
+  export: "NYSEARCA:VEA"
+  name: "Vanguard FTSE Developed Markets ETF"
+  price: "USD:google/NYSEARCA:VEA"
+
+2009-05-01 commodity RGAGX
+  export: "MUTF:RGAGX"
+  name: "American Funds The Growth Fund of America Class R-6"
+  price: "USD:google/MUTF:RGAGX"
+
+
+
+* Equity Accounts
+
+1980-05-12 open Equity:Opening-Balances
+1980-05-12 open Liabilities:AccountsPayable
+
+
+
+* Banking
+
+2022-01-01 open Assets:US:BofA
+  address: "123 America Street, LargeTown, USA"
+  institution: "Bank of America"
+  phone: "+1.012.345.6789"
+2022-01-01 open Assets:US:BofA:Checking                        USD,EUR
+  account: "00234-48574897"
+
+2022-01-01 * "Opening Balance for checking account"
+  Assets:US:BofA:Checking                         2404.00 USD
+  Equity:Opening-Balances                        -2404.00 USD
+
+2022-01-02 note Assets:US:BofA:Checking "Some note"
+2022-01-02 balance Assets:US:BofA:Checking        2404.00 USD
+2022-01-03 balance Assets:US:BofA:Checking        (-(1-2) * (2404.00 + 0.00)) /1 USD
+2022-01-02 balance Assets:US:BofA:Checking        2404.00 ~ 0.0001 USD
+
+2022-01-04 * "BANK FEES" "Monthly bank fee"
+  Assets:US:BofA:Checking                           -4.00 USD
+  Expenses:Financial:Fees                            4.00 USD
+
+2022-01-04 * "RiverBank Properties" "Paying the rent"
+  Assets:US:BofA:Checking                        -2400.00 USD
+  Expenses:Home:Rent                              2400.00 USD
+
+2022-01-09 * "EDISON POWER" ""
+  Assets:US:BofA:Checking                          -65.00 USD
+  Expenses:Home:Electricity                         65.00 USD
+
+2022-01-19 * "Verizon Wireless" ""
+  Assets:US:BofA:Checking                          -77.11 USD
+  Expenses:Home:Phone                               77.11 USD
+
+2022-01-21 * "Wine-Tarner Cable" ""
+  Assets:US:BofA:Checking                          -79.84 USD
+  Expenses:Home:Internet                            79.84 USD
+
+
+
+* Credit-Cards
+
+1980-05-12 open Liabilities:US:Chase:Slate                      USD
+2022-02-04 close Liabilities:US:Chase:Slate
+
+2022-01-04 * "Rose Flower" "Eating out alone"
+  Liabilities:US:Chase:Slate                       -12.81 USD
+  Expenses:Food:Restaurant                          12.81 USD
+
+2022-01-07 * "Cafe Modagor" "Eating out with Natasha"
+  Liabilities:US:Chase:Slate                       -27.74 USD
+  Expenses:Food:Restaurant                          27.74 USD
+
+2022-01-08 * "Farmer Fresh" "Buying groceries"
+  Liabilities:US:Chase:Slate                       -70.30 USD
+  Expenses:Food:Groceries                           70.30 USD
+
+2022-01-12 * "Goba Goba" "Eating out "
+  Liabilities:US:Chase:Slate                       -28.94 USD
+  Expenses:Food:Restaurant                          28.94 USD
+
+2022-01-16 * "Chichipotle" "Eating out with Joe"
+  Liabilities:US:Chase:Slate                       -40.83 USD
+  Expenses:Food:Restaurant                          40.83 USD
+
+2022-01-17 * "Rose Flower" "Eating out "
+  Liabilities:US:Chase:Slate                       -36.15 USD
+  Expenses:Food:Restaurant                          36.15 USD
+
+2022-01-22 balance Liabilities:US:Chase:Slate     -216.77 USD
+
+2022-01-22 * "Jewel of Morroco" "Eating out "
+  Liabilities:US:Chase:Slate                       -30.13 USD
+  Expenses:Food:Restaurant                          30.13 USD
+
+2022-01-24 * "Corner Deli" "Buying groceries"
+  Liabilities:US:Chase:Slate                       -82.93 USD
+  Expenses:Food:Groceries                           82.93 USD
+
+2022-01-25 * "Chichipotle" "Eating out with Joe"
+  Liabilities:US:Chase:Slate                       -23.05 USD
+  Expenses:Food:Restaurant                          23.05 USD
+
+2022-01-27 * "Cafe Modagor" "Eating out alone"
+  Liabilities:US:Chase:Slate                       -28.63 USD
+  Expenses:Food:Restaurant                          28.63 USD
+
+2022-01-29 * "Metro Transport Authority" "Tram tickets"
+  Liabilities:US:Chase:Slate                      -120.00 USD
+  Expenses:Transport:Tram                          120.00 USD
+
+2022-01-31 * "Cafe Modagor" "Eating out with Natasha"
+  Liabilities:US:Chase:Slate                       -45.04 USD
+  Expenses:Food:Restaurant                          45.04 USD
+
+
+
+* Taxable Investments
+
+2022-01-01 open Assets:US:ETrade:Cash                       USD
+2022-01-01 open Assets:US:ETrade:ITOT                       ITOT
+2022-01-01 open Assets:US:ETrade:VEA                       VEA
+2022-01-01 open Assets:US:ETrade:VHT                       VHT
+2022-01-01 open Assets:US:ETrade:GLD                       GLD
+2022-01-01 open Income:US:ETrade:PnL                        USD
+2022-01-01 open Income:US:ETrade:ITOT:Dividend              USD
+2022-01-01 open Income:US:ETrade:VEA:Dividend              USD
+2022-01-01 open Income:US:ETrade:VHT:Dividend              USD
+2022-01-01 open Income:US:ETrade:GLD:Dividend              USD
+
+
+
+* Vanguard Investments
+
+2022-01-01 open Assets:US:Vanguard:VBMPX                     VBMPX
+  number: "882882"
+2022-01-01 open Assets:US:Vanguard:RGAGX                     RGAGX
+  number: "882882"
+2022-01-01 open Assets:US:Vanguard                            USD
+  address: "P.O. Box 1110, Valley Forge, PA 19482-1110"
+  institution: "Vanguard Group"
+  phone: "+1.800.523.1188"
+2022-01-01 open Income:US:Hooli:Match401k                   USD
+2022-01-01 open Assets:US:Vanguard:Cash                       USD
+  number: "882882"
+
+2022-01-07 * "Employer match for contribution"
+  Assets:US:Vanguard:Cash                          600.00 USD
+  Income:US:Hooli:Match401k                       -600.00 USD
+
+2022-01-10 * "Investing 40% of cash in VBMPX"
+  Assets:US:Vanguard:VBMPX                          3.970 VBMPX {120.91 USD, 2022-01-10}
+  Assets:US:Vanguard:Cash                         -480.01 USD
+
+2022-01-10 * "Investing 60% of cash in RGAGX"
+  Assets:US:Vanguard:RGAGX                          9.896 RGAGX {72.76 USD, 2022-01-10}
+  Assets:US:Vanguard:Cash                         -720.03 USD
+
+2022-01-10 * "Investing 40% of cash in VBMPX"
+  Assets:US:Vanguard:VBMPX                          1.985 VBMPX {120.91 USD, 2022-01-10}
+  Assets:US:Vanguard:Cash                         -240.01 USD
+
+2022-01-10 * "Investing 60% of cash in RGAGX"
+  Assets:US:Vanguard:RGAGX                          4.947 RGAGX {72.76 USD, 2022-01-10}
+  Assets:US:Vanguard:Cash                         -359.94 USD
+
+2022-01-21 * "Employer match for contribution"
+  Assets:US:Vanguard:Cash                          600.00 USD
+  Income:US:Hooli:Match401k                       -600.00 USD
+
+2022-01-24 * "Investing 40% of cash in VBMPX"
+  Assets:US:Vanguard:VBMPX                          3.904 VBMPX {122.94 USD, 2022-01-24}
+  Assets:US:Vanguard:Cash                         -479.96 USD
+
+2022-01-24 * "Investing 60% of cash in RGAGX"
+  Assets:US:Vanguard:RGAGX                          9.901 RGAGX {72.72 USD, 2022-01-24}
+  Assets:US:Vanguard:Cash                         -720.00 USD
+
+2022-01-24 * "Investing 40% of cash in VBMPX"
+  Assets:US:Vanguard:VBMPX                          1.952 VBMPX {122.94 USD, 2022-01-24}
+  Assets:US:Vanguard:Cash                         -239.98 USD
+
+2022-01-24 * "Investing 60% of cash in RGAGX"
+  Assets:US:Vanguard:RGAGX                          4.951 RGAGX {72.72 USD, 2022-01-24}
+  Assets:US:Vanguard:Cash                         -360.04 USD
+
+
+
+* Sources of Income
+
+2022-01-01 open Income:US:Hooli:Salary                      USD
+2022-01-01 open Income:US:Hooli:GroupTermLife               USD
+2022-01-01 open Income:US:Hooli:Vacation                    VACHR
+2022-01-01 open Assets:US:Hooli:Vacation                    VACHR
+2022-01-01 open Expenses:Vacation                               VACHR
+2022-01-01 open Expenses:Health:Life:GroupTermLife
+2022-01-01 open Expenses:Health:Medical:Insurance
+2022-01-01 open Expenses:Health:Dental:Insurance
+2022-01-01 open Expenses:Health:Vision:Insurance
+
+2022-01-01 event "employer" "Hooli, 1 Carloston Rd, Mountain Beer, CA"
+
+2022-01-06 * "Hooli" "Payroll"
+  Assets:US:BofA:Checking                         1350.60 USD
+  Assets:US:Vanguard:Cash                         1200.00 USD
+  Income:US:Hooli:Salary                         -4615.38 USD
+  Income:US:Hooli:GroupTermLife                    -24.32 USD
+  Expenses:Health:Life:GroupTermLife                24.32 USD
+  Expenses:Health:Dental:Insurance                   2.90 USD
+  Expenses:Health:Medical:Insurance                 27.38 USD
+  Expenses:Health:Vision:Insurance                  42.30 USD
+  Expenses:Taxes:Y2022:US:Medicare                 106.62 USD
+  Expenses:Taxes:Y2022:US:Federal                 1062.92 USD
+  Expenses:Taxes:Y2022:US:State                    365.08 USD
+  Expenses:Taxes:Y2022:US:CityNYC                  174.92 USD
+  Expenses:Taxes:Y2022:US:SDI                        1.12 USD
+  Expenses:Taxes:Y2022:US:SocSec                   281.54 USD
+  Assets:US:Federal:PreTax401k                   -1200.00 IRAUSD
+  Expenses:Taxes:Y2022:US:Federal:PreTax401k      1200.00 IRAUSD
+  Assets:US:Hooli:Vacation                              5 VACHR
+  Income:US:Hooli:Vacation                             -5 VACHR
+
+2022-01-20 * "Hooli" "Payroll"
+  Assets:US:BofA:Checking                         1350.60 USD
+  Assets:US:Vanguard:Cash                         1200.00 USD
+  Income:US:Hooli:Salary                         -4615.38 USD
+  Income:US:Hooli:GroupTermLife                    -24.32 USD
+  Expenses:Health:Life:GroupTermLife                24.32 USD
+  Expenses:Health:Dental:Insurance                   2.90 USD
+  Expenses:Health:Medical:Insurance                 27.38 USD
+  Expenses:Health:Vision:Insurance                  42.30 USD
+  Expenses:Taxes:Y2022:US:Medicare                 106.62 USD
+  Expenses:Taxes:Y2022:US:Federal                 1062.92 USD
+  Expenses:Taxes:Y2022:US:State                    365.08 USD
+  Expenses:Taxes:Y2022:US:CityNYC                  174.92 USD
+  Expenses:Taxes:Y2022:US:SDI                        1.12 USD
+  Expenses:Taxes:Y2022:US:SocSec                   281.54 USD
+  Assets:US:Federal:PreTax401k                   -1200.00 IRAUSD
+  Expenses:Taxes:Y2022:US:Federal:PreTax401k      1200.00 IRAUSD
+  Assets:US:Hooli:Vacation                              5 VACHR
+  Income:US:Hooli:Vacation                             -5 VACHR
+
+
+
+* Taxes
+
+1980-05-12 open Income:US:Federal:PreTax401k                    IRAUSD
+1980-05-12 open Assets:US:Federal:PreTax401k                    IRAUSD
+
+
+
+** Tax Year 2022
+
+2022-01-01 open Expenses:Taxes:Y2022:US:Federal:PreTax401k      IRAUSD
+2022-01-01 open Expenses:Taxes:Y2022:US:Medicare                USD
+2022-01-01 open Expenses:Taxes:Y2022:US:Federal                 USD
+2022-01-01 open Expenses:Taxes:Y2022:US:CityNYC                 USD
+2022-01-01 open Expenses:Taxes:Y2022:US:SDI                     USD
+2022-01-01 open Expenses:Taxes:Y2022:US:State                   USD
+2022-01-01 open Expenses:Taxes:Y2022:US:SocSec                  USD
+
+2022-01-01 balance Assets:US:Federal:PreTax401k         0 IRAUSD
+
+2022-01-01 * "Allowed contributions for one year"
+  Income:US:Federal:PreTax401k                     -18500 IRAUSD
+  Assets:US:Federal:PreTax401k                      18500 IRAUSD
+
+
+
+* Expenses
+
+1980-05-12 open Expenses:Food:Groceries
+1980-05-12 open Expenses:Food:Restaurant
+1980-05-12 open Expenses:Food:Coffee
+1980-05-12 open Expenses:Food:Alcohol
+1980-05-12 open Expenses:Transport:Tram
+1980-05-12 open Expenses:Home:Rent
+1980-05-12 open Expenses:Home:Electricity
+1980-05-12 open Expenses:Home:Internet
+1980-05-12 open Expenses:Home:Phone
+1980-05-12 open Expenses:Financial:Fees
+1980-05-12 open Expenses:Financial:Commissions
+
+
+
+* Prices
+
+2022-01-07 price VBMPX                             120.91 USD
+2022-01-07 price RGAGX                              72.76 USD
+2022-01-07 price ITOT                               75.18 USD
+2022-01-07 price VEA                               100.89 USD
+2022-01-07 price VHT                                68.24 USD
+2022-01-07 price GLD                                46.78 USD
+2022-01-14 price VBMPX                             122.29 USD
+2022-01-14 price RGAGX                              72.79 USD
+2022-01-14 price ITOT                               75.40 USD
+2022-01-14 price VEA                                99.94 USD
+2022-01-14 price VHT                                67.69 USD
+2022-01-14 price GLD                                47.21 USD
+2022-01-21 price VBMPX                             122.94 USD
+2022-01-21 price RGAGX                              72.72 USD
+2022-01-21 price ITOT                               77.37 USD
+2022-01-21 price VEA                               100.70 USD
+2022-01-21 price VHT                                68.03 USD
+2022-01-21 price GLD                                45.38 USD
+2022-01-28 price VBMPX                             124.43 USD
+2022-01-28 price RGAGX                              73.35 USD
+2022-01-28 price ITOT                               78.51 USD
+2022-01-28 price VEA                               100.97 USD
+2022-01-28 price VHT                                68.22 USD
+2022-01-28 price GLD                                44.95 USD
+
+
+
+* Cash
+

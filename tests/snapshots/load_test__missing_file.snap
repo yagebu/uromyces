@@ -1,0 +1,46 @@
+---
+source: tests/load_test.rs
+expression: ledger
+---
+{
+  "filename": "[REPO_DIR]/tests/ledgers/non-existent-file-missing.beancount",
+  "entries": [],
+  "errors": [
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/non-existent-file-missing.beancount",
+      "line": null,
+      "message": "Could not read file due to IO error: No such file or directory (os error 2)"
+    }
+  ],
+  "options": {
+    "title": "",
+    "root_accounts": {
+      "assets": "Assets",
+      "liabilities": "Liabilities",
+      "equity": "Equity",
+      "income": "Income",
+      "expenses": "Expenses"
+    },
+    "account_current_conversions": "Conversions:Current",
+    "account_current_earnings": "Earnings:Current",
+    "account_previous_balances": "Conversions:Previous",
+    "account_previous_conversions": "Earnings:Previous",
+    "account_previous_earnings": "Opening-Balances",
+    "render_commas": false,
+    "operating_currency": [],
+    "conversion_currency": "NOTHING",
+    "documents": [],
+    "booking_method": "Strict",
+    "inferred_tolerance_default": {
+      "map": {},
+      "default": "0"
+    },
+    "inferred_tolerance_multiplier": "0.5",
+    "infer_tolerance_from_cost": false,
+    "insert_pythonpath": false
+  },
+  "includes": [
+    "[REPO_DIR]/tests/ledgers/non-existent-file-missing.beancount"
+  ],
+  "plugins": []
+}

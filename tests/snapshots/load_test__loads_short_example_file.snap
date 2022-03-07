@@ -1,0 +1,2202 @@
+---
+source: tests/load_test.rs
+expression: ledger
+---
+{
+  "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+  "entries": [
+    {
+      "t": "Commodity",
+      "header": {
+        "date": "1792-01-01",
+        "meta": [
+          {
+            "key": "name",
+            "value": {
+              "String": "US Dollar"
+            }
+          }
+        ],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 9
+      },
+      "currency": "USD"
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 17
+      },
+      "account": "Equity:Opening-Balances",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 18
+      },
+      "account": "Liabilities:AccountsPayable",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 21
+      },
+      "account": "Expenses:Food:Groceries",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 22
+      },
+      "account": "Expenses:Food:Restaurant",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 23
+      },
+      "account": "Expenses:Food:Coffee",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 24
+      },
+      "account": "Expenses:Food:Alcohol",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 25
+      },
+      "account": "Expenses:Transport:Tram",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 26
+      },
+      "account": "Expenses:Home:Rent",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 27
+      },
+      "account": "Expenses:Home:Electricity",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 28
+      },
+      "account": "Expenses:Home:Internet",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 29
+      },
+      "account": "Expenses:Home:Phone",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 30
+      },
+      "account": "Expenses:Financial",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 73
+      },
+      "account": "Liabilities:US:Chase:Slate",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 203
+      },
+      "account": "Income:US:Federal:PreTax401k",
+      "currencies": [
+        "IRAUSD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "1980-05-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 204
+      },
+      "account": "Assets:US:Federal:PreTax401k",
+      "currencies": [
+        "IRAUSD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Commodity",
+      "header": {
+        "date": "1999-01-01",
+        "meta": [
+          {
+            "key": "name",
+            "value": {
+              "String": "Euro"
+            }
+          }
+        ],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 12
+      },
+      "currency": "EUR"
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [
+          {
+            "key": "address",
+            "value": {
+              "String": "123 America Street, LargeTown, USA"
+            }
+          },
+          {
+            "key": "institution",
+            "value": {
+              "String": "Bank of America"
+            }
+          },
+          {
+            "key": "phone",
+            "value": {
+              "String": "+1.012.345.6789"
+            }
+          }
+        ],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 33
+      },
+      "account": "Assets:US:BofA",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [
+          {
+            "key": "account",
+            "value": {
+              "String": "00234-48574897"
+            }
+          }
+        ],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 37
+      },
+      "account": "Assets:US:BofA:Checking",
+      "currencies": [
+        "USD",
+        "EUR"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 130
+      },
+      "account": "Assets:US:ETrade:Cash",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 131
+      },
+      "account": "Assets:US:ETrade:ITOT",
+      "currencies": [
+        "ITOT"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 132
+      },
+      "account": "Assets:US:ETrade:VEA",
+      "currencies": [
+        "VEA"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 133
+      },
+      "account": "Assets:US:ETrade:VHT",
+      "currencies": [
+        "VHT"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 134
+      },
+      "account": "Assets:US:ETrade:GLD",
+      "currencies": [
+        "GLD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 135
+      },
+      "account": "Income:US:ETrade:PnL",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 136
+      },
+      "account": "Income:US:ETrade:ITOT:Dividend",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 137
+      },
+      "account": "Income:US:ETrade:VEA:Dividend",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 138
+      },
+      "account": "Income:US:ETrade:VHT:Dividend",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 139
+      },
+      "account": "Income:US:ETrade:GLD:Dividend",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 147
+      },
+      "account": "Income:US:Hooli:Salary",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 148
+      },
+      "account": "Income:US:Hooli:GroupTermLife",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 149
+      },
+      "account": "Income:US:Hooli:Vacation",
+      "currencies": [
+        "VACHR"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 150
+      },
+      "account": "Assets:US:Hooli:Vacation",
+      "currencies": [
+        "VACHR"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 151
+      },
+      "account": "Expenses:Vacation",
+      "currencies": [
+        "VACHR"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 152
+      },
+      "account": "Expenses:Health:Life:GroupTermLife",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 153
+      },
+      "account": "Expenses:Health:Medical:Insurance",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 154
+      },
+      "account": "Expenses:Health:Dental:Insurance",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 155
+      },
+      "account": "Expenses:Health:Vision:Insurance",
+      "currencies": [],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 210
+      },
+      "account": "Expenses:Taxes:Y2022:US:Federal:PreTax401k",
+      "currencies": [
+        "IRAUSD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 211
+      },
+      "account": "Expenses:Taxes:Y2022:US:Medicare",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 212
+      },
+      "account": "Expenses:Taxes:Y2022:US:Federal",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 213
+      },
+      "account": "Expenses:Taxes:Y2022:US:CityNYC",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 214
+      },
+      "account": "Expenses:Taxes:Y2022:US:SDI",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 215
+      },
+      "account": "Expenses:Taxes:Y2022:US:State",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Open",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 216
+      },
+      "account": "Expenses:Taxes:Y2022:US:SocSec",
+      "currencies": [
+        "USD"
+      ],
+      "booking": null
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 218
+      },
+      "account": "Assets:US:Federal:PreTax401k",
+      "amount": {
+        "number": "0",
+        "currency": "IRAUSD"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 40
+      },
+      "flag": "*",
+      "payee": null,
+      "narration": "Opening Balance for checking account",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 41,
+          "meta": [],
+          "account": "Assets:US:BofA:Checking",
+          "flag": null,
+          "units": {
+            "number": "2404.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 42,
+          "meta": [],
+          "account": "Equity:Opening-Balances",
+          "flag": null,
+          "units": {
+            "number": "-2404.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Event",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 157
+      },
+      "type": "employer",
+      "description": "Hooli, 1 Carloston Rd, Mountain Beer, CA"
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 220
+      },
+      "flag": "*",
+      "payee": null,
+      "narration": "Allowed contributions for one year",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 221,
+          "meta": [],
+          "account": "Income:US:Federal:PreTax401k",
+          "flag": null,
+          "units": {
+            "number": "-18500",
+            "currency": "IRAUSD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 222,
+          "meta": [],
+          "account": "Assets:US:Federal:PreTax401k",
+          "flag": null,
+          "units": {
+            "number": "18500",
+            "currency": "IRAUSD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2022-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 45
+      },
+      "account": "Assets:US:BofA:Checking",
+      "amount": {
+        "number": "2404.00",
+        "currency": "USD"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2022-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 47
+      },
+      "account": "Assets:US:BofA:Checking",
+      "amount": {
+        "number": "2404.00",
+        "currency": "USD"
+      },
+      "tolerance": "0.0001"
+    },
+    {
+      "t": "Note",
+      "header": {
+        "date": "2022-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 44
+      },
+      "account": "Assets:US:BofA:Checking",
+      "comment": "Some note"
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2022-01-03",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 46
+      },
+      "account": "Assets:US:BofA:Checking",
+      "amount": {
+        "number": "2404.00",
+        "currency": "USD"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-04",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 49
+      },
+      "flag": "*",
+      "payee": "BANK FEES",
+      "narration": "Monthly bank fee",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 50,
+          "meta": [],
+          "account": "Assets:US:BofA:Checking",
+          "flag": null,
+          "units": {
+            "number": "-4.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 51,
+          "meta": [],
+          "account": "Expenses:Financial:Fees",
+          "flag": null,
+          "units": {
+            "number": "4.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-04",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 53
+      },
+      "flag": "*",
+      "payee": "RiverBank Properties",
+      "narration": "Paying the rent",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 54,
+          "meta": [],
+          "account": "Assets:US:BofA:Checking",
+          "flag": null,
+          "units": {
+            "number": "-2400.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 55,
+          "meta": [],
+          "account": "Expenses:Home:Rent",
+          "flag": null,
+          "units": {
+            "number": "2400.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-04",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 76
+      },
+      "flag": "*",
+      "payee": "Rose Flower",
+      "narration": "Eating out alone",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 77,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-12.81",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 78,
+          "meta": [],
+          "account": "Expenses:Food:Restaurant",
+          "flag": null,
+          "units": {
+            "number": "12.81",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-06",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 159
+      },
+      "flag": "*",
+      "payee": "Hooli",
+      "narration": "Payroll",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 160,
+          "meta": [],
+          "account": "Assets:US:BofA:Checking",
+          "flag": null,
+          "units": {
+            "number": "1350.60",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 161,
+          "meta": [],
+          "account": "Assets:US:Vanguard:Cash",
+          "flag": null,
+          "units": {
+            "number": "1200.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 162,
+          "meta": [],
+          "account": "Income:US:Hooli:Salary",
+          "flag": null,
+          "units": {
+            "number": "-4615.38",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 163,
+          "meta": [],
+          "account": "Income:US:Hooli:GroupTermLife",
+          "flag": null,
+          "units": {
+            "number": "-24.32",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 164,
+          "meta": [],
+          "account": "Expenses:Health:Life:GroupTermLife",
+          "flag": null,
+          "units": {
+            "number": "24.32",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 165,
+          "meta": [],
+          "account": "Expenses:Health:Dental:Insurance",
+          "flag": null,
+          "units": {
+            "number": "2.90",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 166,
+          "meta": [],
+          "account": "Expenses:Health:Medical:Insurance",
+          "flag": null,
+          "units": {
+            "number": "27.38",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 167,
+          "meta": [],
+          "account": "Expenses:Health:Vision:Insurance",
+          "flag": null,
+          "units": {
+            "number": "42.30",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 168,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:Medicare",
+          "flag": null,
+          "units": {
+            "number": "106.62",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 169,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:Federal",
+          "flag": null,
+          "units": {
+            "number": "1062.92",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 170,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:State",
+          "flag": null,
+          "units": {
+            "number": "365.08",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 171,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:CityNYC",
+          "flag": null,
+          "units": {
+            "number": "174.92",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 172,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:SDI",
+          "flag": null,
+          "units": {
+            "number": "1.12",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 173,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:SocSec",
+          "flag": null,
+          "units": {
+            "number": "281.54",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 174,
+          "meta": [],
+          "account": "Assets:US:Federal:PreTax401k",
+          "flag": null,
+          "units": {
+            "number": "-1200.00",
+            "currency": "IRAUSD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 175,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:Federal:PreTax401k",
+          "flag": null,
+          "units": {
+            "number": "1200.00",
+            "currency": "IRAUSD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 176,
+          "meta": [],
+          "account": "Assets:US:Hooli:Vacation",
+          "flag": null,
+          "units": {
+            "number": "5",
+            "currency": "VACHR"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 177,
+          "meta": [],
+          "account": "Income:US:Hooli:Vacation",
+          "flag": null,
+          "units": {
+            "number": "-5",
+            "currency": "VACHR"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-07",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 80
+      },
+      "flag": "*",
+      "payee": "Cafe Modagor",
+      "narration": "Eating out with Natasha",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 81,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-27.74",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 82,
+          "meta": [],
+          "account": "Expenses:Food:Restaurant",
+          "flag": null,
+          "units": {
+            "number": "27.74",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-08",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 84
+      },
+      "flag": "*",
+      "payee": "Farmer Fresh",
+      "narration": "Buying groceries",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 85,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-70.30",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 86,
+          "meta": [],
+          "account": "Expenses:Food:Groceries",
+          "flag": null,
+          "units": {
+            "number": "70.30",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-09",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 57
+      },
+      "flag": "*",
+      "payee": "EDISON POWER",
+      "narration": "",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 58,
+          "meta": [],
+          "account": "Assets:US:BofA:Checking",
+          "flag": null,
+          "units": {
+            "number": "-65.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 59,
+          "meta": [],
+          "account": "Expenses:Home:Electricity",
+          "flag": null,
+          "units": {
+            "number": "65.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-12",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 88
+      },
+      "flag": "*",
+      "payee": "Goba Goba",
+      "narration": "Eating out ",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 89,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-28.94",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 90,
+          "meta": [],
+          "account": "Expenses:Food:Restaurant",
+          "flag": null,
+          "units": {
+            "number": "28.94",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-16",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 92
+      },
+      "flag": "*",
+      "payee": "Chichipotle",
+      "narration": "Eating out with Joe",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 93,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-40.83",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 94,
+          "meta": [],
+          "account": "Expenses:Food:Restaurant",
+          "flag": null,
+          "units": {
+            "number": "40.83",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-17",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 96
+      },
+      "flag": "*",
+      "payee": "Rose Flower",
+      "narration": "Eating out ",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 97,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-36.15",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 98,
+          "meta": [],
+          "account": "Expenses:Food:Restaurant",
+          "flag": null,
+          "units": {
+            "number": "36.15",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-19",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 61
+      },
+      "flag": "*",
+      "payee": "Verizon Wireless",
+      "narration": "",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 62,
+          "meta": [],
+          "account": "Assets:US:BofA:Checking",
+          "flag": null,
+          "units": {
+            "number": "-77.11",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 63,
+          "meta": [],
+          "account": "Expenses:Home:Phone",
+          "flag": null,
+          "units": {
+            "number": "77.11",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-20",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 179
+      },
+      "flag": "*",
+      "payee": "Hooli",
+      "narration": "Payroll",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 180,
+          "meta": [],
+          "account": "Assets:US:BofA:Checking",
+          "flag": null,
+          "units": {
+            "number": "1350.60",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 181,
+          "meta": [],
+          "account": "Assets:US:Vanguard:Cash",
+          "flag": null,
+          "units": {
+            "number": "1200.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 182,
+          "meta": [],
+          "account": "Income:US:Hooli:Salary",
+          "flag": null,
+          "units": {
+            "number": "-4615.38",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 183,
+          "meta": [],
+          "account": "Income:US:Hooli:GroupTermLife",
+          "flag": null,
+          "units": {
+            "number": "-24.32",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 184,
+          "meta": [],
+          "account": "Expenses:Health:Life:GroupTermLife",
+          "flag": null,
+          "units": {
+            "number": "24.32",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 185,
+          "meta": [],
+          "account": "Expenses:Health:Dental:Insurance",
+          "flag": null,
+          "units": {
+            "number": "2.90",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 186,
+          "meta": [],
+          "account": "Expenses:Health:Medical:Insurance",
+          "flag": null,
+          "units": {
+            "number": "27.38",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 187,
+          "meta": [],
+          "account": "Expenses:Health:Vision:Insurance",
+          "flag": null,
+          "units": {
+            "number": "42.30",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 188,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:Medicare",
+          "flag": null,
+          "units": {
+            "number": "106.62",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 189,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:Federal",
+          "flag": null,
+          "units": {
+            "number": "1062.92",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 190,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:State",
+          "flag": null,
+          "units": {
+            "number": "365.08",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 191,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:CityNYC",
+          "flag": null,
+          "units": {
+            "number": "174.92",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 192,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:SDI",
+          "flag": null,
+          "units": {
+            "number": "1.12",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 193,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:SocSec",
+          "flag": null,
+          "units": {
+            "number": "281.54",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 194,
+          "meta": [],
+          "account": "Assets:US:Federal:PreTax401k",
+          "flag": null,
+          "units": {
+            "number": "-1200.00",
+            "currency": "IRAUSD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 195,
+          "meta": [],
+          "account": "Expenses:Taxes:Y2022:US:Federal:PreTax401k",
+          "flag": null,
+          "units": {
+            "number": "1200.00",
+            "currency": "IRAUSD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 196,
+          "meta": [],
+          "account": "Assets:US:Hooli:Vacation",
+          "flag": null,
+          "units": {
+            "number": "5",
+            "currency": "VACHR"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 197,
+          "meta": [],
+          "account": "Income:US:Hooli:Vacation",
+          "flag": null,
+          "units": {
+            "number": "-5",
+            "currency": "VACHR"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-21",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 65
+      },
+      "flag": "*",
+      "payee": "Wine-Tarner Cable",
+      "narration": "",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 66,
+          "meta": [],
+          "account": "Assets:US:BofA:Checking",
+          "flag": null,
+          "units": {
+            "number": "-79.84",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 67,
+          "meta": [],
+          "account": "Expenses:Home:Internet",
+          "flag": null,
+          "units": {
+            "number": "79.84",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Balance",
+      "header": {
+        "date": "2022-01-22",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 100
+      },
+      "account": "Liabilities:US:Chase:Slate",
+      "amount": {
+        "number": "-216.77",
+        "currency": "USD"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-22",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 102
+      },
+      "flag": "*",
+      "payee": "Jewel of Morroco",
+      "narration": "Eating out ",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 103,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-30.13",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 104,
+          "meta": [],
+          "account": "Expenses:Food:Restaurant",
+          "flag": null,
+          "units": {
+            "number": "30.13",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-24",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 106
+      },
+      "flag": "*",
+      "payee": "Corner Deli",
+      "narration": "Buying groceries",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 107,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-82.93",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 108,
+          "meta": [],
+          "account": "Expenses:Food:Groceries",
+          "flag": null,
+          "units": {
+            "number": "82.93",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-25",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 110
+      },
+      "flag": "*",
+      "payee": "Chichipotle",
+      "narration": "Eating out with Joe",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 111,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-23.05",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 112,
+          "meta": [],
+          "account": "Expenses:Food:Restaurant",
+          "flag": null,
+          "units": {
+            "number": "23.05",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-27",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 114
+      },
+      "flag": "*",
+      "payee": "Cafe Modagor",
+      "narration": "Eating out alone",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 115,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-28.63",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 116,
+          "meta": [],
+          "account": "Expenses:Food:Restaurant",
+          "flag": null,
+          "units": {
+            "number": "28.63",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-29",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 118
+      },
+      "flag": "*",
+      "payee": "Metro Transport Authority",
+      "narration": "Tram tickets",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 119,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-120.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 120,
+          "meta": [],
+          "account": "Expenses:Transport:Tram",
+          "flag": null,
+          "units": {
+            "number": "120.00",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Transaction",
+      "header": {
+        "date": "2022-01-31",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 122
+      },
+      "flag": "*",
+      "payee": "Cafe Modagor",
+      "narration": "Eating out with Natasha",
+      "postings": [
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 123,
+          "meta": [],
+          "account": "Liabilities:US:Chase:Slate",
+          "flag": null,
+          "units": {
+            "number": "-45.04",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        },
+        {
+          "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+          "line": 124,
+          "meta": [],
+          "account": "Expenses:Food:Restaurant",
+          "flag": null,
+          "units": {
+            "number": "45.04",
+            "currency": "USD"
+          },
+          "price": null,
+          "cost": null
+        }
+      ]
+    },
+    {
+      "t": "Close",
+      "header": {
+        "date": "2022-02-04",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 74
+      },
+      "account": "Liabilities:US:Chase:Slate"
+    }
+  ],
+  "errors": [
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+      "line": 49,
+      "message": "Invalid reference to unknown account Expenses:Financial:Fees."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+      "line": 159,
+      "message": "Invalid reference to unknown account Assets:US:Vanguard:Cash."
+    },
+    {
+      "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+      "line": 179,
+      "message": "Invalid reference to unknown account Assets:US:Vanguard:Cash."
+    }
+  ],
+  "options": {
+    "title": "A short Beancount file that should",
+    "root_accounts": {
+      "assets": "Assets",
+      "liabilities": "Liabilities",
+      "equity": "Equity",
+      "income": "Income",
+      "expenses": "Expenses"
+    },
+    "account_current_conversions": "Conversions:Current",
+    "account_current_earnings": "Earnings:Current",
+    "account_previous_balances": "Conversions:Previous",
+    "account_previous_conversions": "Earnings:Previous",
+    "account_previous_earnings": "Opening-Balances",
+    "render_commas": false,
+    "operating_currency": [
+      "USD",
+      "EUR"
+    ],
+    "conversion_currency": "NOTHING",
+    "documents": [],
+    "booking_method": "Strict",
+    "inferred_tolerance_default": {
+      "map": {
+        "EUR": "0.005"
+      },
+      "default": "0"
+    },
+    "inferred_tolerance_multiplier": "0.5",
+    "infer_tolerance_from_cost": false,
+    "insert_pythonpath": false
+  },
+  "includes": [
+    "[REPO_DIR]/tests/ledgers/short-example.beancount"
+  ],
+  "plugins": []
+}

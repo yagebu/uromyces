@@ -1,0 +1,36 @@
+---
+source: src/parse/tests.rs
+expression: parse_string(&input)
+input_file: src/parse/test_inputs/directives.beancount
+---
+ParsedFile {
+    entries: [],
+    errors: [],
+    directives: [
+        Option {
+            filename: None,
+            line: 1,
+            key: "name",
+            value: "file name",
+        },
+        Option {
+            filename: None,
+            line: 3,
+            key: "name_assets",
+            value: "AssetsRootAccount",
+        },
+        Include {
+            pattern: "./transactions.beancount",
+        },
+        Plugin {
+            name: "beancount.plugins.implicit_prices",
+            config: None,
+        },
+        Plugin {
+            name: "another_plugin",
+            config: Some(
+                "with_config",
+            ),
+        },
+    ],
+}

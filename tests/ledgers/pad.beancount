@@ -1,0 +1,7 @@
+2002-01-17 open Equity:Opening-Balances
+2002-01-17 open Assets:US:BofA:Checking
+
+2002-01-17 pad Assets:US:BofA:Checking Equity:Opening-Balances
+
+2014-07-09 balance Assets:US:BofA:Checking  987.34 USD
+

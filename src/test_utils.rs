@@ -1,0 +1,30 @@
+use std::str::FromStr;
+
+use crate::types::{Amount, Currency, Decimal, RawEntry, RawPosting};
+
+/// Test helper to create a Currence from a string like `EUR`
+pub fn c(cur: &str) -> Currency {
+    cur.into()
+}
+
+/// Test helper to create a Decimal from a string like `4.00`
+pub fn d(dec: &str) -> Decimal {
+    Decimal::from_str_exact(dec).unwrap()
+}
+
+/// Test helper to create an Amount from a string like `4.00 USD`
+pub fn a(amt: &str) -> Amount {
+    Amount::from_str(amt).unwrap()
+}
+
+/// Create postings from a slice of string slices.
+pub fn postings_from_strings(postings: &[&str]) -> Vec<RawPosting> {
+    let string = "2000-01-01 *\n ".to_owned() + &postings.join("\n ") + "\n";
+    let mut res = crate::parse::parse_string(&string, &None);
+    assert_eq!(res.entries.len(), 1);
+    let entry = res.entries.pop().unwrap();
+    match entry {
+        RawEntry::Transaction(t) => t.postings,
+        _ => panic!("expected transaction"),
+    }
+}
