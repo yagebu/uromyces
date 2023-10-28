@@ -56,7 +56,7 @@ fn close_positions(
 ) -> Result<(), BookingError> {
     let mut additional_postings = Vec::new();
 
-    for posting in postings.iter_mut() {
+    for posting in &mut *postings {
         debug_assert!(posting.units.currency.is_some());
         if posting.cost.is_none() || posting.units.number.is_none() {
             continue;

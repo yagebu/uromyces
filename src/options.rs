@@ -122,7 +122,7 @@ impl BeancountOptions {
             }
             "booking_method" => {
                 self.booking_method = Booking::try_from(value)
-                    .map_err(|_| BeancountOptionError::InvalidBookingMethod)?;
+                    .map_err(|()| BeancountOptionError::InvalidBookingMethod)?;
             }
             "account_rounding" => {
                 // TODO handle account_rounding

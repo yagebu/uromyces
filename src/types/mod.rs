@@ -581,7 +581,7 @@ impl RawEntry {
 
 impl PartialOrd for RawEntry {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.sort_key().partial_cmp(&other.sort_key())
+        Some(self.cmp(other))
     }
 }
 
@@ -593,7 +593,7 @@ impl Ord for RawEntry {
 
 impl PartialOrd for Entry {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.sort_key().partial_cmp(&other.sort_key())
+        Some(self.cmp(other))
     }
 }
 
