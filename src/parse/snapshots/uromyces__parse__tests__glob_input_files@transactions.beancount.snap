@@ -3,647 +3,381 @@ source: src/parse/tests.rs
 expression: "super::parse_string(&input, &None)"
 input_file: src/parse/test_inputs/transactions.beancount
 ---
-ParsedFile {
-    entries: [
-        Transaction(
-            RawTransaction {
-                header: EntryHeader {
-                    date: Date(
-                        "2022-01-10",
-                    ),
-                    meta: [],
-                    tags: TagsLinks(
-                        [],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 1,
-                },
-                flag: '*',
-                payee: None,
-                narration: Some(
-                    "Investing 60% of cash in RGAGX",
-                ),
-                postings: [
-                    RawPosting {
-                        filename: None,
-                        line: 2,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:RGAGX",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                4.947,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "RGAGX",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: Some(
-                            CostSpec {
-                                number_per: Some(
-                                    72.76,
-                                ),
-                                number_total: None,
-                                currency: Some(
-                                    Currency(
-                                        "USD",
-                                    ),
-                                ),
-                                date: Some(
-                                    Date(
-                                        "2022-01-10",
-                                    ),
-                                ),
-                                label: None,
-                                merge: false,
-                            },
-                        ),
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 3,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:RGAGX",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                4.947,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "TEST",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: Some(
-                            CostSpec {
-                                number_per: None,
-                                number_total: None,
-                                currency: None,
-                                date: None,
-                                label: None,
-                                merge: true,
-                            },
-                        ),
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 4,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:RGAGX",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                4.947,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "TEST",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: Some(
-                            CostSpec {
-                                number_per: Some(
-                                    20.00,
-                                ),
-                                number_total: Some(
-                                    100,
-                                ),
-                                currency: Some(
-                                    Currency(
-                                        "USD",
-                                    ),
-                                ),
-                                date: None,
-                                label: None,
-                                merge: false,
-                            },
-                        ),
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 5,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:RGAGX",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                4.947,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "TEST",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: Some(
-                            CostSpec {
-                                number_per: Some(
-                                    20.00,
-                                ),
-                                number_total: Some(
-                                    100,
-                                ),
-                                currency: Some(
-                                    Currency(
-                                        "USD",
-                                    ),
-                                ),
-                                date: None,
-                                label: Some(
-                                    "cost-label",
-                                ),
-                                merge: false,
-                            },
-                        ),
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 6,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:RGAGX",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                4.947,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "TEST",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: Some(
-                            CostSpec {
-                                number_per: None,
-                                number_total: None,
-                                currency: None,
-                                date: None,
-                                label: None,
-                                merge: false,
-                            },
-                        ),
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 7,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:RGAGX",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                4.947,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "TEST",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: Some(
-                            CostSpec {
-                                number_per: Some(
-                                    1,
-                                ),
-                                number_total: Some(
-                                    100,
-                                ),
-                                currency: Some(
-                                    Currency(
-                                        "USD",
-                                    ),
-                                ),
-                                date: None,
-                                label: None,
-                                merge: false,
-                            },
-                        ),
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 8,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:RGAGX",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                4.947,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "TEST",
-                                ),
-                            ),
-                        },
-                        price: Some(
-                            IncompleteAmount {
-                                number: Some(
-                                    10,
-                                ),
-                                currency: Some(
-                                    Currency(
-                                        "USD",
-                                    ),
-                                ),
-                            },
-                        ),
-                        cost: Some(
-                            CostSpec {
-                                number_per: Some(
-                                    1,
-                                ),
-                                number_total: Some(
-                                    100,
-                                ),
-                                currency: Some(
-                                    Currency(
-                                        "USD",
-                                    ),
-                                ),
-                                date: None,
-                                label: None,
-                                merge: false,
-                            },
-                        ),
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 9,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:RGAGX",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                4.947,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "TEST",
-                                ),
-                            ),
-                        },
-                        price: Some(
-                            IncompleteAmount {
-                                number: Some(
-                                    2.0214271275520517485344653325,
-                                ),
-                                currency: Some(
-                                    Currency(
-                                        "USD",
-                                    ),
-                                ),
-                            },
-                        ),
-                        cost: Some(
-                            CostSpec {
-                                number_per: Some(
-                                    1,
-                                ),
-                                number_total: Some(
-                                    100,
-                                ),
-                                currency: Some(
-                                    Currency(
-                                        "USD",
-                                    ),
-                                ),
-                                date: None,
-                                label: None,
-                                merge: false,
-                            },
-                        ),
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 10,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:Cash",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                -359.94,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "USD",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: None,
-                    },
-                ],
+{
+  "entries": [
+    {
+      "Transaction": {
+        "header": {
+          "date": "2022-01-10",
+          "meta": [],
+          "tags": [],
+          "links": [],
+          "filename": null,
+          "line": 1
+        },
+        "flag": "*",
+        "payee": null,
+        "narration": "Investing 60% of cash in RGAGX",
+        "postings": [
+          {
+            "filename": null,
+            "line": 2,
+            "meta": [],
+            "account": "Assets:US:Vanguard:RGAGX",
+            "flag": null,
+            "units": {
+              "number": "4.947",
+              "currency": "RGAGX"
             },
-        ),
-        Transaction(
-            RawTransaction {
-                header: EntryHeader {
-                    date: Date(
-                        "2022-01-21",
-                    ),
-                    meta: [
-                        MetaKeyValuePair {
-                            key: "info",
-                            value: Some(
-                                String(
-                                    "Some metadata",
-                                ),
-                            ),
-                        },
-                    ],
-                    tags: TagsLinks(
-                        [
-                            "tag",
-                            "another-tag",
-                        ],
-                    ),
-                    links: TagsLinks(
-                        [
-                            "link",
-                        ],
-                    ),
-                    filename: None,
-                    line: 12,
-                },
-                flag: '*',
-                payee: Some(
-                    "payee",
-                ),
-                narration: Some(
-                    "narration",
-                ),
-                postings: [
-                    RawPosting {
-                        filename: None,
-                        line: 14,
-                        meta: [
-                            MetaKeyValuePair {
-                                key: "posting_meta",
-                                value: Some(
-                                    String(
-                                        "testetss",
-                                    ),
-                                ),
-                            },
-                        ],
-                        account: Account(
-                            "Assets:US:Vanguard:Cash",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                600.00,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "USD",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: None,
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 16,
-                        meta: [],
-                        account: Account(
-                            "Income:US:Hooli:Match401k",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                -600.00,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "USD",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: None,
-                    },
-                ],
+            "price": null,
+            "cost": {
+              "number_per": "72.76",
+              "number_total": null,
+              "currency": "USD",
+              "date": "2022-01-10",
+              "label": null,
+              "merge": false
+            }
+          },
+          {
+            "filename": null,
+            "line": 3,
+            "meta": [],
+            "account": "Assets:US:Vanguard:RGAGX",
+            "flag": null,
+            "units": {
+              "number": "4.947",
+              "currency": "TEST"
             },
-        ),
-        Transaction(
-            RawTransaction {
-                header: EntryHeader {
-                    date: Date(
-                        "2022-01-21",
-                    ),
-                    meta: [
-                        MetaKeyValuePair {
-                            key: "asdf",
-                            value: Some(
-                                String(
-                                    "asdf",
-                                ),
-                            ),
-                        },
-                        MetaKeyValuePair {
-                            key: "info",
-                            value: Some(
-                                String(
-                                    "Some metadata",
-                                ),
-                            ),
-                        },
-                    ],
-                    tags: TagsLinks(
-                        [
-                            "tag",
-                        ],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 21,
-                },
-                flag: '*',
-                payee: None,
-                narration: Some(
-                    "narration",
-                ),
-                postings: [
-                    RawPosting {
-                        filename: None,
-                        line: 23,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:Cash",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                600.00,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "USD",
-                                ),
-                            ),
-                        },
-                        price: Some(
-                            IncompleteAmount {
-                                number: None,
-                                currency: Some(
-                                    Currency(
-                                        "EUR",
-                                    ),
-                                ),
-                            },
-                        ),
-                        cost: None,
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 24,
-                        meta: [],
-                        account: Account(
-                            "Income:US:Hooli:Match401k",
-                        ),
-                        flag: Some(
-                            '!',
-                        ),
-                        units: IncompleteAmount {
-                            number: Some(
-                                -400.00,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "EUR",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: None,
-                    },
-                ],
+            "price": null,
+            "cost": {
+              "number_per": null,
+              "number_total": null,
+              "currency": null,
+              "date": null,
+              "label": null,
+              "merge": true
+            }
+          },
+          {
+            "filename": null,
+            "line": 4,
+            "meta": [],
+            "account": "Assets:US:Vanguard:RGAGX",
+            "flag": null,
+            "units": {
+              "number": "4.947",
+              "currency": "TEST"
             },
-        ),
-        Transaction(
-            RawTransaction {
-                header: EntryHeader {
-                    date: Date(
-                        "2022-01-21",
-                    ),
-                    meta: [
-                        MetaKeyValuePair {
-                            key: "info",
-                            value: Some(
-                                String(
-                                    "Some metadata",
-                                ),
-                            ),
-                        },
-                    ],
-                    tags: TagsLinks(
-                        [],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 29,
-                },
-                flag: '*',
-                payee: None,
-                narration: Some(
-                    "narration",
-                ),
-                postings: [
-                    RawPosting {
-                        filename: None,
-                        line: 31,
-                        meta: [],
-                        account: Account(
-                            "Assets:US:Vanguard:Cash",
-                        ),
-                        flag: None,
-                        units: IncompleteAmount {
-                            number: Some(
-                                600.00,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "USD",
-                                ),
-                            ),
-                        },
-                        price: Some(
-                            IncompleteAmount {
-                                number: Some(
-                                    0.6666666666666666666666666667,
-                                ),
-                                currency: Some(
-                                    Currency(
-                                        "EUR",
-                                    ),
-                                ),
-                            },
-                        ),
-                        cost: None,
-                    },
-                    RawPosting {
-                        filename: None,
-                        line: 32,
-                        meta: [],
-                        account: Account(
-                            "Income:US:Hooli:Match401k",
-                        ),
-                        flag: Some(
-                            '!',
-                        ),
-                        units: IncompleteAmount {
-                            number: Some(
-                                -400.00,
-                            ),
-                            currency: Some(
-                                Currency(
-                                    "EUR",
-                                ),
-                            ),
-                        },
-                        price: None,
-                        cost: None,
-                    },
-                ],
+            "price": null,
+            "cost": {
+              "number_per": "20.00",
+              "number_total": "100",
+              "currency": "USD",
+              "date": null,
+              "label": null,
+              "merge": false
+            }
+          },
+          {
+            "filename": null,
+            "line": 5,
+            "meta": [],
+            "account": "Assets:US:Vanguard:RGAGX",
+            "flag": null,
+            "units": {
+              "number": "4.947",
+              "currency": "TEST"
             },
-        ),
-    ],
-    errors: [],
-    directives: [],
+            "price": null,
+            "cost": {
+              "number_per": "20.00",
+              "number_total": "100",
+              "currency": "USD",
+              "date": null,
+              "label": "cost-label",
+              "merge": false
+            }
+          },
+          {
+            "filename": null,
+            "line": 6,
+            "meta": [],
+            "account": "Assets:US:Vanguard:RGAGX",
+            "flag": null,
+            "units": {
+              "number": "4.947",
+              "currency": "TEST"
+            },
+            "price": null,
+            "cost": {
+              "number_per": null,
+              "number_total": null,
+              "currency": null,
+              "date": null,
+              "label": null,
+              "merge": false
+            }
+          },
+          {
+            "filename": null,
+            "line": 7,
+            "meta": [],
+            "account": "Assets:US:Vanguard:RGAGX",
+            "flag": null,
+            "units": {
+              "number": "4.947",
+              "currency": "TEST"
+            },
+            "price": null,
+            "cost": {
+              "number_per": "1",
+              "number_total": "100",
+              "currency": "USD",
+              "date": null,
+              "label": null,
+              "merge": false
+            }
+          },
+          {
+            "filename": null,
+            "line": 8,
+            "meta": [],
+            "account": "Assets:US:Vanguard:RGAGX",
+            "flag": null,
+            "units": {
+              "number": "4.947",
+              "currency": "TEST"
+            },
+            "price": {
+              "number": "10",
+              "currency": "USD"
+            },
+            "cost": {
+              "number_per": "1",
+              "number_total": "100",
+              "currency": "USD",
+              "date": null,
+              "label": null,
+              "merge": false
+            }
+          },
+          {
+            "filename": null,
+            "line": 9,
+            "meta": [],
+            "account": "Assets:US:Vanguard:RGAGX",
+            "flag": null,
+            "units": {
+              "number": "4.947",
+              "currency": "TEST"
+            },
+            "price": {
+              "number": "2.0214271275520517485344653325",
+              "currency": "USD"
+            },
+            "cost": {
+              "number_per": "1",
+              "number_total": "100",
+              "currency": "USD",
+              "date": null,
+              "label": null,
+              "merge": false
+            }
+          },
+          {
+            "filename": null,
+            "line": 10,
+            "meta": [],
+            "account": "Assets:US:Vanguard:Cash",
+            "flag": null,
+            "units": {
+              "number": "-359.94",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null
+          }
+        ]
+      }
+    },
+    {
+      "Transaction": {
+        "header": {
+          "date": "2022-01-21",
+          "meta": [
+            {
+              "key": "info",
+              "value": {
+                "String": "Some metadata"
+              }
+            }
+          ],
+          "tags": [
+            "tag",
+            "another-tag"
+          ],
+          "links": [
+            "link"
+          ],
+          "filename": null,
+          "line": 12
+        },
+        "flag": "*",
+        "payee": "payee",
+        "narration": "narration",
+        "postings": [
+          {
+            "filename": null,
+            "line": 14,
+            "meta": [
+              {
+                "key": "posting_meta",
+                "value": {
+                  "String": "testetss"
+                }
+              }
+            ],
+            "account": "Assets:US:Vanguard:Cash",
+            "flag": null,
+            "units": {
+              "number": "600.00",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null
+          },
+          {
+            "filename": null,
+            "line": 16,
+            "meta": [],
+            "account": "Income:US:Hooli:Match401k",
+            "flag": null,
+            "units": {
+              "number": "-600.00",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null
+          }
+        ]
+      }
+    },
+    {
+      "Transaction": {
+        "header": {
+          "date": "2022-01-21",
+          "meta": [
+            {
+              "key": "asdf",
+              "value": {
+                "String": "asdf"
+              }
+            },
+            {
+              "key": "info",
+              "value": {
+                "String": "Some metadata"
+              }
+            }
+          ],
+          "tags": [
+            "tag"
+          ],
+          "links": [],
+          "filename": null,
+          "line": 21
+        },
+        "flag": "*",
+        "payee": null,
+        "narration": "narration",
+        "postings": [
+          {
+            "filename": null,
+            "line": 23,
+            "meta": [],
+            "account": "Assets:US:Vanguard:Cash",
+            "flag": null,
+            "units": {
+              "number": "600.00",
+              "currency": "USD"
+            },
+            "price": {
+              "number": null,
+              "currency": "EUR"
+            },
+            "cost": null
+          },
+          {
+            "filename": null,
+            "line": 24,
+            "meta": [],
+            "account": "Income:US:Hooli:Match401k",
+            "flag": "!",
+            "units": {
+              "number": "-400.00",
+              "currency": "EUR"
+            },
+            "price": null,
+            "cost": null
+          }
+        ]
+      }
+    },
+    {
+      "Transaction": {
+        "header": {
+          "date": "2022-01-21",
+          "meta": [
+            {
+              "key": "info",
+              "value": {
+                "String": "Some metadata"
+              }
+            }
+          ],
+          "tags": [],
+          "links": [],
+          "filename": null,
+          "line": 29
+        },
+        "flag": "*",
+        "payee": null,
+        "narration": "narration",
+        "postings": [
+          {
+            "filename": null,
+            "line": 31,
+            "meta": [],
+            "account": "Assets:US:Vanguard:Cash",
+            "flag": null,
+            "units": {
+              "number": "600.00",
+              "currency": "USD"
+            },
+            "price": {
+              "number": "0.6666666666666666666666666667",
+              "currency": "EUR"
+            },
+            "cost": null
+          },
+          {
+            "filename": null,
+            "line": 32,
+            "meta": [],
+            "account": "Income:US:Hooli:Match401k",
+            "flag": "!",
+            "units": {
+              "number": "-400.00",
+              "currency": "EUR"
+            },
+            "price": null,
+            "cost": null
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "directives": []
 }

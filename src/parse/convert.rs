@@ -14,16 +14,18 @@ use tree_sitter::Node;
 
 use super::errors::ConversionError;
 use super::errors::ConversionErrorKind::{
-    InvalidBookingMethod, InvalidDate, InvalidDecimal, UnsupportedTotalCost,
+    InvalidBookingMethod, InvalidDate, InvalidDecimal, InvalidDocumentFilename,
+    UnsupportedTotalCost,
 };
 use super::node_fields;
 use super::node_ids;
 use super::ConversionResult;
 use super::NodeGetters;
 use crate::types::{
-    Account, Amount, Balance, Booking, Close, Commodity, CostSpec, Currency, Custom, Date, Decimal,
-    Document, EntryHeader, Event, FilePath, Flag, IncompleteAmount, Meta, MetaKeyValuePair,
-    MetaValue, Note, Open, Pad, Price, Query, RawPosting, RawTransaction, TagsLinks,
+    Account, Amount, Balance, Booking, Close, Commodity, CostSpec, Currency, Custom, CustomValue,
+    Date, Decimal, Document, EntryHeader, Event, FilePath, Flag, IncompleteAmount, Meta,
+    MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query, RawPosting, RawTransaction,
+    TagsLinks,
 };
 
 /// The state that all conversion node handlers have access to.
@@ -43,7 +45,7 @@ impl<'source> ConversionState<'source> {
         Self {
             string,
             filename,
-            pushed_meta: Vec::new(),
+            pushed_meta: Meta::default(),
             pushed_tags: TagsLinks::new(),
         }
     }
@@ -126,7 +128,7 @@ impl FromNode for Vec<Currency> {
 impl TryFromNode for Date {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "date");
-        Date::try_from_str(s.get_str(node))
+        Self::try_from_str(s.get_str(node))
             .map_err(|()| ConversionError::new(InvalidDate(s.get_str(node).into()), &node, s))
     }
 }
@@ -135,7 +137,7 @@ impl TryFromNode for Booking {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "string");
         let method = s.get_string(node);
-        Booking::try_from(method)
+        Self::try_from(method)
             .map_err(|()| ConversionError::new(InvalidBookingMethod(method.into()), &node, s))
     }
 }
@@ -146,18 +148,18 @@ impl TryFromNode for Decimal {
             node_ids::NUMBER => {
                 let contents = s.get_str(node);
                 let dec = if contents.contains(',') {
-                    // TODO(perf): this currently creates an intermediate String
-                    Decimal::from_str_exact(&contents.replace(',', ""))
+                    // FIXME(perf): this currently creates an intermediate String
+                    Self::from_str_exact(&contents.replace(',', ""))
                 } else {
-                    Decimal::from_str_exact(contents)
+                    Self::from_str_exact(contents)
                 };
                 dec.map_err(|e| {
                     ConversionError::new(InvalidDecimal(contents.into(), e.to_string()), &node, s)
                 })
             }
-            node_ids::PAREN_NUM_EXPR => Decimal::try_from_node(node.required_child(1), s),
+            node_ids::PAREN_NUM_EXPR => Self::try_from_node(node.required_child(1), s),
             node_ids::UNARY_NUM_EXPR => {
-                let num = Decimal::try_from_node(node.required_child(1), s)?;
+                let num = Self::try_from_node(node.required_child(1), s)?;
                 let sign = s.get_str(node.required_child(0));
                 Ok(match sign {
                     "-" => -num,
@@ -165,8 +167,8 @@ impl TryFromNode for Decimal {
                 })
             }
             node_ids::BINARY_NUM_EXPR => {
-                let left = Decimal::try_from_node(node.required_child(0), s)?;
-                let right = Decimal::try_from_node(node.required_child(2), s)?;
+                let left = Self::try_from_node(node.required_child(0), s)?;
+                let right = Self::try_from_node(node.required_child(2), s)?;
                 let op = s.get_str(node.required_child(1));
                 Ok(match op {
                     "+" => left + right,
@@ -213,7 +215,7 @@ impl TryFromNode for CostSpec {
                 .map(|m| Currency::from_node(m, s));
         }
 
-        Ok(CostSpec {
+        Ok(Self {
             number_per,
             number_total,
             currency,
@@ -254,7 +256,7 @@ impl TryFromNode for RawPosting {
         } else {
             None
         };
-        Ok(RawPosting {
+        Ok(Self {
             filename: s.filename.clone(),
             line: node.line_number() + 1,
             meta: node
@@ -277,7 +279,7 @@ impl TryFromNode for RawPosting {
 impl TryFromNode for IncompleteAmount {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert!(node.kind() == "amount" || node.kind() == "incomplete_amount",);
-        Ok(IncompleteAmount {
+        Ok(Self {
             number: node
                 .child_by_field_id(node_fields::NUMBER)
                 .map(|n| Decimal::try_from_node(n, s))
@@ -292,30 +294,30 @@ impl TryFromNode for IncompleteAmount {
 impl TryFromNode for Amount {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert!(node.kind() == "amount" || node.kind() == "amount_with_tolerance",);
-        Ok(Amount {
-            number: Decimal::try_from_node(node.required_child_by_id(node_fields::NUMBER), s)?,
-            currency: Currency::from_node(node.required_child_by_id(node_fields::CURRENCY), s),
-        })
+        Ok(Self::new(
+            Decimal::try_from_node(node.required_child_by_id(node_fields::NUMBER), s)?,
+            Currency::from_node(node.required_child_by_id(node_fields::CURRENCY), s),
+        ))
     }
 }
 
 impl TryFromNode for MetaValue {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         Ok(match node.kind_id() {
-            node_ids::STRING => MetaValue::String(String::from_node(node, s)),
-            node_ids::DATE => MetaValue::Date(Date::try_from_node(node, s)?),
-            node_ids::TAG => MetaValue::Tag(s.get_tag_link(node).into()),
-            node_ids::ACCOUNT => MetaValue::Account(Account::from_node(node, s)),
-            node_ids::BOOL => MetaValue::Bool(s.get_str(node) == "TRUE"),
-            node_ids::AMOUNT => MetaValue::Amount(Amount::try_from_node(node, s)?),
-            _ => MetaValue::Number(Decimal::try_from_node(node, s)?),
+            node_ids::STRING => Self::String(String::from_node(node, s)),
+            node_ids::DATE => Self::Date(Date::try_from_node(node, s)?),
+            node_ids::TAG => Self::Tag(s.get_tag_link(node).into()),
+            node_ids::ACCOUNT => Self::Account(Account::from_node(node, s)),
+            node_ids::BOOL => Self::Bool(s.get_str(node) == "TRUE"),
+            node_ids::AMOUNT => Self::Amount(Amount::try_from_node(node, s)?),
+            _ => Self::Number(Decimal::try_from_node(node, s)?),
         })
     }
 }
 impl TryFromNode for MetaKeyValuePair {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "key_value");
-        Ok(MetaKeyValuePair {
+        Ok(Self {
             key: s.get_key(node.required_child(0)).into(),
             value: if let Some(n) = node.child(1) {
                 Some(MetaValue::try_from_node(n, s)?)
@@ -358,7 +360,7 @@ impl TryFromNode for EntryHeader {
                 }
             }
         };
-        Ok(EntryHeader {
+        Ok(Self {
             date: Date::try_from_node(node.required_child_by_id(node_fields::DATE), s)?,
             meta: node
                 .child_by_field_id(node_fields::METADATA)
@@ -378,7 +380,7 @@ impl TryFromNode for Balance {
         debug_assert_eq!(node.kind(), "balance");
         let amt = node.required_child_by_id(node_fields::AMOUNT);
         let tol = amt.child_by_field_id(node_fields::TOLERANCE);
-        Ok(Balance {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             amount: Amount::try_from_node(amt, s)?,
@@ -390,7 +392,7 @@ impl TryFromNode for Balance {
 impl TryFromNode for Commodity {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "commodity");
-        Ok(Commodity {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             currency: Currency::from_node(node.required_child_by_id(node_fields::CURRENCY), s),
         })
@@ -399,7 +401,7 @@ impl TryFromNode for Commodity {
 
 impl TryFromNode for Close {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
-        Ok(Close {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
         })
@@ -409,13 +411,13 @@ impl TryFromNode for Close {
 impl TryFromNode for Custom {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "custom");
-        Ok(Custom {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             r#type: String::from_node(node.required_child_by_id(node_fields::NAME), s),
             values: node
                 .children(&mut node.walk())
-                .skip(2)
-                .map(|n| MetaValue::try_from_node(n, s))
+                .skip(3)
+                .map(|n| MetaValue::try_from_node(n, s).map(CustomValue))
                 .collect::<ConversionResult<_>>()?,
         })
     }
@@ -425,11 +427,12 @@ impl TryFromNode for Document {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "document");
         let raw_path = String::from_node(node.required_child_by_id(node_fields::FILENAME), s);
-        Ok(Document {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
-            // TODO: handle error
-            filename: (raw_path.as_str()).try_into().unwrap(),
+            filename: std::convert::TryInto::<FilePath>::try_into(raw_path.as_str()).map_err(
+                |e| ConversionError::new(InvalidDocumentFilename(e.to_string()), &node, s),
+            )?,
         })
     }
 }
@@ -437,7 +440,7 @@ impl TryFromNode for Document {
 impl TryFromNode for Event {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "event");
-        Ok(Event {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             r#type: String::from_node(node.required_child_by_id(node_fields::TYPE), s),
             description: String::from_node(node.required_child_by_id(node_fields::DESCRIPTION), s),
@@ -448,7 +451,7 @@ impl TryFromNode for Event {
 impl TryFromNode for Note {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "note");
-        Ok(Note {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             comment: String::from_node(node.required_child_by_id(node_fields::NOTE), s),
@@ -458,7 +461,7 @@ impl TryFromNode for Note {
 
 impl TryFromNode for Open {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
-        Ok(Open {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             currencies: node
@@ -476,7 +479,7 @@ impl TryFromNode for Open {
 impl TryFromNode for Pad {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "pad");
-        Ok(Pad {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             source_account: Account::from_node(
@@ -490,7 +493,7 @@ impl TryFromNode for Pad {
 impl TryFromNode for Price {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "price");
-        Ok(Price {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             currency: Currency::from_node(node.required_child_by_id(node_fields::CURRENCY), s),
             amount: Amount::try_from_node(node.required_child_by_id(node_fields::AMOUNT), s)?,
@@ -501,7 +504,7 @@ impl TryFromNode for Price {
 impl TryFromNode for RawTransaction {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "transaction");
-        Ok(RawTransaction {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             flag: s.get_flag(node.required_child_by_id(node_fields::FLAG)),
             payee: node
@@ -526,7 +529,7 @@ impl TryFromNode for RawTransaction {
 impl TryFromNode for Query {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "query");
-        Ok(Query {
+        Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             name: String::from_node(node.required_child_by_id(node_fields::NAME), s),
             query_string: String::from_node(node.required_child_by_id(node_fields::QUERY), s),

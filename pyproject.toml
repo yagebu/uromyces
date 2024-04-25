@@ -4,19 +4,54 @@ build-backend = "maturin"
 
 [tool.maturin]
 include = ["tree-sitter-beancount/**/*"]
+features = ["pyo3/extension-module"]
 
 [project]
 name = "uromyces"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-
-[tool.hatch.envs.default]
 dependencies = [
-  "beancount",
+  "click",
   "fava",
 ]
 
+[project.scripts]
+uro = "uromyces._cli:cli"
+
+[tool.black]
+line-length = 79
+
+[tool.ruff]
+target-version = "py38"
+line-length = 79
+
+[tool.ruff.lint]
+extend-select = [
+    "ALL",
+]
+extend-ignore = [
+    "COM812",      # Handled by formatter
+    "ANN401",      # Allow typing.Any
+    "TD",          # Allow TODOs
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-type-checking]
+strict = true  # always move type-only imports to TYPE_CHECKING-if blocks
+
+[tool.ruff.lint.isort]
+force-single-line = true
+order-by-type = false
+known-first-party = ["uromyces"]
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.lint.per-file-ignores]
+"*.pyi" = ["D"]
+"tests/conftest.py" = ["S101"]
+"tests/test_*.py" = ["D", "S101"]

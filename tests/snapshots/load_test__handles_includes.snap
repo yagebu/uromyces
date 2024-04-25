@@ -7,14 +7,12 @@ expression: ledger
   "entries": [
     {
       "t": "Open",
-      "header": {
-        "date": "1980-05-12",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/includes/included.beancount",
-        "line": 1
-      },
+      "date": "1980-05-12",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/includes/included.beancount",
+      "line": 1,
       "account": "Equity:Included-Account",
       "currencies": [],
       "booking": null
@@ -45,8 +43,8 @@ expression: ledger
       "default": "0"
     },
     "inferred_tolerance_multiplier": "0.5",
-    "infer_tolerance_from_cost": false,
-    "insert_pythonpath": false
+    "insert_pythonpath": false,
+    "display_precisions": {}
   },
   "includes": [
     "[REPO_DIR]/tests/ledgers/test-includes.beancount",

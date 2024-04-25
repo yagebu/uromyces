@@ -1,11 +1,15 @@
 use std::fmt::{Debug, Display};
+use std::hash::{DefaultHasher, Hash, Hasher};
 use std::ops::Neg;
 use std::str::FromStr;
 
-use pyo3::prelude::*;
+use pyo3::basic::CompareOp;
+use pyo3::{intern, prelude::*};
 use serde::{Deserialize, Serialize};
 
-use super::{Currency, Decimal, DecimalPyWrapper};
+use crate::py_bindings::{decimal_to_py, py_to_decimal};
+
+use super::{Cost, Currency, Decimal};
 
 /// An amount.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -18,12 +22,74 @@ pub struct Amount {
     pub currency: Currency,
 }
 
+impl Amount {
+    /// Create an amount from a number and currency.
+    #[must_use]
+    pub fn new(number: Decimal, currency: Currency) -> Self {
+        Self { number, currency }
+    }
+
+    #[must_use]
+    pub fn from_cost(cost: &Cost) -> Self {
+        Self {
+            number: cost.number,
+            currency: cost.currency.clone(),
+        }
+    }
+}
+
 #[pymethods]
 impl Amount {
-    #[getter]
-    fn number(&self) -> DecimalPyWrapper {
-        DecimalPyWrapper(self.number)
+    #[new]
+    fn __new__(
+        #[pyo3(from_py_with = "py_to_decimal")] number: Decimal,
+        currency: Currency,
+    ) -> Self {
+        Self { number, currency }
     }
+    fn __str__(&self) -> String {
+        format!("{} {}", self.number, self.currency)
+    }
+    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
+        match op {
+            CompareOp::Eq => (self == other).into_py(py),
+            CompareOp::Ne => (self != other).into_py(py),
+            _ => py.NotImplemented(),
+        }
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    #[getter]
+    fn number(&self, py: Python) -> PyObject {
+        decimal_to_py(py, self.number)
+    }
+}
+
+/// Convert from a Python object which has the correct attributes.
+pub fn amount_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Amount> {
+    if let Ok(a) = ob.downcast::<Amount>() {
+        Ok(a.get().clone())
+    } else {
+        let py = ob.py();
+        let number = ob.getattr(intern!(py, "number"))?;
+        let currency = ob.getattr(intern!(py, "currency"))?;
+
+        Ok(Amount {
+            number: py_to_decimal(&number)?,
+            currency: currency.extract()?,
+        })
+    }
+}
+
+pub fn option_amount_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Option<Amount>> {
+    Ok(if ob.is_none() {
+        None
+    } else {
+        Some(amount_from_py(ob)?)
+    })
 }
 
 impl Neg for Amount {
@@ -58,7 +124,7 @@ impl FromStr for Amount {
 }
 
 /// An amount, where one or both of number and currency might still be missing.
-#[derive(Default, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
 pub struct IncompleteAmount {
     pub number: Option<Decimal>,

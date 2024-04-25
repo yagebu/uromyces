@@ -1,16 +1,17 @@
+//! Booking - finding matching positions when reducing inventories
 use hashbrown::HashMap;
 
 use crate::inventory::Inventory;
 use crate::ledgers::{Ledger, RawLedger};
 use crate::tolerances::Tolerances;
 use crate::types::{
-    Account, Amount, Booking, Cost, CostSpec, Currency, Decimal, Entry, IncompleteAmount, Posting,
-    RawEntry, RawPosting, RawTransaction, Transaction,
+    Account, Amount, Booking, Cost, CostSpec, Currency, Date, Decimal, Entry, IncompleteAmount,
+    Posting, RawEntry, RawPosting, RawTransaction, Transaction,
 };
 
-use self::currency_groups::group_and_fill_in_currencies;
-use self::errors::{BookingError, BookingErrorKind};
-use self::methods::{resolve_matches, BookingMethod};
+use currency_groups::group_and_fill_in_currencies;
+use errors::{BookingError, BookingErrorKind};
+use methods::{resolve_matches, BookingMethod};
 
 mod currency_groups;
 mod errors;
@@ -24,7 +25,7 @@ struct BookingMethods {
 
 impl BookingMethods {
     /// Collect all specified booking methods (and the default).
-    fn from_ledger(raw_ledger: &RawLedger) -> BookingMethods {
+    fn from_ledger(raw_ledger: &RawLedger) -> Self {
         let mut map = HashMap::new();
         for e in &raw_ledger.entries {
             if let RawEntry::Open(entry) = e {
@@ -33,7 +34,7 @@ impl BookingMethods {
                 }
             }
         }
-        BookingMethods {
+        Self {
             map,
             default_method: raw_ledger.options.booking_method,
         }
@@ -49,7 +50,6 @@ impl BookingMethods {
 ///
 /// This mutates the given list of raw postings in place.
 fn close_positions(
-    txn: &RawTransaction,
     balances: &HashMap<Account, Inventory>,
     postings: &mut Vec<RawPosting>,
     methods: &BookingMethods,
@@ -58,58 +58,58 @@ fn close_positions(
 
     for posting in &mut *postings {
         debug_assert!(posting.units.currency.is_some());
-        if posting.cost.is_none() || posting.units.number.is_none() {
+        let Some(cost) = &posting.cost else {
             continue;
-        }
+        };
+        let Some(units_number) = posting.units.number else {
+            continue;
+        };
+        let Some(units_currency) = &posting.units.currency else {
+            continue;
+        };
+        let Some(balance) = balances.get(&posting.account) else {
+            continue;
+        };
 
-        let cost_spec = posting.cost.as_ref().unwrap(); // unwrap is safe: we just checked that the cost is not None
-        let balance = balances.get(&posting.account);
+        let units = Amount::new(units_number, units_currency.clone());
+        let booking = methods.get_account_booking_method(&posting.account);
+        let Some(booking_method) = BookingMethod::from_option(*booking) else {
+            continue;
+        };
 
-        if let Some(bal) = balance {
-            // number.is_some() is checked above, the currency should also be present
-            let units = complete_amount(&posting.units)
-                .expect("units to not have missing number or currency");
-            let booking = methods.get_account_booking_method(&posting.account);
-            let booking_method = BookingMethod::from_option(*booking);
-
-            if booking_method.is_some() && bal.is_reduced_by(&units) {
-                let matches = bal
-                    .iter_with_cost()
-                    .filter(|pos| units.currency == *pos.currency)
-                    .filter(|pos| match &cost_spec.currency {
-                        Some(currency) => currency == &pos.cost.currency,
-                        None => true,
-                    })
-                    .filter(|pos| match &cost_spec.number_per {
-                        Some(number) => number == &pos.cost.number,
-                        None => true,
-                    })
-                    .filter(|pos| match &cost_spec.date {
-                        Some(date) => date == &pos.cost.date,
-                        None => true,
-                    })
-                    .filter(|pos| match &cost_spec.label {
-                        Some(label) => pos.cost.label.iter().any(|v| v == label),
-                        None => true,
-                    })
-                    .collect::<Vec<_>>();
-                if matches.is_empty() {
-                    return Err(BookingError::new(
-                        posting,
-                        BookingErrorKind::NoMatchesForReduction,
-                    ));
-                }
-                additional_postings.append(&mut resolve_matches(
-                    &booking_method.unwrap(), // unwrap is safe: we checked .is_some() above
+        if balance.is_reduced_by(&units) {
+            let matches = balance
+                .iter_with_cost()
+                .filter(|pos| units.currency == *pos.currency)
+                .filter(|pos| match &cost.currency {
+                    Some(currency) => currency == &pos.cost.currency,
+                    None => true,
+                })
+                .filter(|pos| match &cost.number_per {
+                    Some(number) => number == &pos.cost.number,
+                    None => true,
+                })
+                .filter(|pos| match &cost.date {
+                    Some(date) => date == &pos.cost.date,
+                    None => true,
+                })
+                .filter(|pos| match &cost.label {
+                    Some(label) => pos.cost.label.iter().any(|v| v == label),
+                    None => true,
+                })
+                .collect::<Vec<_>>();
+            if matches.is_empty() {
+                return Err(BookingError::new(
                     posting,
-                    matches,
-                    &units,
-                )?);
-            } else if let Some(cost) = &mut posting.cost {
-                cost.date.get_or_insert(txn.header.date);
+                    BookingErrorKind::NoMatchesForReduction,
+                ));
             }
-        } else if let Some(cost) = &mut posting.cost {
-            cost.date.get_or_insert(txn.header.date);
+            additional_postings.append(&mut resolve_matches(
+                &booking_method,
+                posting,
+                matches,
+                &units,
+            )?);
         }
     }
     postings.append(&mut additional_postings);
@@ -117,6 +117,7 @@ fn close_positions(
     Ok(())
 }
 
+/// Try to complete an incomplete amount.
 fn complete_amount(value: &IncompleteAmount) -> Result<Amount, BookingErrorKind> {
     let number = value.number.ok_or(BookingErrorKind::MissingAmountNumber)?;
     let currency = value
@@ -125,26 +126,38 @@ fn complete_amount(value: &IncompleteAmount) -> Result<Amount, BookingErrorKind>
         .expect("amount to have currency")
         .clone();
 
-    Ok(Amount { number, currency })
+    Ok(Amount::new(number, currency))
 }
 
-fn complete_cost_spec(value: &CostSpec) -> Result<Cost, BookingErrorKind> {
-    // TODO number_total
-    let number = value
-        .number_per
-        .ok_or(BookingErrorKind::MissingCostNumber)?;
-    let currency = value
+/// Try to complete a cost spec to a cost.
+fn complete_cost_spec(
+    cost: &CostSpec,
+    date: Date,
+    units_number: Option<Decimal>,
+) -> Result<Cost, BookingErrorKind> {
+    let number = if let Some(number_total) = cost.number_total {
+        let units_number = units_number
+            .ok_or(BookingErrorKind::MissingAmountNumber)?
+            .abs();
+        let mut total = number_total;
+        if let Some(number_per) = cost.number_per {
+            total += number_per * units_number;
+        }
+        total / units_number
+    } else {
+        cost.number_per.ok_or(BookingErrorKind::MissingCostNumber)?
+    };
+    let currency = cost
         .currency
         .as_ref()
         .expect("cost to have currency")
         .clone();
-    let date = value.date.expect("cost to have a date");
 
     Ok(Cost {
         number,
         currency,
-        date,
-        label: value.label.clone(),
+        date: cost.date.unwrap_or(date),
+        label: cost.label.clone(),
     })
 }
 
@@ -154,28 +167,37 @@ pub fn compute_residual(postings: &[Posting]) -> Inventory {
     postings
         .iter()
         .map(crate::conversions::get_weight)
-        .collect()
+        .collect::<Inventory>()
 }
 
-enum MissingValue {
+/// The variants of where a number might be missing in a posting.
+enum MissingNumber {
+    /// Nothing missing, all values are present
     None(Amount, Option<Amount>, Option<Cost>),
+    /// The number of the units is missing, price and cost are present.
     UnitsNumber(Option<Amount>, Option<Cost>),
+    /// The per-unit cost is missing, units and price are present.
     CostPerUnit(Amount, Option<Amount>),
-    // CostTotal,
+    /// The number of the price is missing, units and cost are present.
     PriceNumber(Amount, Option<Cost>),
+    // TODO: CostTotal,
 }
 
 /// Find which value might be missing in a posting.
-fn find_missing_value(posting: &RawPosting) -> Result<MissingValue, BookingError> {
+fn find_missing_value(posting: &RawPosting, date: Date) -> Result<MissingNumber, BookingError> {
     let units = complete_amount(&posting.units);
     let price = posting.price.as_ref().map(complete_amount).transpose();
-    let cost = posting.cost.as_ref().map(complete_cost_spec).transpose();
+    let cost = posting
+        .cost
+        .as_ref()
+        .map(|c| complete_cost_spec(c, date, posting.units.number))
+        .transpose();
 
     match (units, price, cost) {
-        (Ok(u), Ok(p), Ok(c)) => Ok(MissingValue::None(u, p, c)),
-        (Err(..), Ok(p), Ok(c)) => Ok(MissingValue::UnitsNumber(p, c)),
-        (Ok(u), Err(..), Ok(c)) => Ok(MissingValue::PriceNumber(u, c)),
-        (Ok(u), Ok(p), Err(..)) => Ok(MissingValue::CostPerUnit(u, p)),
+        (Ok(u), Ok(p), Ok(c)) => Ok(MissingNumber::None(u, p, c)),
+        (Err(..), Ok(p), Ok(c)) => Ok(MissingNumber::UnitsNumber(p, c)),
+        (Ok(u), Err(..), Ok(c)) => Ok(MissingNumber::PriceNumber(u, c)),
+        (Ok(u), Ok(p), Err(..)) => Ok(MissingNumber::CostPerUnit(u, p)),
         _ => Err(BookingError::new(
             posting,
             BookingErrorKind::TooManyMissingNumbers,
@@ -186,19 +208,21 @@ fn find_missing_value(posting: &RawPosting) -> Result<MissingValue, BookingError
 /// Interpolate and fill in missing numbers.
 ///
 /// This turns `RawPosting`s into fully booked Postings. So this will error on any missing numbers
-/// or currencies. The input postings should not have any missing currencies. Also all costs should
-/// have a date already.
+/// or currencies. The input postings should not have any missing currencies.
+///
+/// Use the provided (entry) date for all costs that do not have an explicit date.
 fn interpolate_and_fill_in_missing(
     postings: Vec<RawPosting>,
     group_currency: &Currency,
     tolerances: &Tolerances,
+    date: Date,
 ) -> Result<Vec<Posting>, BookingError> {
     let mut incomplete = None;
     let mut complete_postings = Vec::with_capacity(postings.len());
 
     for posting in postings {
-        let missing_type = find_missing_value(&posting)?;
-        if let MissingValue::None(units, price, cost) = missing_type {
+        let missing_type = find_missing_value(&posting, date)?;
+        if let MissingNumber::None(units, price, cost) = missing_type {
             complete_postings.push(Posting {
                 filename: posting.filename,
                 line: posting.line,
@@ -222,18 +246,19 @@ fn interpolate_and_fill_in_missing(
 
     if let Some((posting, missing)) = incomplete {
         let residual = compute_residual(&complete_postings);
-        let weight = if residual.is_empty() {
-            Decimal::ZERO
-        } else {
-            debug_assert_eq!(residual.len(), 1);
-            let pos = residual.iter().next().expect("missing residual");
+        // this function is only called on posting of the same currency
+        debug_assert!(residual.len() <= 1);
+        let pos = residual.iter().next();
+        let weight = if let Some(pos) = pos {
             debug_assert!(pos.cost.is_none());
             debug_assert_eq!(pos.currency, group_currency);
             -*pos.number
+        } else {
+            Decimal::ZERO
         };
 
         let (units, price, cost) = match missing {
-            MissingValue::UnitsNumber(price, cost) => {
+            MissingNumber::UnitsNumber(price, cost) => {
                 let number = if let Some(c) = &cost {
                     debug_assert_eq!(&c.currency, group_currency);
                     weight / c.number
@@ -243,27 +268,25 @@ fn interpolate_and_fill_in_missing(
                 } else {
                     weight
                 };
-                let units = Amount {
-                    currency: group_currency.clone(),
-                    number: tolerances.quantize(group_currency, number),
-                };
+                let units = Amount::new(
+                    tolerances.quantize(group_currency, number),
+                    group_currency.clone(),
+                );
+
                 (units, price, cost)
             }
-            MissingValue::CostPerUnit(units, price) => {
+            MissingNumber::CostPerUnit(units, price) => {
                 let mut cost_spec = posting.cost.clone().expect("should have a cost");
                 cost_spec.number_per = Some(weight / units.number);
-                let cost = complete_cost_spec(&cost_spec)
+                let cost = complete_cost_spec(&cost_spec, date, posting.units.number)
                     .expect("cost to not have missing number or currency");
                 (units, price, Some(cost))
             }
-            MissingValue::PriceNumber(units, cost) => {
-                let price = Amount {
-                    currency: group_currency.clone(),
-                    number: weight / units.number,
-                };
+            MissingNumber::PriceNumber(units, cost) => {
+                let price = Amount::new(weight / units.number, group_currency.clone());
                 (units, Some(price), cost)
             }
-            MissingValue::None(units, price, cost) => (units, price, cost),
+            MissingNumber::None(units, price, cost) => (units, price, cost),
         };
         complete_postings.push(Posting {
             filename: posting.filename,
@@ -294,11 +317,12 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> Ledger {
 
             let groups = group_and_fill_in_currencies(&txn.postings)?;
             for (currency, mut postings) in groups {
-                close_positions(&txn, &balances, &mut postings, &booking_methods)?;
+                close_positions(&balances, &mut postings, &booking_methods)?;
                 all_postings.append(&mut interpolate_and_fill_in_missing(
                     postings,
                     &currency,
                     &tolerances,
+                    txn.header.date,
                 )?);
             }
             all_postings.sort_by_key(|p| p.line);
@@ -310,7 +334,7 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> Ledger {
                 .from_key(&posting.account)
                 .or_insert_with(|| (posting.account.clone(), Inventory::new()))
                 .1
-                .add_position(posting.units.clone(), posting.cost.clone());
+                .add_position(posting);
         }
         Ok(Transaction {
             flag: txn.flag,

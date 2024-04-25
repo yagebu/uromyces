@@ -7,164 +7,140 @@ expression: ledger
   "entries": [
     {
       "t": "Open",
-      "header": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 6
-      },
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 6,
       "account": "Assets:Account2",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
-      "header": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 10
-      },
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 10,
       "account": "Assets:Account3",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
-      "header": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 15
-      },
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 15,
       "account": "Assets:DuplBalance",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
-      "header": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 20
-      },
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 20,
       "account": "Assets:DuplBalance1",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
-      "header": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 25
-      },
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 25,
       "account": "Assets:DuplBalance2",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
-      "header": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 34
-      },
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 34,
       "account": "Assets:Inactive",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Commodity",
-      "header": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 30
-      },
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 30,
       "currency": "EUR"
     },
     {
       "t": "Close",
-      "header": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 2
-      },
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 2,
       "account": "Assets:Account1"
     },
     {
       "t": "Open",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 3
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 3,
       "account": "Assets:Account1",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 7
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 7,
       "account": "Assets:Account2",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 44
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 44,
       "account": "NotARoot:Unknown",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Balance",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 16
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 16,
       "account": "Assets:DuplBalance",
       "amount": {
         "number": "10",
@@ -174,14 +150,12 @@ expression: ledger
     },
     {
       "t": "Balance",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 17
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 17,
       "account": "Assets:DuplBalance",
       "amount": {
         "number": "10",
@@ -191,14 +165,12 @@ expression: ledger
     },
     {
       "t": "Balance",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 21
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 21,
       "account": "Assets:DuplBalance1",
       "amount": {
         "number": "10",
@@ -208,14 +180,12 @@ expression: ledger
     },
     {
       "t": "Balance",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 22
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 22,
       "account": "Assets:DuplBalance1",
       "amount": {
         "number": "10",
@@ -225,14 +195,12 @@ expression: ledger
     },
     {
       "t": "Balance",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 26
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 26,
       "account": "Assets:DuplBalance2",
       "amount": {
         "number": "10",
@@ -242,14 +210,12 @@ expression: ledger
     },
     {
       "t": "Balance",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 27
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 27,
       "account": "Assets:DuplBalance2",
       "amount": {
         "number": "11",
@@ -259,63 +225,53 @@ expression: ledger
     },
     {
       "t": "Commodity",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 31
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 31,
       "currency": "EUR"
     },
     {
       "t": "Note",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 41
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 41,
       "account": "Assets:Unknown",
       "comment": "note"
     },
     {
       "t": "Close",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 11
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 11,
       "account": "Assets:Account3"
     },
     {
       "t": "Close",
-      "header": {
-        "date": "2000-01-02",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 35
-      },
+      "date": "2000-01-02",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 35,
       "account": "Assets:Inactive"
     },
     {
       "t": "Transaction",
-      "header": {
-        "date": "2000-01-03",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 36
-      },
+      "date": "2000-01-03",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 36,
       "flag": "*",
       "payee": null,
       "narration": "",
@@ -325,39 +281,37 @@ expression: ledger
           "line": 37,
           "meta": [],
           "account": "Assets:Inactive",
-          "flag": null,
           "units": {
             "number": "10",
             "currency": "EUR"
           },
           "price": null,
-          "cost": null
+          "cost": null,
+          "flag": null
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
           "line": 38,
           "meta": [],
           "account": "Assets:Inactive",
-          "flag": null,
           "units": {
             "number": "-10",
             "currency": "EUR"
           },
           "price": null,
-          "cost": null
+          "cost": null,
+          "flag": null
         }
       ]
     },
     {
       "t": "Close",
-      "header": {
-        "date": "2000-01-03",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
-        "line": 12
-      },
+      "date": "2000-01-03",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+      "line": 12,
       "account": "Assets:Account3"
     }
   ],
@@ -462,8 +416,19 @@ expression: ledger
       "default": "0"
     },
     "inferred_tolerance_multiplier": "0.5",
-    "infer_tolerance_from_cost": false,
-    "insert_pythonpath": false
+    "insert_pythonpath": false,
+    "display_precisions": {
+      "EUR": {
+        "has_sign": true,
+        "max": 0,
+        "common": 0
+      },
+      "USD": {
+        "has_sign": false,
+        "max": 0,
+        "common": 0
+      }
+    }
   },
   "includes": [
     "[REPO_DIR]/tests/ledgers/invalid-input.beancount"

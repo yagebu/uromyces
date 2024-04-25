@@ -6,6 +6,21 @@ use crate::tolerances::Tolerances;
 use crate::types::{Account, Balance, Currency, Date, Entry};
 use crate::Ledger;
 
+struct InvalidAccountName(Account);
+impl InvalidAccountName {
+    fn new(a: &Account) -> Self {
+        Self(a.clone())
+    }
+}
+impl From<InvalidAccountName> for UroError {
+    fn from(val: InvalidAccountName) -> Self {
+        UroError::new(format!(
+            "Invalid account name '{}' (invalid root account).",
+            val.0
+        ))
+    }
+}
+
 /// Check that:
 ///
 /// - Each account name starts with one of the root accounts.
@@ -23,9 +38,7 @@ pub fn account_names(ledger: &Ledger) -> Vec<UroError> {
 
     for account in all_accounts {
         if !account.has_valid_root(roots) {
-            errors.push(UroError::new(format!(
-                "Invalid account name '{account}' (invalid root account).",
-            )));
+            errors.push(InvalidAccountName::new(account).into());
         }
         // TODO: check full account syntax
     }

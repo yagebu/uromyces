@@ -1,9 +1,10 @@
+//! Tolerances are used to determine if transactions balance.
 use hashbrown::HashMap;
 
 use serde::{Deserialize, Serialize};
 
 use crate::inventory::Inventory;
-use crate::options::{BeancountOptionError, BeancountOptions};
+use crate::options::BeancountOptions;
 use crate::types::{Balance, Currency, Decimal, Posting, RawPosting};
 
 /// Tolerances for currencies.
@@ -64,12 +65,11 @@ impl Tolerances {
     }
 
     /// Set from an option string like "USD:0.04".
-    pub fn set_from_option(&mut self, value: &str) -> Result<(), BeancountOptionError> {
+    pub(crate) fn set_from_option(&mut self, value: &str) -> Result<(), ()> {
         let mut parts = value.split(':');
         if let Some(currency) = parts.next() {
             if let Some(tol) = parts.next() {
-                let tolerance = Decimal::from_str_exact(tol)
-                    .map_err(|_| BeancountOptionError::InvalidToleranceDefault)?;
+                let tolerance = Decimal::from_str_exact(tol).map_err(|_| ())?;
                 if currency == "*" {
                     self.default = tolerance;
                 } else {
@@ -78,7 +78,7 @@ impl Tolerances {
                 return Ok(());
             }
         }
-        Err(BeancountOptionError::InvalidToleranceDefault)
+        Err(())
     }
 
     /// Infer tolerance for the given number and currency.

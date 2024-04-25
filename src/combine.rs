@@ -6,11 +6,11 @@ use std::fs;
 use hashbrown::HashSet;
 
 use crate::booking;
+use crate::display_precision::DisplayPrecisionsStats;
 use crate::errors::UroError;
 use crate::ledgers::{Ledger, RawLedger};
 use crate::parse;
 use crate::parse::ParsedFile;
-use crate::plugins;
 use crate::types::{FilePath, Plugin, RawDirective};
 use crate::util::paths;
 use crate::util::timer::SimpleTimer;
@@ -24,20 +24,19 @@ struct PathAndResult {
 ///
 /// Takes a reference to a path and tries to load the given Beancount file, producing
 /// a completely booked list of entries.
+///
+/// This does not run any user-specified plugins or the built-in validations, those
+/// should be orchestrated from the calling Python code.
 #[must_use]
 pub fn load(main_path: &FilePath) -> Ledger {
     let paths_and_results = load_beancount_file(main_path);
     let raw_ledger = combine_files(paths_and_results);
-    let mut t = SimpleTimer::new();
 
+    let mut t = SimpleTimer::new();
     let mut ledger = booking::book_entries(raw_ledger);
     t.log_elapsed("booking");
 
-    plugins::run_pre(&mut ledger);
-
-    // TODO: run plugins
-    ledger.errors.append(&mut plugins::run_validations(&ledger));
-
+    crate::plugins::run_pre(&mut ledger);
     ledger
 }
 
@@ -73,9 +72,11 @@ fn load_beancount_file(main_path: &FilePath) -> Vec<PathAndResult> {
                 if let RawDirective::Include { pattern } = directive {
                     match paths::glob_include(&path, pattern) {
                         Ok(included_paths) => path_queue.extend(included_paths.into_iter()),
-                        Err(..) => result.errors.push(
-                            UroError::new(format!("Include pattern '{pattern}' failed"))
-                                .with_filename(&path),
+                        Err(glob_include_error) => result.errors.push(
+                            UroError::new(format!(
+                                "Include pattern '{pattern}' failed: {glob_include_error}"
+                            ))
+                            .with_filename(&path),
                         ),
                     };
                 }
@@ -127,6 +128,10 @@ fn combine_files(result: Vec<PathAndResult>) -> RawLedger {
 
     combined.entries.sort();
     t.log_elapsed("sorting entries");
+
+    combined.options.display_precisions =
+        DisplayPrecisionsStats::from_raw_entries(&combined.entries).get_precisions();
+    t.log_elapsed("compute display context");
 
     combined
 }

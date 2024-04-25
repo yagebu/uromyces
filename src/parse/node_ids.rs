@@ -41,13 +41,13 @@ mod tests {
 
     use super::*;
 
-    fn get_id(l: Language, name: &str) -> u16 {
+    fn get_id(l: &Language, name: &str) -> u16 {
         l.id_for_node_kind(name, true)
     }
 
     #[test]
     fn it_has_correct_ids() {
-        let l = crate::parse::get_beancount_language();
+        let l = &crate::parse::get_beancount_language();
         assert_eq!(get_id(l, "balance"), BALANCE);
         assert_eq!(get_id(l, "close"), CLOSE);
         assert_eq!(get_id(l, "commodity"), COMMODITY);

@@ -36,8 +36,8 @@ expression: ledger
       "default": "0"
     },
     "inferred_tolerance_multiplier": "0.5",
-    "infer_tolerance_from_cost": false,
-    "insert_pythonpath": false
+    "insert_pythonpath": false,
+    "display_precisions": {}
   },
   "includes": [
     "[REPO_DIR]/tests/ledgers/non-existent-file-missing.beancount"

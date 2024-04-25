@@ -4,7 +4,8 @@ use std::path::{Path, PathBuf};
 
 use internment::ArcIntern;
 use pyo3::exceptions::PyValueError;
-use pyo3::{IntoPy, PyErr, PyObject, ToPyObject};
+use pyo3::prelude::*;
+use pyo3::pybacked::PyBackedStr;
 use serde::{Deserialize, Serialize};
 
 use super::Account;
@@ -37,8 +38,8 @@ impl FilePath {
     /// Join an account onto this path.
     pub(crate) fn join_account(&self, account: &Account) -> Self {
         let mut joined = self.as_ref().to_path_buf();
+        joined.extend(account.components());
         // self is absolute and Unicode-only and so is the account, so the joined path is as well
-        account.components().for_each(|a| joined.push(a));
         Self::from_ref(joined.to_str().expect("valid UTF-8"))
     }
 
@@ -88,8 +89,19 @@ impl AsRef<Path> for FilePath {
 
 #[derive(Debug)]
 pub enum FilePathError {
-    NonUnicode,
-    NonAbsolute,
+    NonUnicode(PathBuf),
+    NonAbsolute(String),
+}
+impl std::error::Error for FilePathError {}
+impl std::fmt::Display for FilePathError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            Self::NonUnicode(p) => {
+                write!(f, "Filepath is not valid unicode: {}", p.to_string_lossy())
+            }
+            Self::NonAbsolute(m) => write!(f, "Filepath is not absolute: '{m}'"),
+        }
+    }
 }
 
 impl TryFrom<&str> for FilePath {
@@ -97,7 +109,7 @@ impl TryFrom<&str> for FilePath {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         if !Path::new(value).is_absolute() {
-            return Err(FilePathError::NonAbsolute);
+            return Err(FilePathError::NonAbsolute(value.to_owned()));
         }
         Ok(Self::from_ref(value))
     }
@@ -107,12 +119,15 @@ impl TryFrom<&Path> for FilePath {
     type Error = FilePathError;
 
     fn try_from(value: &Path) -> Result<Self, Self::Error> {
-        if !value.is_absolute() {
-            return Err(FilePathError::NonAbsolute);
-        }
         match value.to_str() {
-            Some(s) => Ok(Self::from_ref(s)),
-            None => Err(FilePathError::NonUnicode),
+            Some(s) => {
+                if value.is_absolute() {
+                    Ok(Self::from_ref(s))
+                } else {
+                    Err(FilePathError::NonAbsolute(s.to_owned()))
+                }
+            }
+            None => Err(FilePathError::NonUnicode(value.to_path_buf())),
         }
     }
 }
@@ -137,6 +152,13 @@ impl IntoPy<PyObject> for FilePath {
     }
 }
 
+impl<'py> FromPyObject<'py> for FilePath {
+    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+        let str = ob.extract::<PyBackedStr>()?;
+        Ok(Self::try_from(&*str)?)
+    }
+}
+
 impl From<FilePathError> for PyErr {
     fn from(_: FilePathError) -> Self {
         PyValueError::new_err("Invalid FilePath")
@@ -151,5 +173,15 @@ mod tests {
     fn test_file_path_from() {
         assert!(FilePath::try_from("asdf").is_err());
         assert!(FilePath::try_from(Path::new("asdf")).is_err());
+    }
+
+    #[test]
+    fn test_file_path_join_account() {
+        let path = FilePath::try_from("/tmp/dir").unwrap();
+        let account = "Assets:Cash".into();
+        assert_eq!(
+            path.join_account(&account),
+            "/tmp/dir/Assets/Cash".try_into().unwrap()
+        );
     }
 }

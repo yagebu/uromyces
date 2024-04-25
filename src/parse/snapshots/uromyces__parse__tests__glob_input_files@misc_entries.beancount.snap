@@ -3,199 +3,124 @@ source: src/parse/tests.rs
 expression: "super::parse_string(&input, &None)"
 input_file: src/parse/test_inputs/misc_entries.beancount
 ---
-ParsedFile {
-    entries: [
-        Open(
-            Open {
-                header: EntryHeader {
-                    date: Date(
-                        "2000-01-01",
-                    ),
-                    meta: [],
-                    tags: TagsLinks(
-                        [],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 1,
-                },
-                account: Account(
-                    "Assets:Cash",
-                ),
-                currencies: [
-                    Currency(
-                        "EUR",
-                    ),
-                ],
-                booking: None,
-            },
-        ),
-        Open(
-            Open {
-                header: EntryHeader {
-                    date: Date(
-                        "2000-01-01",
-                    ),
-                    meta: [
-                        MetaKeyValuePair {
-                            key: "name",
-                            value: Some(
-                                String(
-                                    "Some account name",
-                                ),
-                            ),
-                        },
-                    ],
-                    tags: TagsLinks(
-                        [],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 2,
-                },
-                account: Account(
-                    "Equity:OpeningBalances",
-                ),
-                currencies: [
-                    Currency(
-                        "EUR",
-                    ),
-                ],
-                booking: None,
-            },
-        ),
-        Pad(
-            Pad {
-                header: EntryHeader {
-                    date: Date(
-                        "2001-01-01",
-                    ),
-                    meta: [
-                        MetaKeyValuePair {
-                            key: "number",
-                            value: Some(
-                                Number(
-                                    20.00,
-                                ),
-                            ),
-                        },
-                    ],
-                    tags: TagsLinks(
-                        [],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 5,
-                },
-                account: Account(
-                    "Assets:Cash",
-                ),
-                source_account: Account(
-                    "Equity:OpeningBalances",
-                ),
-            },
-        ),
-        Balance(
-            Balance {
-                header: EntryHeader {
-                    date: Date(
-                        "2001-01-01",
-                    ),
-                    meta: [],
-                    tags: TagsLinks(
-                        [],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 8,
-                },
-                account: Account(
-                    "Assets:Cash",
-                ),
-                amount: Amount {
-                    number: 1.00,
-                    currency: Currency(
-                        "EUR",
-                    ),
-                },
-                tolerance: None,
-            },
-        ),
-        Query(
-            Query {
-                header: EntryHeader {
-                    date: Date(
-                        "2002-01-01",
-                    ),
-                    meta: [],
-                    tags: TagsLinks(
-                        [],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 10,
-                },
-                name: "query all entries",
-                query_string: "journal",
-            },
-        ),
-        Custom(
-            Custom {
-                header: EntryHeader {
-                    date: Date(
-                        "2000-01-01",
-                    ),
-                    meta: [],
-                    tags: TagsLinks(
-                        [],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 12,
-                },
-                type: "string",
-                values: [
-                    String(
-                        "string",
-                    ),
-                    Account(
-                        Account(
-                            "Assets:Cash",
-                        ),
-                    ),
-                    Bool(
-                        false,
-                    ),
-                    Bool(
-                        true,
-                    ),
-                    Number(
-                        20.00,
-                    ),
-                    Amount(
-                        Amount {
-                            number: 200.00,
-                            currency: Currency(
-                                "EUR",
-                            ),
-                        },
-                    ),
-                ],
-            },
-        ),
-    ],
-    errors: [],
-    directives: [],
+{
+  "entries": [
+    {
+      "Open": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": null,
+        "line": 1,
+        "account": "Assets:Cash",
+        "currencies": [
+          "EUR"
+        ],
+        "booking": null
+      }
+    },
+    {
+      "Open": {
+        "date": "2000-01-01",
+        "meta": [
+          {
+            "key": "name",
+            "value": {
+              "String": "Some account name"
+            }
+          }
+        ],
+        "tags": [],
+        "links": [],
+        "filename": null,
+        "line": 2,
+        "account": "Equity:OpeningBalances",
+        "currencies": [
+          "EUR"
+        ],
+        "booking": null
+      }
+    },
+    {
+      "Pad": {
+        "date": "2001-01-01",
+        "meta": [
+          {
+            "key": "number",
+            "value": {
+              "Number": "20.00"
+            }
+          }
+        ],
+        "tags": [],
+        "links": [],
+        "filename": null,
+        "line": 5,
+        "account": "Assets:Cash",
+        "source_account": "Equity:OpeningBalances"
+      }
+    },
+    {
+      "Balance": {
+        "date": "2001-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": null,
+        "line": 8,
+        "account": "Assets:Cash",
+        "amount": {
+          "number": "1.00",
+          "currency": "EUR"
+        },
+        "tolerance": null
+      }
+    },
+    {
+      "Query": {
+        "date": "2002-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": null,
+        "line": 10,
+        "name": "query all entries",
+        "query_string": "journal"
+      }
+    },
+    {
+      "Custom": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": null,
+        "line": 12,
+        "type": "string",
+        "values": [
+          {
+            "Account": "Assets:Cash"
+          },
+          {
+            "Bool": false
+          },
+          {
+            "Bool": true
+          },
+          {
+            "Number": "20.00"
+          },
+          {
+            "Amount": {
+              "number": "200.00",
+              "currency": "EUR"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "directives": []
 }

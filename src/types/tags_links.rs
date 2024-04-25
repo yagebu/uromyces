@@ -1,5 +1,5 @@
-use pyo3::types::PySet;
-use pyo3::{IntoPy, PyObject, ToPyObject};
+use pyo3::prelude::*;
+use pyo3::types::{PyFrozenSet, PySet};
 use serde::{Deserialize, Serialize};
 use thin_vec::ThinVec;
 
@@ -16,7 +16,7 @@ pub struct TagsLinks(ThinVec<String>);
 impl TagsLinks {
     #[must_use]
     pub fn new() -> Self {
-        TagsLinks(ThinVec::new())
+        Self(ThinVec::new())
     }
 
     /// Insert a tag or link. Returns whether it was newly inserted.
@@ -46,16 +46,36 @@ impl Default for TagsLinks {
     }
 }
 
+impl IntoPy<PyObject> for TagsLinks {
+    fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
+        self.to_object(py)
+    }
+}
 impl IntoPy<PyObject> for &TagsLinks {
     fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
         self.to_object(py)
     }
 }
-
 impl ToPyObject for TagsLinks {
     fn to_object(&self, py: pyo3::Python<'_>) -> PyObject {
-        PySet::new(py, &self.0)
-            .expect("creating a Python set to work")
+        PyFrozenSet::new_bound(py, &self.0)
+            .expect("creating a Python frozenset to work")
             .into()
+    }
+}
+
+impl<'py> FromPyObject<'py> for TagsLinks {
+    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+        let vec = if let Ok(set) = ob.downcast::<PySet>() {
+            set.into_iter()
+                .filter_map(|e| e.extract::<String>().ok())
+                .collect()
+        } else {
+            let set = ob.downcast::<PyFrozenSet>()?;
+            set.into_iter()
+                .filter_map(|e| e.extract::<String>().ok())
+                .collect()
+        };
+        Ok(Self(vec))
     }
 }

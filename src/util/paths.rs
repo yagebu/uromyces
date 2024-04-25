@@ -4,46 +4,70 @@ use glob;
 
 use crate::types::FilePath;
 
+/// An error that might be encountered on reading a glob.
 #[derive(Debug)]
-pub enum IncludeError {
+pub enum GlobIncludeError {
+    BasePathHasNoParent,
     GlobReadError,
-    InvalidBasePath,
-    InvalidGlobPattern,
+    InvalidGlobPattern(String),
     NonUnicodePath,
+}
+
+impl std::error::Error for GlobIncludeError {}
+impl std::fmt::Display for GlobIncludeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            Self::BasePathHasNoParent => {
+                write!(f, "base path has not parent folder")
+            }
+            Self::GlobReadError => {
+                write!(f, "IO error on reading glob")
+            }
+            Self::InvalidGlobPattern(msg) => {
+                write!(f, "Invalid glob pattern: {msg}")
+            }
+            Self::NonUnicodePath => {
+                write!(f, "encountered non-Unicode path during glob")
+            }
+        }
+    }
 }
 
 /// For the given include directive, find matching files.
 // TODO: consider restricting the allowed kinds of patterns.
-pub fn glob_include(base_path: &FilePath, include: &str) -> Result<Vec<FilePath>, IncludeError> {
+pub fn glob_include(
+    base_path: &FilePath,
+    include: &str,
+) -> Result<Vec<FilePath>, GlobIncludeError> {
     let has_root = matches!(
         Path::new(include).components().next(),
         Some(Component::Prefix(..) | Component::RootDir)
     );
 
     let pattern = if has_root {
-        include.to_string()
+        include.to_owned()
     } else {
         let dirname = base_path
             .as_ref()
             .parent()
-            .ok_or(IncludeError::InvalidBasePath)?;
+            .ok_or(GlobIncludeError::BasePathHasNoParent)?;
         dirname
             .join(include)
             .to_str()
-            .ok_or(IncludeError::NonUnicodePath)?
-            .to_string()
+            .expect("paths joined from unicode parts to be unicode")
+            .to_owned()
     };
 
     glob::glob(&pattern)
-        .map_err(|_| IncludeError::InvalidGlobPattern)?
+        .map_err(|e| GlobIncludeError::InvalidGlobPattern(e.msg.to_owned()))?
         .map(|glob_result| match glob_result {
-            Err(_) => Err(IncludeError::GlobReadError),
+            Err(_) => Err(GlobIncludeError::GlobReadError),
             Ok(path) => match path.canonicalize() {
                 Ok(p) => p
                     .as_path()
                     .try_into()
-                    .map_err(|_| IncludeError::NonUnicodePath),
-                Err(_) => Err(IncludeError::GlobReadError),
+                    .map_err(|_| GlobIncludeError::NonUnicodePath),
+                Err(_) => Err(GlobIncludeError::GlobReadError),
             },
         })
         .collect()
@@ -58,7 +82,11 @@ mod tests {
     #[test]
     fn test_invalid_glob() {
         let path: FilePath = std::env::current_dir().unwrap().try_into().unwrap();
-        assert!(glob_include(&path, "****").is_err());
+        let err = glob_include(&path, "****").unwrap_err();
+        let GlobIncludeError::InvalidGlobPattern(msg) = err else {
+            panic!();
+        };
+        assert!(msg.contains("wildcards"));
     }
 
     #[test]

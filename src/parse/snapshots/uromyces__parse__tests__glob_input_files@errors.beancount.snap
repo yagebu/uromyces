@@ -1,53 +1,72 @@
 ---
 source: src/parse/tests.rs
-expression: parse_string(&input)
+expression: "super::parse_string(&input, &None)"
 input_file: src/parse/test_inputs/errors.beancount
 ---
-ParsedFile {
-    entries: [
-        Open(
-            Open {
-                header: EntryHeader {
-                    date: Date(
-                        "2000-01-01",
-                    ),
-                    meta: [],
-                    tags: TagsLinks(
-                        [],
-                    ),
-                    links: TagsLinks(
-                        [],
-                    ),
-                    filename: None,
-                    line: 2,
-                },
-                account: Account(
-                    "Assets:Cash",
-                ),
-                currencies: [
-                    Currency(
-                        "EUR",
-                    ),
-                ],
-                booking: None,
+{
+  "entries": [
+    {
+      "Open": {
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": null,
+        "line": 2,
+        "account": "Assets:Cash",
+        "currencies": [
+          "EUR"
+        ],
+        "booking": null
+      }
+    },
+    {
+      "Transaction": {
+        "header": {
+          "date": "2022-01-21",
+          "meta": [],
+          "tags": [],
+          "links": [],
+          "filename": null,
+          "line": 9
+        },
+        "flag": "*",
+        "payee": null,
+        "narration": "valid syntax",
+        "postings": [
+          {
+            "filename": null,
+            "line": 10,
+            "meta": [],
+            "account": "Income:US:Hooli:Match401k",
+            "flag": null,
+            "units": {
+              "number": "-600.00",
+              "currency": "USD"
             },
-        ),
-    ],
-    errors: [
-        UroError {
-            filename: None,
-            line: Some(
-                1,
-            ),
-            message: "Invalid booking method: INVALIDBOOKINGMETHOD",
-        },
-        UroError {
-            filename: None,
-            line: Some(
-                4,
-            ),
-            message: "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (unary_num_expr (number)) currency: (currency)))) (MISSING \"_skipped_lines_token3\"))",
-        },
-    ],
-    directives: [],
+            "price": null,
+            "cost": null
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "filename": null,
+      "line": 1,
+      "message": "Invalid booking method: INVALIDBOOKINGMETHOD"
+    },
+    {
+      "filename": null,
+      "line": 4,
+      "message": "Invalid document filename: Filepath is not absolute: 'relative/path'"
+    },
+    {
+      "filename": null,
+      "line": 6,
+      "message": "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (unary_num_expr (number)) currency: (currency)))) (MISSING \"_skipped_lines_token3\"))"
+    }
+  ],
+  "directives": []
 }

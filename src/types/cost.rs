@@ -1,22 +1,97 @@
+use std::hash::{DefaultHasher, Hash, Hasher};
+
+use pyo3::{basic::CompareOp, prelude::*};
 use serde::{Deserialize, Serialize};
+
+use crate::py_bindings::{decimal_to_py, py_to_decimal};
 
 use super::{Currency, Date, Decimal};
 
 /// A cost (basically an Amount + date and label).
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[pyclass(frozen, module = "uromyces")]
 pub struct Cost {
     /// The per-unit cost.
     pub number: Decimal,
     /// The currency.
+    #[pyo3(get)]
     pub currency: Currency,
     /// The date that this lot was created.
+    ///
+    /// This can be provided in the input but will be filled in by the transaction date
+    /// if not provided automatically.
+    #[pyo3(get)]
     pub date: Date,
     /// An optional label to identify a position.
+    #[pyo3(get)]
     pub label: Option<String>,
 }
 
+#[pymethods]
+impl Cost {
+    #[new]
+    #[pyo3(signature = (number, curreny, date, label=None))]
+    fn __new__(
+        #[pyo3(from_py_with = "py_to_decimal")] number: Decimal,
+        curreny: Currency,
+        date: Date,
+        label: Option<String>,
+    ) -> Self {
+        Self {
+            number,
+            currency: curreny,
+            date,
+            label,
+        }
+    }
+    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
+        match op {
+            CompareOp::Eq => (self == other).into_py(py),
+            CompareOp::Ne => (self != other).into_py(py),
+            _ => py.NotImplemented(),
+        }
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    #[getter]
+    fn number(&self, py: Python) -> PyObject {
+        decimal_to_py(py, self.number)
+    }
+}
+
+/// Convert from a Python object which has the correct attributes.
+pub fn cost_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Cost> {
+    if let Ok(a) = ob.downcast::<Cost>() {
+        Ok(a.get().clone())
+    } else {
+        let py = ob.py();
+        let number = ob.getattr(pyo3::intern!(py, "number"))?;
+        let currency = ob.getattr(pyo3::intern!(py, "currency"))?;
+        let date = ob.getattr(pyo3::intern!(py, "date"))?;
+        let label = ob.getattr(pyo3::intern!(py, "label"))?;
+
+        Ok(Cost {
+            number: py_to_decimal(&number)?,
+            currency: currency.extract()?,
+            date: date.extract()?,
+            label: label.extract()?,
+        })
+    }
+}
+
+pub fn option_cost_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Option<Cost>> {
+    Ok(if ob.is_none() {
+        None
+    } else {
+        Some(cost_from_py(ob)?)
+    })
+}
+
 /// A possibly incomplete cost as specified in the Beancount file.
-#[derive(Default, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
 pub struct CostSpec {
     /// The per-unit cost.
@@ -35,7 +110,7 @@ pub struct CostSpec {
 
 impl From<&Cost> for CostSpec {
     fn from(cost: &Cost) -> Self {
-        CostSpec {
+        Self {
             number_per: Some(cost.number),
             number_total: None,
             currency: Some(cost.currency.clone()),

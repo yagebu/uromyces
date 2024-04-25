@@ -2,7 +2,7 @@ use crate::types::{FilePath, LineNumber, RawPosting};
 
 /// An error that occurs during interpolation or booking.
 #[derive(Debug)]
-pub(crate) struct BookingError {
+pub struct BookingError {
     filename: Option<FilePath>,
     line: LineNumber,
     kind: BookingErrorKind,

@@ -1,4 +1,3 @@
-use log::info;
 use std::time::Instant;
 
 /// A simple timer that can be used to log the time that certain steps took.
@@ -21,9 +20,8 @@ impl SimpleTimer {
     /// Log the elapsed time since init or the last log and reset.
     pub fn log_elapsed(&mut self, step: &str) {
         let elapsed = self.time.elapsed();
-        info!(
-            target: step,
-            "time: {}.{:03}ms.",
+        log::info!(
+            "{:>4}.{:03}ms - {step}",
             elapsed.as_millis(),
             elapsed.as_micros() % 1000
         );

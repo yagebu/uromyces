@@ -1,22 +1,24 @@
-all:
-
-.PHONY: py
-py:
-	maturin build --release
-	pip install target/wheels/*.whl --force-reinstall
-	./run_python.py
+all: lint test
 
 .PHONY: lint
 lint:
 	cargo fmt
 	cargo clippy
+	pre-commit run -a
 
 .PHONY: test
 test:
 	cargo test
-	cargo doc
+	cargo doc --document-private-items
+	tox
 
-.PHONY: snapshots
-snapshots:
-	cargo insta test --delete-unreferenced-snapshots
+.PHONY: update
+update:
+	pre-commit autoupdate
+	cargo update
+	cargo outdated
+
+.PHONY: insta
+insta:
+	-cargo insta test --unreferenced=delete
 	cargo insta review

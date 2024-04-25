@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
-use chrono::{Datelike, NaiveDate};
-use pyo3::{IntoPy, PyObject, ToPyObject};
+use chrono::{Datelike, Days, NaiveDate};
+use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::py_bindings::date_to_py;
@@ -14,13 +14,15 @@ use crate::py_bindings::date_to_py;
 #[serde(transparent)]
 pub struct Date(NaiveDate);
 
+const ONE_DAY: Days = Days::new(1);
+
 impl Date {
     /// Try to parse a date from a string like "2012-12-12".
     pub(crate) fn try_from_str(s: &str) -> Result<Self, ()> {
         if s.len() < 10 {
             return Err(());
         }
-        Ok(Date(
+        Ok(Self(
             NaiveDate::from_ymd_opt(
                 s[0..4].parse().map_err(|_| ())?,
                 s[5..7].parse().map_err(|_| ())?,
@@ -30,19 +32,28 @@ impl Date {
         ))
     }
 
+    /// Get the year of this date.
     #[must_use]
     pub fn year(self) -> i32 {
         self.0.year()
     }
 
+    /// Get the month of this date.
     #[must_use]
     pub fn month(self) -> u32 {
         self.0.month()
     }
 
+    /// Get the day of this date.
     #[must_use]
     pub fn day(self) -> u32 {
         self.0.day()
+    }
+
+    /// Get the day previous to this day.
+    #[must_use]
+    pub fn previous_day(self) -> Option<Self> {
+        self.0.checked_sub_days(ONE_DAY).map(Self)
     }
 }
 
@@ -65,9 +76,29 @@ impl IntoPy<PyObject> for Date {
     }
 }
 
+impl<'py> FromPyObject<'py> for Date {
+    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+        let py = ob.py();
+        let year = ob.getattr(pyo3::intern!(py, "year"))?.extract()?;
+        let month = ob.getattr(pyo3::intern!(py, "month"))?.extract()?;
+        let day = ob.getattr(pyo3::intern!(py, "day"))?.extract()?;
+        Ok(Self(
+            NaiveDate::from_ymd_opt(year, month, day).expect("Python date to be a valid date."),
+        ))
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn date_getters() {
+        let date = Date::try_from_str("2023-01-03").unwrap();
+        assert_eq!(date.year(), 2023);
+        assert_eq!(date.month(), 1);
+        assert_eq!(date.day(), 3);
+    }
 
     #[test]
     fn date_from_str() {
@@ -75,7 +106,9 @@ mod test {
         assert!(Date::try_from_str("2022-12-1").is_err());
         assert!(Date::try_from_str("2022-22-11").is_err());
         let date = Date::try_from_str("2022-12-12").unwrap();
-        assert_eq!(date.year(), 2022);
+        assert_eq!((date.year(), date.month(), date.day()), (2022, 12, 12));
+        let date = Date::try_from_str("2022-12-12aasdfasdfasdf").unwrap();
+        assert_eq!((date.year(), date.month(), date.day()), (2022, 12, 12));
     }
 
     #[test]

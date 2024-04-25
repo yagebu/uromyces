@@ -7,7 +7,8 @@ fn snap_ledger(snap_name: &str, filename: &str) {
     settings.add_filter(cwd, "[REPO_DIR]");
     settings.remove_input_file();
     let path = current_dir.join("tests").join("ledgers").join(filename);
-    let ledger = uromyces::load(&path.try_into().expect("FilePath creation to work"));
+    let mut ledger = uromyces::load(&path.try_into().expect("FilePath creation to work"));
+    ledger.run_validations();
     settings.bind(|| {
         insta::assert_json_snapshot!(snap_name, ledger);
     });

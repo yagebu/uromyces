@@ -1,46 +1,56 @@
-use super::errors::{BookingError, BookingErrorKind};
 use crate::types::{CostSpec, Currency, IncompleteAmount, RawPosting};
 
+use super::errors::{BookingError, BookingErrorKind};
+
 /// Get the currency group for this posting.
-fn get_posting_currency_group(p: &RawPosting) -> Option<Currency> {
-    match (&p.cost, &p.price) {
-        // If there is a cost currency, use it
+///
+/// Sees whether one of the following exists and return it, in this order:
+/// - cost currency
+/// - price currency
+/// - units currency
+/// - None otherwise
+fn get_posting_currency_group(posting: &RawPosting) -> Option<&Currency> {
+    match (&posting.cost, &posting.price) {
         (
             Some(CostSpec {
                 currency: Some(cost_currency),
                 ..
             }),
             _,
-        ) => Some(cost_currency.clone()),
-        // If there is a price currency, use that next
+        ) => Some(cost_currency),
         (
             _,
             Some(IncompleteAmount {
                 currency: Some(price_currency),
                 ..
             }),
-        ) => Some(price_currency.clone()),
-        // If both price and cost are missing, use the units currency
-        (None, None) => p.units.currency.clone(),
-        // Otherwise, it's None
+        ) => Some(price_currency),
+        (None, None) => posting.units.currency.as_ref(),
         _ => None,
     }
 }
 
-type VecMap<K, V> = Vec<(K, Vec<V>)>;
+type GroupedPostings = Vec<(Currency, Vec<RawPosting>)>;
 
-type GroupedPostings = VecMap<Currency, RawPosting>;
-
-/// Push an item to the matching group (abusing the Vec as a kind of Map).
-fn push_to_group<K, V>(groups: &mut VecMap<K, V>, key: &K, value: V)
-where
-    K: PartialEq + Clone,
-{
-    let group = groups.iter_mut().find(|group| group.0 == *key);
-    if let Some((_, ps)) = group {
-        ps.push(value);
+/// Check whether all currencies are set in the posting.
+fn check_posting_currencies(posting: &RawPosting) -> Result<(), BookingError> {
+    if posting.units.currency.is_none() {
+        Err(BookingError::new(
+            posting,
+            BookingErrorKind::UnresolvedUnitsCurrency,
+        ))
+    } else if posting.price.iter().any(|v| v.currency.is_none()) {
+        Err(BookingError::new(
+            posting,
+            BookingErrorKind::UnresolvedPriceCurrency,
+        ))
+    } else if posting.cost.iter().any(|v| v.currency.is_none()) {
+        Err(BookingError::new(
+            posting,
+            BookingErrorKind::UnresolvedCostCurrency,
+        ))
     } else {
-        groups.push((key.clone(), vec![value]));
+        Ok(())
     }
 }
 
@@ -58,40 +68,45 @@ pub(super) fn group_and_fill_in_currencies(
     postings: &[RawPosting],
 ) -> Result<GroupedPostings, BookingError> {
     let mut auto_posting = None;
-    let mut groups = Vec::new();
+    let mut groups: GroupedPostings = Vec::new();
     let mut unknown = Vec::new();
 
-    for mut p in postings.iter().cloned() {
-        // Ensure that cost and price have the same currency.
-        if let Some(cost) = &mut p.cost {
-            if let Some(price) = &mut p.price {
-                // Both cost and price are set, now check if one of the currencies is missing.
-                // If so, set it to the other one.
-                if let Some(cost_currency) = &cost.currency {
-                    if price.currency.is_none() {
-                        price.currency = Some(cost_currency.clone());
-                    }
+    for mut posting in postings.iter().cloned() {
+        if let (Some(cost), Some(price)) = (&mut posting.cost, &mut posting.price) {
+            // Both cost and price are set, now check if one of the currencies is missing. If so,
+            // set it to the other one.
+            match (&cost.currency, &price.currency) {
+                (Some(cost_currency), None) => {
+                    price.currency = Some(cost_currency.clone());
                 }
-                if let Some(price_currency) = &price.currency {
-                    if cost.currency.is_none() {
-                        cost.currency = Some(price_currency.clone());
-                    }
+                (None, Some(price_currency)) => {
+                    cost.currency = Some(price_currency.clone());
                 }
+                _ => {}
             }
         }
 
-        if p.units.number.is_none() && p.units.currency.is_none() {
+        if posting.units.number.is_none() && posting.units.currency.is_none() {
             if auto_posting.is_some() {
                 return Err(BookingError::new(
-                    &p,
+                    &posting,
                     BookingErrorKind::MultipleAutoPostings,
                 ));
             }
-            auto_posting = Some(p);
+            auto_posting = Some(posting);
         } else {
-            match get_posting_currency_group(&p) {
-                Some(c) => push_to_group(&mut groups, &c, p),
-                None => unknown.push(p),
+            match get_posting_currency_group(&posting) {
+                Some(currency) => {
+                    check_posting_currencies(&posting)?;
+                    if let Some((_, group_postings)) =
+                        groups.iter_mut().find(|(c, _)| c == currency)
+                    {
+                        group_postings.push(posting);
+                    } else {
+                        groups.push((currency.clone(), vec![posting]));
+                    }
+                }
+                None => unknown.push(posting),
             };
         }
     }
@@ -99,51 +114,38 @@ pub(super) fn group_and_fill_in_currencies(
     // Only support this simple case for now.
     if unknown.len() < 2 && groups.len() == 1 {
         if let Some(mut unknown_posting) = unknown.pop() {
-            let currency = groups[0].0.clone();
-            if unknown_posting.cost.is_none() && unknown_posting.price.is_none() {
-                unknown_posting.units.currency = Some(currency.clone());
-            } else {
-                if let Some(cost) = &mut unknown_posting.cost {
+            let currency = &groups[0].0;
+            match (&mut unknown_posting.cost, &mut unknown_posting.price) {
+                (None, None) => {
+                    unknown_posting.units.currency = Some(currency.clone());
+                }
+                (Some(cost), None) => {
                     cost.currency = Some(currency.clone());
                 }
-                if let Some(price) = &mut unknown_posting.price {
+                (None, Some(price)) => {
+                    price.currency = Some(currency.clone());
+                }
+                (Some(cost), Some(price)) => {
+                    cost.currency = Some(currency.clone());
                     price.currency = Some(currency.clone());
                 }
             }
-            push_to_group(&mut groups, &currency, unknown_posting);
+            check_posting_currencies(&unknown_posting)?;
+            groups[0].1.push(unknown_posting);
         }
     }
+    // if we had more than one unknwon posting, this should now bubble up an error
+    for posting in unknown {
+        check_posting_currencies(&posting)?;
+    }
 
-    if let Some(auto_p) = auto_posting {
+    if let Some(auto_posting) = auto_posting {
         // Add this auto posting for each currency group.
-        for (currency, ps) in &mut groups {
-            let mut new_posting = auto_p.clone();
+        for (currency, group_postings) in &mut groups {
+            let mut new_posting = auto_posting.clone();
             new_posting.units.currency = Some(currency.clone());
-            ps.push(new_posting);
-        }
-    }
-
-    // Check that no currencies are missing.
-    for (_, postings) in &groups {
-        for posting in postings {
-            if posting.units.currency.is_none() {
-                return Err(BookingError::new(
-                    posting,
-                    BookingErrorKind::UnresolvedUnitsCurrency,
-                ));
-            }
-            if posting.price.iter().any(|v| v.currency.is_none()) {
-                return Err(BookingError::new(
-                    posting,
-                    BookingErrorKind::UnresolvedPriceCurrency,
-                ));
-            }
-            if posting.cost.iter().any(|v| v.currency.is_none()) {
-                return Err(BookingError::new(
-                    posting,
-                    BookingErrorKind::UnresolvedCostCurrency,
-                ));
-            }
+            check_posting_currencies(&new_posting)?;
+            group_postings.push(new_posting);
         }
     }
 
@@ -160,107 +162,295 @@ mod tests {
     fn test_get_currency_group() {
         fn t(p: &str, e: Option<&str>) {
             let posting = &postings_from_strings(&[p])[0];
-            assert_eq!(get_posting_currency_group(posting), e.map(c));
+            assert_eq!(get_posting_currency_group(posting), e.map(c).as_ref());
         }
-        t("A:C 20 USD", Some("USD"));
-        t("A:C    USD", Some("USD"));
-        t("A:C       ", None);
-        t("A:C 20 USD @ 20 EUR", Some("EUR"));
-        t("A:C 20 USD @    EUR", Some("EUR"));
-        t("A:C    USD @ 20 EUR", Some("EUR"));
-        t("A:C    USD @ 20 EUR", Some("EUR"));
-        t("A:C 20 USD @", None);
-        t("A:C 20 USD {       }", None);
-        t("A:C 20 USD {       } @", None);
-        t("A:C 20 USD {10 ASDF} @ 20 EUR", Some("ASDF"));
-        t("A:C 20 USD {10 ASDF} @    EUR", Some("ASDF"));
-        t("A:C 20 USD {   ASDF} @ 20 EUR", Some("ASDF"));
-        t("A:C 20 USD {   ASDF} @    EUR", Some("ASDF"));
-        t("A:C    USD {10 ASDF} @ 20 EUR", Some("ASDF"));
-        t("A:C    USD {10 ASDF} @    EUR", Some("ASDF"));
-        t("A:C    USD {   ASDF} @ 20 EUR", Some("ASDF"));
-        t("A:C    USD {   ASDF} @    EUR", Some("ASDF"));
+        t("Assets:Cash     20 USD", Some("USD"));
+        t("Assets:Cash        USD", Some("USD"));
+        t("Assets:Cash           ", None);
+        t("Assets:Cash     20 USD @ 20 EUR", Some("EUR"));
+        t("Assets:Cash     20 USD @    EUR", Some("EUR"));
+        t("Assets:Cash        USD @ 20 EUR", Some("EUR"));
+        t("Assets:Cash        USD @ 20 EUR", Some("EUR"));
+        t("Assets:Cash     20 USD @", None);
+        t("Assets:Cash     20 USD {       }", None);
+        t("Assets:Cash     20 USD {       } @", None);
+        t("Assets:Cash     20 USD {10 ASDF} @ 20 EUR", Some("ASDF"));
+        t("Assets:Cash     20 USD {10 ASDF} @    EUR", Some("ASDF"));
+        t("Assets:Cash     20 USD {   ASDF} @ 20 EUR", Some("ASDF"));
+        t("Assets:Cash     20 USD {   ASDF} @    EUR", Some("ASDF"));
+        t("Assets:Cash        USD {10 ASDF} @ 20 EUR", Some("ASDF"));
+        t("Assets:Cash        USD {10 ASDF} @    EUR", Some("ASDF"));
+        t("Assets:Cash        USD {   ASDF} @ 20 EUR", Some("ASDF"));
+        t("Assets:Cash        USD {   ASDF} @    EUR", Some("ASDF"));
     }
 
-    fn check(ps: &[&str]) -> String {
-        use std::fmt::Write;
-
-        let posting = &postings_from_strings(ps);
+    fn check_single_group(
+        currency: impl Into<Currency>,
+        posting_strings: &[&str],
+    ) -> Vec<RawPosting> {
+        let posting = &postings_from_strings(posting_strings);
         let groups = group_and_fill_in_currencies(posting).unwrap();
-        let mut s = String::new();
+        assert_eq!(groups.len(), 1);
+        let group = groups.into_iter().next().unwrap();
+        assert_eq!(group.0, currency.into());
+        group.1
+    }
 
-        for (currency, postings) in groups {
-            writeln!(&mut s, "{currency}").unwrap();
-            for p in postings {
-                writeln!(
-                    &mut s,
-                    "    account: {}; units: {:?}, price: {:?}, cost: {:?}",
-                    p.account, p.units, p.price, p.cost
-                )
-                .unwrap();
-            }
-        }
-        s
+    fn check(posting_strings: &[&str]) -> GroupedPostings {
+        let posting = &postings_from_strings(posting_strings);
+        group_and_fill_in_currencies(posting).unwrap()
     }
 
     #[test]
     fn test_filling_in_complete() {
-        let groups = check(&["Assets:Cash 20 USD"]);
-        insta::assert_snapshot!(groups, @r###"
-        USD
-            account: Assets:Cash; units: IncompleteAmount { number: Some(20), currency: Some(Currency("USD")) }, price: None, cost: None
+        let group = check_single_group("USD", &["Assets:Cash 20 USD"]);
+        insta::assert_json_snapshot!(group, @r###"
+        [
+          {
+            "filename": null,
+            "line": 2,
+            "meta": [],
+            "account": "Assets:Cash",
+            "flag": null,
+            "units": {
+              "number": "20",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null
+          }
+        ]
         "###);
     }
 
     #[test]
     fn test_filling_in_one_auto_posting() {
-        let groups = check(&["Assets:Cash 20 USD", "Assets:Cash2"]);
-        insta::assert_snapshot!(groups, @r###"
-        USD
-            account: Assets:Cash; units: IncompleteAmount { number: Some(20), currency: Some(Currency("USD")) }, price: None, cost: None
-            account: Assets:Cash2; units: IncompleteAmount { number: None, currency: Some(Currency("USD")) }, price: None, cost: None
+        let group = check_single_group("USD", &["Assets:Cash 20 USD", "Assets:Cash2"]);
+        insta::assert_json_snapshot!(group, @r###"
+        [
+          {
+            "filename": null,
+            "line": 2,
+            "meta": [],
+            "account": "Assets:Cash",
+            "flag": null,
+            "units": {
+              "number": "20",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null
+          },
+          {
+            "filename": null,
+            "line": 3,
+            "meta": [],
+            "account": "Assets:Cash2",
+            "flag": null,
+            "units": {
+              "number": null,
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null
+          }
+        ]
         "###);
     }
 
     #[test]
     fn test_filling_in_multiple_auto_postings() {
         let groups = check(&["Assets:Cash 20 USD", "Assets:Cash 20 EUR", "Assets:Cash2"]);
-        insta::assert_snapshot!(groups, @r###"
-        USD
-            account: Assets:Cash; units: IncompleteAmount { number: Some(20), currency: Some(Currency("USD")) }, price: None, cost: None
-            account: Assets:Cash2; units: IncompleteAmount { number: None, currency: Some(Currency("USD")) }, price: None, cost: None
-        EUR
-            account: Assets:Cash; units: IncompleteAmount { number: Some(20), currency: Some(Currency("EUR")) }, price: None, cost: None
-            account: Assets:Cash2; units: IncompleteAmount { number: None, currency: Some(Currency("EUR")) }, price: None, cost: None
+        insta::assert_json_snapshot!(groups, @r###"
+        [
+          [
+            "USD",
+            [
+              {
+                "filename": null,
+                "line": 2,
+                "meta": [],
+                "account": "Assets:Cash",
+                "flag": null,
+                "units": {
+                  "number": "20",
+                  "currency": "USD"
+                },
+                "price": null,
+                "cost": null
+              },
+              {
+                "filename": null,
+                "line": 4,
+                "meta": [],
+                "account": "Assets:Cash2",
+                "flag": null,
+                "units": {
+                  "number": null,
+                  "currency": "USD"
+                },
+                "price": null,
+                "cost": null
+              }
+            ]
+          ],
+          [
+            "EUR",
+            [
+              {
+                "filename": null,
+                "line": 3,
+                "meta": [],
+                "account": "Assets:Cash",
+                "flag": null,
+                "units": {
+                  "number": "20",
+                  "currency": "EUR"
+                },
+                "price": null,
+                "cost": null
+              },
+              {
+                "filename": null,
+                "line": 4,
+                "meta": [],
+                "account": "Assets:Cash2",
+                "flag": null,
+                "units": {
+                  "number": null,
+                  "currency": "EUR"
+                },
+                "price": null,
+                "cost": null
+              }
+            ]
+          ]
+        ]
         "###);
     }
 
     #[test]
     fn test_filling_cost() {
-        let groups = check(&["Assets:Cash 20 USD", "Assets:Cash2 30 APL {}"]);
-        insta::assert_snapshot!(groups, @r###"
-        USD
-            account: Assets:Cash; units: IncompleteAmount { number: Some(20), currency: Some(Currency("USD")) }, price: None, cost: None
-            account: Assets:Cash2; units: IncompleteAmount { number: Some(30), currency: Some(Currency("APL")) }, price: None, cost: Some(CostSpec { number_per: None, number_total: None, currency: Some(Currency("USD")), date: None, label: None, merge: false })
+        let group = check_single_group("USD", &["Assets:Cash 20 USD", "Assets:Cash2 30 APL {}"]);
+        insta::assert_json_snapshot!(group, @r###"
+        [
+          {
+            "filename": null,
+            "line": 2,
+            "meta": [],
+            "account": "Assets:Cash",
+            "flag": null,
+            "units": {
+              "number": "20",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null
+          },
+          {
+            "filename": null,
+            "line": 3,
+            "meta": [],
+            "account": "Assets:Cash2",
+            "flag": null,
+            "units": {
+              "number": "30",
+              "currency": "APL"
+            },
+            "price": null,
+            "cost": {
+              "number_per": null,
+              "number_total": null,
+              "currency": "USD",
+              "date": null,
+              "label": null,
+              "merge": false
+            }
+          }
+        ]
         "###);
     }
+
     #[test]
     fn test_filling_price() {
-        let groups = check(&["Assets:Cash 20 USD", "Assets:Cash2 30 APL @"]);
-        insta::assert_snapshot!(groups, @r###"
-        USD
-            account: Assets:Cash; units: IncompleteAmount { number: Some(20), currency: Some(Currency("USD")) }, price: None, cost: None
-            account: Assets:Cash2; units: IncompleteAmount { number: Some(30), currency: Some(Currency("APL")) }, price: Some(IncompleteAmount { number: None, currency: Some(Currency("USD")) }), cost: None
+        let group = check_single_group("USD", &["Assets:Cash 20 USD", "Assets:Cash2 30 APL @"]);
+        insta::assert_json_snapshot!(group, @r###"
+        [
+          {
+            "filename": null,
+            "line": 2,
+            "meta": [],
+            "account": "Assets:Cash",
+            "flag": null,
+            "units": {
+              "number": "20",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null
+          },
+          {
+            "filename": null,
+            "line": 3,
+            "meta": [],
+            "account": "Assets:Cash2",
+            "flag": null,
+            "units": {
+              "number": "30",
+              "currency": "APL"
+            },
+            "price": {
+              "number": null,
+              "currency": "USD"
+            },
+            "cost": null
+          }
+        ]
         "###);
     }
 
     #[test]
     fn test_filling_price_and_cost() {
-        let groups = check(&["Assets:Cash 20 USD", "Assets:Cash2 30 APL {} @"]);
-        insta::assert_snapshot!(groups, @r###"
-        USD
-            account: Assets:Cash; units: IncompleteAmount { number: Some(20), currency: Some(Currency("USD")) }, price: None, cost: None
-            account: Assets:Cash2; units: IncompleteAmount { number: Some(30), currency: Some(Currency("APL")) }, price: Some(IncompleteAmount { number: None, currency: Some(Currency("USD")) }), cost: Some(CostSpec { number_per: None, number_total: None, currency: Some(Currency("USD")), date: None, label: None, merge: false })
+        let group = check_single_group("USD", &["Assets:Cash 20 USD", "Assets:Cash2 30 APL {} @"]);
+        insta::assert_json_snapshot!(group, @r###"
+        [
+          {
+            "filename": null,
+            "line": 2,
+            "meta": [],
+            "account": "Assets:Cash",
+            "flag": null,
+            "units": {
+              "number": "20",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null
+          },
+          {
+            "filename": null,
+            "line": 3,
+            "meta": [],
+            "account": "Assets:Cash2",
+            "flag": null,
+            "units": {
+              "number": "30",
+              "currency": "APL"
+            },
+            "price": {
+              "number": null,
+              "currency": "USD"
+            },
+            "cost": {
+              "number_per": null,
+              "number_total": null,
+              "currency": "USD",
+              "date": null,
+              "label": null,
+              "merge": false
+            }
+          }
+        ]
         "###);
     }
 }

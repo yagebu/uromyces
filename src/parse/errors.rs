@@ -1,4 +1,8 @@
+use crate::errors::UroError;
 use crate::types::{FilePath, LineNumber};
+
+use super::convert::ConversionState;
+use super::NodeGetters;
 
 /// An error that might occur when trying to parse a string with tree-sitter.
 #[derive(Debug)]
@@ -6,7 +10,6 @@ pub enum ParsingError {
     /// Parsing timeout.
     ParsingTimedOut,
 }
-
 impl std::error::Error for ParsingError {}
 
 impl std::fmt::Display for ParsingError {
@@ -33,7 +36,7 @@ impl ConversionError {
         node: &tree_sitter::Node,
         s: &ConversionState,
     ) -> Self {
-        ConversionError {
+        Self {
             filename: s.filename.clone(),
             line: node.line_number(),
             kind,
@@ -47,14 +50,10 @@ pub enum ConversionErrorKind {
     InvalidBookingMethod(String),
     InvalidDate(String),
     InvalidDecimal(String, String),
+    InvalidDocumentFilename(String),
     UnsupportedTotalCost,
     SyntaxError(String),
 }
-
-use crate::errors::UroError;
-
-use super::convert::ConversionState;
-use super::NodeGetters;
 
 impl std::error::Error for ConversionError {}
 
@@ -68,6 +67,7 @@ impl std::fmt::Display for ConversionError {
             K::InvalidDecimal(m, decimal_error) => {
                 write!(f, "Invalid decimal number '{m}': {decimal_error}")
             }
+            K::InvalidDocumentFilename(m) => write!(f, "Invalid document filename: {m}"),
             K::UnsupportedTotalCost => write!(
                 f,
                 "the deprecated total cost syntax '{{}}' brackets is not supported"

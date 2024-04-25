@@ -7,6 +7,7 @@ use crate::tolerances::balance_tolerance;
 use crate::types::{Account, Balance, Entry, Posting};
 use crate::Ledger;
 
+/// A balance assertion failed.
 struct BalanceCheckError {
     account: Account,
     balance_entry: Balance,
@@ -66,7 +67,7 @@ impl<'ledger> BalanceChecker<'ledger> {
 
     fn posting(&mut self, posting: &Posting) {
         // we only add the units here, we do not care about the cost for balance assertions.
-        self.balance.add_amount(posting.units.clone());
+        self.balance.add_position(&posting.units);
     }
 
     fn balance(&mut self, entry: &'ledger Balance) {
@@ -133,21 +134,25 @@ pub fn check_balance_assertions(ledger: &Ledger) -> Vec<UroError> {
                             active
                         });
                     for ancestor in active_ancestors {
-                        balance_checkers.get_mut(ancestor).unwrap().posting(posting);
+                        balance_checkers
+                            .get_mut(ancestor)
+                            .expect("balance_checker to be created above")
+                            .posting(posting);
                     }
                 }
             }
             Entry::Balance(e) => {
-                if let Some(state) = balance_checkers.get_mut(&e.account) {
-                    state.balance(e);
-                }
+                let state = balance_checkers
+                    .get_mut(&e.account)
+                    .expect("balance_checker to be created above");
+                state.balance(e);
             }
             _ => {}
         }
     }
 
     let mut sorted_checkers = balance_checkers.into_iter().collect::<Vec<_>>();
-    sorted_checkers.sort_unstable_by_key(|v| v.0.clone());
+    sorted_checkers.sort_unstable_by_key(|v| v.0);
     sorted_checkers
         .into_iter()
         .flat_map(|s| s.1.errors)
@@ -172,20 +177,20 @@ mod tests {
 
     #[test]
     fn test_simple_error() {
-        insta::assert_debug_snapshot!(check(r"
+        insta::assert_json_snapshot!(check(r"
 2013-05-01 open Assets:US:Checking
 
 2013-05-03 balance Assets:US:Checking   100 USD
 "), @r###"
         [
-            "Balance failed for 'Assets:US:Checking': expected 100 USD != accumulated 0 USD (100 too little)",
+          "Balance failed for 'Assets:US:Checking': expected 100 USD != accumulated 0 USD (100 too little)"
         ]
         "###);
     }
 
     #[test]
     fn test_parents() {
-        insta::assert_debug_snapshot!(check(r"
+        insta::assert_json_snapshot!(check(r"
 2013-05-01 open Assets:Bank
 2013-05-01 open Assets:Bank:Checking1
 2013-05-01 open Assets:Bank:Checking2
@@ -213,7 +218,7 @@ mod tests {
 
     #[test]
     fn test_precision() {
-        insta::assert_debug_snapshot!(check(r"
+        insta::assert_json_snapshot!(check(r"
 2013-05-01 open Assets:Bank:Checking
 2013-05-01 open Income:Interest
 
@@ -239,7 +244,7 @@ mod tests {
 
     #[test]
     fn test_mixed_cost_and_no_cost() {
-        insta::assert_debug_snapshot!(check(r"
+        insta::assert_json_snapshot!(check(r"
 2013-05-01 open Assets:Invest
 2013-05-01 open Equity:Opening-Balances
 
@@ -257,7 +262,7 @@ mod tests {
 
     #[test]
     fn test_balance_with_tolerance() {
-        insta::assert_debug_snapshot!(check(r"
+        insta::assert_json_snapshot!(check(r"
 2013-05-01 open Assets:Bank:Checking
 2013-05-01 open Equity:Opening-Balances
 
@@ -274,8 +279,8 @@ mod tests {
 2015-05-10 balance Assets:Bank:Checking   23.03 ~ 0.01 USD
 "), @r###"
         [
-            "Balance failed for 'Assets:Bank:Checking': expected 23.022 USD != accumulated 23.024 USD (0.002 too much)",
-            "Balance failed for 'Assets:Bank:Checking': expected 23.026 USD != accumulated 23.024 USD (0.002 too little)",
+          "Balance failed for 'Assets:Bank:Checking': expected 23.022 USD != accumulated 23.024 USD (0.002 too much)",
+          "Balance failed for 'Assets:Bank:Checking': expected 23.026 USD != accumulated 23.024 USD (0.002 too little)"
         ]
         "###);
     }

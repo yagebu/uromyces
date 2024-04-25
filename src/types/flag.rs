@@ -1,6 +1,8 @@
 use std::fmt::{Debug, Display};
 
-use pyo3::{IntoPy, PyObject, ToPyObject};
+use pyo3::exceptions::PyValueError;
+use pyo3::prelude::*;
+use pyo3::pybacked::PyBackedStr;
 use serde::{Deserialize, Serialize};
 
 /// An transaction or posting flag.
@@ -33,7 +35,7 @@ impl<'de> Deserialize<'de> for Flag {
         D: serde::Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        Ok(Flag::try_from(s.as_ref()).unwrap_or_default())
+        Ok(Self::try_from(s.as_ref()).unwrap_or_default())
     }
 }
 
@@ -94,6 +96,13 @@ impl ToPyObject for Flag {
 impl IntoPy<PyObject> for Flag {
     fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
         self.to_object(py)
+    }
+}
+
+impl<'py> FromPyObject<'py> for Flag {
+    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+        let str = ob.extract::<PyBackedStr>()?;
+        Self::try_from(&*str).map_err(|_e| PyValueError::new_err("Invalid flag"))
     }
 }
 

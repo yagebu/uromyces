@@ -1,3 +1,4 @@
+//! Plugins that implement custom checks, validations and functionality.
 use crate::errors::UroError;
 use crate::ledgers::Ledger;
 use crate::types::Entry;
@@ -5,6 +6,7 @@ use crate::util::timer::SimpleTimer;
 
 mod balances;
 mod documents;
+mod implicit_prices;
 mod pad;
 mod validation;
 
@@ -40,6 +42,26 @@ pub fn run_pre(ledger: &mut Ledger) {
     }
     ledger.entries.sort();
     total.log_elapsed("pre_plugin");
+}
+
+const NAMED_PLUGINS: [(&str, ExtendPlugin); 1] =
+    [("beancount.plugins.implicit_prices", implicit_prices::add)];
+
+pub fn get_named_plugin(plugin: &str) -> Option<ExtendPlugin> {
+    NAMED_PLUGINS.iter().find(|n| n.0 == plugin).map(|n| n.1)
+}
+
+/// Run a named plugin.
+pub fn run_named_plugin(ledger: &mut Ledger, plugin: &str) -> bool {
+    let func = get_named_plugin(plugin);
+    let Some(func) = func else { return false };
+    let mut t = SimpleTimer::new();
+    let (mut entries, mut errors) = func(ledger);
+    ledger.entries.append(&mut entries);
+    ledger.errors.append(&mut errors);
+    ledger.entries.sort();
+    t.log_elapsed(&format!("plugin '{plugin}'"));
+    true
 }
 
 // The validations to run after all other plugins.

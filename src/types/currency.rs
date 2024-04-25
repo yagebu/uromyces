@@ -1,7 +1,8 @@
 use std::fmt::{Debug, Display};
 
 use internment::ArcIntern;
-use pyo3::{IntoPy, PyObject, ToPyObject};
+use pyo3::prelude::*;
+use pyo3::pybacked::PyBackedStr;
 use serde::{Deserialize, Serialize};
 
 /// A currency name.
@@ -24,6 +25,7 @@ impl Display for Currency {
     }
 }
 
+#[cfg(test)]
 impl PartialEq<str> for Currency {
     fn eq(&self, other: &str) -> bool {
         self.0.as_ref() == other
@@ -32,7 +34,7 @@ impl PartialEq<str> for Currency {
 
 impl From<&str> for Currency {
     fn from(s: &str) -> Self {
-        Currency(ArcIntern::from_ref(s))
+        Self(ArcIntern::from_ref(s))
     }
 }
 
@@ -45,5 +47,12 @@ impl ToPyObject for Currency {
 impl IntoPy<PyObject> for Currency {
     fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
         self.0.to_object(py)
+    }
+}
+
+impl<'py> FromPyObject<'py> for Currency {
+    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+        let str = ob.extract::<PyBackedStr>()?;
+        Ok(Self::from(&*str))
     }
 }

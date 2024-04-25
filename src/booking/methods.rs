@@ -20,12 +20,12 @@ pub(super) enum BookingMethod {
 
 impl BookingMethod {
     /// Turn a booking method option into one of the valid booking methods.
-    pub fn from_option(b: Booking) -> Option<BookingMethod> {
+    pub fn from_option(b: Booking) -> Option<Self> {
         match b {
-            Booking::Average => Some(BookingMethod::Average),
-            Booking::Fifo => Some(BookingMethod::Ordered(ClosingOrder::Fifo)),
-            Booking::Lifo => Some(BookingMethod::Ordered(ClosingOrder::Lifo)),
-            Booking::Strict => Some(BookingMethod::Strict),
+            Booking::Average => Some(Self::Average),
+            Booking::Fifo => Some(Self::Ordered(ClosingOrder::Fifo)),
+            Booking::Lifo => Some(Self::Ordered(ClosingOrder::Lifo)),
+            Booking::Strict => Some(Self::Strict),
             Booking::None => None,
         }
     }
@@ -76,6 +76,38 @@ fn resolve_ordered(
     }
 }
 
+fn resolve_strict(
+    posting_units: &Amount,
+    matches: &[PositionWithCost],
+) -> Result<Vec<(IncompleteAmount, CostSpec)>, BookingErrorKind> {
+    let sign_positive = posting_units.number.is_sign_positive();
+    let mut remaining = posting_units.number.abs();
+
+    if matches.len() > 1 {
+        // let sum = matches.iter().map(|p| p.number).sum();
+        todo!("check for matching sum");
+    } else {
+        let position = &matches[0];
+
+        let mut reduced = std::cmp::min(position.number.abs(), remaining);
+
+        remaining -= reduced;
+        reduced.set_sign_positive(sign_positive);
+
+        if remaining > Decimal::ZERO {
+            Err(BookingErrorKind::InsufficientLots)
+        } else {
+            Ok(vec![(
+                IncompleteAmount {
+                    number: Some(reduced),
+                    currency: Some(position.currency.clone()),
+                },
+                position.cost.into(),
+            )])
+        }
+    }
+}
+
 /// Close the matching positions.
 pub(super) fn resolve_matches(
     method: &BookingMethod,
@@ -111,7 +143,11 @@ pub(super) fn resolve_matches(
             }
         }
         BookingMethod::Strict => {
-            todo!("implement strict booking method.")
+            let resolved =
+                resolve_strict(units, &matches).map_err(|kind| BookingError::new(posting, kind))?;
+            for (units, cost) in resolved {
+                add_closing_position(posting, units, cost);
+            }
         }
         BookingMethod::Average => {
             return Err(BookingError::new(

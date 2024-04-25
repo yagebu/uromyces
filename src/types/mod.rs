@@ -5,24 +5,52 @@
 //! To be able to apply various optimisations and properly distinguish between them, basic
 //! string-like types like [`Currency`] and [`Account`] each have their own wrapper type. With
 //! their help, we can use string interners and easily make specific methods (like getting the
-//! parent for an account) available.
-//!
-//! All of these data types can be serialised with `serde`.
+//! parent for an account) available. All of these data types can be serialised with `serde`.
 //!
 //! ## Entries
 //!
 //! Entries are the central composite data structure for transactions, documents and the other
-//! types of Beancount input data.
+//! types of Beancount input data. Each entry type exists as a separate struct:
+//!
+//! - [`Balance`]
+//! - [`Close`]
+//! - [`Commodity`]
+//! - [`Custom`]
+//! - [`Document`]
+//! - [`Event`]
+//! - [`Note`]
+//! - [`Open`]
+//! - [`Pad`]
+//! - [`Price`]
+//! - [`Query`]
+//! - [`Transaction`]
+//!
+//! Before booking, various attributes on the postings of a transaction might still be missing,
+//! such an unbooked transaction is represented by the [`RawTransaction`].
+//!
+//! To handle collections of entries, we have the enum [`Entry`], which has the above list of
+//! different entry structs as its variants. To represented entries before booking, the
+//! [`RawEntry`] enum represents mostly the same by contains a raw transaction instead of a fully
+//! booked transaction.
 //!
 //! ## Base data types
 //!
+//! - [`Account`] - an account name
+//! - [`Booking`] - an enumeration of the possible booking methods for accounts
+//! - [`Currency`] - a currency name
+//! - [`Date`] - a simple date
 //! - [`Decimal`] - all numbers that represent some financial value.
-// - TODO: docs
-
-#![allow(clippy::unsafe_derive_deserialize)]
+//! - [`FilePath`] - a file path - ensured to be absolute and valid unicode
+//! - [`Flag`] - an enumeration of the possible transaction or posting flags
+//!
+//! ## Base composite data types
+//!
+//! - [`Amount`] - an amount, a number of some currency
 
 use std::fmt::Debug;
+use std::hash::{Hash, Hasher};
 
+use pyo3::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 pub(crate) use rust_decimal::Decimal;
@@ -35,26 +63,30 @@ mod cost;
 mod currency;
 mod date;
 mod flag;
+mod metadata;
 mod paths;
 mod tags_links;
 
-pub use account::{Account, RootAccounts};
+pub use account::{Account, RootAccounts, SummarizationAccounts};
 pub use amount::{Amount, IncompleteAmount};
 pub use booking::Booking;
 pub use cost::{Cost, CostSpec};
 pub use currency::Currency;
 pub use date::Date;
 pub use flag::Flag;
+pub use metadata::{EntryHeader, Meta, MetaKeyValuePair, MetaValue};
 pub use paths::FilePath;
 pub use tags_links::TagsLinks;
 
-use crate::py_bindings::decimal_to_py;
+use crate::py_bindings::{decimal_to_py, get_python_types, py_to_decimal};
+use amount::{amount_from_py, option_amount_from_py};
+use cost::option_cost_from_py;
 
 /// The type to use for line numbers in file positions.
 pub type LineNumber = u32;
 
 /// A raw Beancount directive (option, plugin, or include).
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RawDirective {
     /// A raw Beancount option.
     Option {
@@ -74,86 +106,38 @@ pub enum RawDirective {
 
 /// A plugin directive.
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[pyclass(frozen, module = "uromyces")]
 pub struct Plugin {
+    /// The plugin name - name of a Python module that contains plugin functions in `__plugins__`.
+    #[pyo3(get)]
     pub name: String,
+    /// Optionally, config for the plugin.
+    #[pyo3(get)]
     pub config: Option<String>,
 }
 
-/// Possible metadata values (this is also used for custom entries).
+/// A custom value - a value and associated type.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum MetaValue {
-    String(String),
-    Tag(String),
-    Date(Date),
-    Account(Account),
-    Bool(bool),
-    Amount(Amount),
-    Number(Decimal),
-}
+#[pyclass(frozen, module = "uromyces")]
+#[serde(transparent)]
+pub struct CustomValue(pub(crate) MetaValue);
 
-impl ToPyObject for MetaValue {
-    fn to_object(&self, py: Python<'_>) -> PyObject {
-        match self {
-            Self::String(v) | Self::Tag(v) => v.to_object(py),
-            Self::Date(v) => v.to_object(py),
-            Self::Account(v) => v.to_object(py),
-            Self::Bool(v) => v.to_object(py),
-            Self::Amount(v) => v.clone().into_py(py),
-            Self::Number(v) => decimal_to_py(py, *v).unwrap(),
-        }
+#[pymethods]
+impl CustomValue {
+    #[getter]
+    fn value(&self) -> MetaValue {
+        self.0.clone()
     }
-}
-
-/// A single key-value pair in metadata.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct MetaKeyValuePair {
-    pub key: String,
-    pub value: Option<MetaValue>,
-}
-
-/// Metadata, a list of key-value pairs.
-pub type Meta = Vec<MetaKeyValuePair>;
-
-/// The "entry header", the data which all entries carry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct EntryHeader {
-    /// Entry date.
-    pub date: Date,
-    /// Entry metadata.
-    pub meta: Meta,
-    /// Tags of the entry.
-    pub tags: TagsLinks,
-    /// Links of the entry.
-    pub links: TagsLinks,
-    /// The filename.
-    pub filename: Option<FilePath>,
-    /// The 1-based line number.
-    pub line: LineNumber,
-}
-
-impl EntryHeader {
-    /// Create a new entry header (with empty metadata, tags and links).
-    #[must_use]
-    pub fn new(date: Date, filename: Option<FilePath>, line: LineNumber) -> Self {
-        Self {
-            date,
-            meta: Meta::default(),
-            tags: TagsLinks::default(),
-            links: TagsLinks::default(),
-            filename,
-            line,
+    #[getter]
+    fn dtype<'py>(&self, py: Python<'py>) -> &Bound<'py, PyAny> {
+        match self.0 {
+            MetaValue::String(_) | MetaValue::Tag(_) => get_python_types(py).str.bind(py),
+            MetaValue::Date(_) => get_python_types(py).date.bind(py),
+            MetaValue::Account(_) => get_python_types(py).account_dummy.bind(py),
+            MetaValue::Bool(_) => get_python_types(py).bool.bind(py),
+            MetaValue::Amount(_) => get_python_types(py).amount.bind(py),
+            MetaValue::Number(_) => get_python_types(py).decimal.bind(py),
         }
-    }
-
-    /// Convert this to a Python dictionary like the `meta` attribute of Beancount entries.
-    fn to_py_dict(&self, py: Python) -> PyResult<Py<PyDict>> {
-        let meta = PyDict::new(py);
-        meta.set_item(pyo3::intern!(py, "filename"), &self.filename)?;
-        meta.set_item(pyo3::intern!(py, "lineno"), self.line)?;
-        for kv in &self.meta {
-            meta.set_item(&kv.key, kv.value.to_object(py))?;
-        }
-        Ok(meta.into())
     }
 }
 
@@ -161,12 +145,13 @@ impl EntryHeader {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Balance {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
     #[pyo3(get)]
     pub amount: Amount,
-    // TODO #[pyo3(get)]
+    // getter is implemented below
     pub tolerance: Option<Decimal>,
 }
 
@@ -174,6 +159,7 @@ pub struct Balance {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Close {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -183,6 +169,7 @@ pub struct Close {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Commodity {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub currency: Currency,
@@ -192,17 +179,19 @@ pub struct Commodity {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Custom {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub r#type: String,
-    // TODO pyo3 get
-    pub values: Vec<MetaValue>,
+    #[pyo3(get)]
+    pub values: Vec<CustomValue>,
 }
 
 /// An document entry for an account.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Document {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -214,6 +203,7 @@ pub struct Document {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Event {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub r#type: String,
@@ -225,6 +215,7 @@ pub struct Event {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Open {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -238,6 +229,7 @@ pub struct Open {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Note {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -249,6 +241,7 @@ pub struct Note {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Pad {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -260,6 +253,7 @@ pub struct Pad {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Price {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub currency: Currency,
@@ -271,7 +265,7 @@ pub struct Price {
 ///
 /// During booking, the incomplete amounts will be replaced with the actual amounts
 /// and the cost spec will turn into a cost.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RawPosting {
     /// The filename.
     pub filename: Option<FilePath>,
@@ -294,16 +288,68 @@ pub struct Posting {
     pub filename: Option<FilePath>,
     /// The 1-based line number.
     pub line: LineNumber,
+    /// Metadata for the posting.
     pub meta: Meta,
 
+    /// The account that the posting should be booked to.
+    #[pyo3(get)]
     pub account: Account,
-    pub flag: Option<Flag>,
+    /// The units of the posting.
+    #[pyo3(get)]
     pub units: Amount,
+    /// An optional price for the units of the posting.
+    #[pyo3(get)]
     pub price: Option<Amount>,
+    /// An optional cost for the units of the posting.
+    #[pyo3(get)]
     pub cost: Option<Cost>,
+    /// An optional flag for the posting.
+    #[pyo3(get)]
+    pub flag: Option<Flag>,
+}
+
+#[pymethods]
+impl Posting {
+    #[new]
+    #[pyo3(signature = (account, units, cost=None, price=None, flag=None, meta=None))]
+    fn __new__(
+        account: Account,
+        #[pyo3(from_py_with = "amount_from_py")] units: Amount,
+        #[pyo3(from_py_with = "option_cost_from_py")] cost: Option<Cost>,
+        #[pyo3(from_py_with = "option_amount_from_py")] price: Option<Amount>,
+        flag: Option<Flag>,
+        meta: Option<&Bound<'_, PyDict>>,
+    ) -> PyResult<Self> {
+        let (filename, line, meta) = match meta {
+            Some(meta) => metadata::extract_meta_dict(meta)?,
+            None => (None, 0, Meta::default()),
+        };
+        Ok(Self {
+            filename,
+            line,
+            meta,
+            account,
+            units,
+            price,
+            cost,
+            flag,
+        })
+    }
+    #[getter]
+    fn meta<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
+        self.meta.to_py_dict(py, &self.filename, self.line)
+    }
+    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
+        match op {
+            CompareOp::Eq => (self == other).into_py(py),
+            CompareOp::Ne => (self != other).into_py(py),
+            _ => py.NotImplemented(),
+        }
+    }
 }
 
 impl Posting {
+    /// Create a posting for an account with just some units.
     #[must_use]
     pub(crate) fn new_simple(account: Account, units: Amount) -> Self {
         Self {
@@ -314,7 +360,22 @@ impl Posting {
             units,
             cost: None,
             price: None,
-            meta: Vec::new(),
+            meta: Meta::default(),
+        }
+    }
+
+    /// Create a posting for an account with just units and possibly a cost.
+    #[must_use]
+    pub(crate) fn new_with_cost(account: Account, units: Amount, cost: Option<Cost>) -> Self {
+        Self {
+            flag: None,
+            filename: None,
+            line: 0,
+            account,
+            units,
+            cost,
+            price: None,
+            meta: Meta::default(),
         }
     }
 }
@@ -323,6 +384,7 @@ impl Posting {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Transaction {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub flag: Flag,
@@ -338,7 +400,7 @@ pub struct Transaction {
 ///
 /// After parsing, parts of the transaction might still be missing and will
 /// only be inferred during booking.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RawTransaction {
     pub header: EntryHeader,
     pub flag: Flag,
@@ -351,6 +413,7 @@ pub struct RawTransaction {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct Query {
+    #[serde(flatten)]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub name: String,
@@ -359,7 +422,7 @@ pub struct Query {
 }
 
 /// The Beancount entries (raw, after parsing).
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RawEntry {
     Balance(Balance),
     Close(Close),
@@ -371,13 +434,14 @@ pub enum RawEntry {
     Open(Open),
     Pad(Pad),
     Price(Price),
-    Transaction(RawTransaction),
     Query(Query),
+    Transaction(RawTransaction),
 }
 
 /// The Beancount entries.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(tag = "t")]
+#[derive(FromPyObject)]
 pub enum Entry {
     Balance(Balance),
     Close(Close),
@@ -389,12 +453,399 @@ pub enum Entry {
     Open(Open),
     Pad(Pad),
     Price(Price),
-    Transaction(Transaction),
     Query(Query),
+    Transaction(Transaction),
 }
 
-/// Since all the entry types need the same additional getter functions, this short macro provides
-/// them.
+#[pymethods]
+impl Balance {
+    #[new]
+    #[pyo3(signature = (header, account, amount, tolerance=None))]
+    fn __new__(
+        header: EntryHeader,
+        account: Account,
+        #[pyo3(from_py_with = "amount_from_py")] amount: Amount,
+        tolerance: Option<&Bound<'_, PyAny>>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header,
+            account,
+            amount,
+            tolerance: tolerance.map(py_to_decimal).transpose()?,
+        })
+    }
+
+    #[getter]
+    fn tolerance(&self, py: Python) -> Option<PyObject> {
+        self.tolerance.map(|t| decimal_to_py(py, t))
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, amount=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        account: Option<Account>,
+        amount: Option<Amount>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            account: account.unwrap_or_else(|| self.account.clone()),
+            amount: amount.unwrap_or_else(|| self.amount.clone()),
+            tolerance: self.tolerance,
+        })
+    }
+}
+#[pymethods]
+impl Close {
+    #[new]
+    fn __new__(header: EntryHeader, account: Account) -> Self {
+        Self { header, account }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        account: Option<Account>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            account: account.unwrap_or_else(|| self.account.clone()),
+        })
+    }
+}
+#[pymethods]
+impl Commodity {
+    #[new]
+    fn __new__(header: EntryHeader, currency: Currency) -> Self {
+        Self { header, currency }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, currency=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        currency: Option<Currency>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            currency: currency.unwrap_or_else(|| self.currency.clone()),
+        })
+    }
+}
+#[pymethods]
+impl Custom {
+    #[new]
+    fn __new__(header: EntryHeader, r#type: String, values: Vec<CustomValue>) -> Self {
+        Self {
+            header,
+            r#type,
+            values,
+        }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, r#type=None, values=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        r#type: Option<String>,
+        values: Option<Vec<CustomValue>>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            r#type: r#type.unwrap_or_else(|| self.r#type.clone()),
+            values: values.unwrap_or_else(|| self.values.clone()),
+        })
+    }
+}
+#[pymethods]
+impl Document {
+    #[new]
+    fn __new__(header: EntryHeader, account: Account, filename: FilePath) -> Self {
+        Self {
+            header,
+            account,
+            filename,
+        }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, filename=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        account: Option<Account>,
+        filename: Option<FilePath>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            account: account.unwrap_or_else(|| self.account.clone()),
+            filename: filename.unwrap_or_else(|| self.filename.clone()),
+        })
+    }
+}
+#[pymethods]
+impl Event {
+    #[new]
+    fn __new__(header: EntryHeader, r#type: String, description: String) -> Self {
+        Self {
+            header,
+            r#type,
+            description,
+        }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, r#type=None, description=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        r#type: Option<String>,
+        description: Option<String>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            r#type: r#type.unwrap_or_else(|| self.r#type.clone()),
+            description: description.unwrap_or_else(|| self.description.clone()),
+        })
+    }
+}
+#[pymethods]
+impl Note {
+    #[new]
+    fn __new__(header: EntryHeader, account: Account, comment: String) -> Self {
+        Self {
+            header,
+            account,
+            comment,
+        }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, comment=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        account: Option<Account>,
+        comment: Option<String>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            account: account.unwrap_or_else(|| self.account.clone()),
+            comment: comment.unwrap_or_else(|| self.comment.clone()),
+        })
+    }
+}
+#[pymethods]
+impl Open {
+    #[new]
+    #[pyo3(signature = (header, account, currencies, booking=None))]
+    fn __new__(
+        header: EntryHeader,
+        account: Account,
+        currencies: Vec<Currency>,
+        booking: Option<Booking>,
+    ) -> Self {
+        Self {
+            header,
+            account,
+            currencies,
+            booking,
+        }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, currencies=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        account: Option<Account>,
+        currencies: Option<Vec<Currency>>,
+        // TODO: booking: Option<Booking>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            account: account.unwrap_or_else(|| self.account.clone()),
+            currencies: currencies.unwrap_or_else(|| self.currencies.clone()),
+            booking: self.booking,
+        })
+    }
+}
+#[pymethods]
+impl Pad {
+    #[new]
+    fn __new__(header: EntryHeader, account: Account, source_account: Account) -> Self {
+        Self {
+            header,
+            account,
+            source_account,
+        }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, source_account=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        account: Option<Account>,
+        source_account: Option<Account>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            account: account.unwrap_or_else(|| self.account.clone()),
+            source_account: source_account.unwrap_or_else(|| self.source_account.clone()),
+        })
+    }
+}
+#[pymethods]
+impl Price {
+    #[new]
+    fn __new__(
+        header: EntryHeader,
+        currency: Currency,
+        #[pyo3(from_py_with = "amount_from_py")] amount: Amount,
+    ) -> Self {
+        Self {
+            header,
+            currency,
+            amount,
+        }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, currency=None, amount=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        currency: Option<Currency>,
+        amount: Option<Amount>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            currency: currency.unwrap_or_else(|| self.currency.clone()),
+            amount: amount.unwrap_or_else(|| self.amount.clone()),
+        })
+    }
+}
+#[pymethods]
+impl Query {
+    #[new]
+    fn __new__(header: EntryHeader, name: String, query_string: String) -> Self {
+        Self {
+            header,
+            name,
+            query_string,
+        }
+    }
+
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, name=None, query_string=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        name: Option<String>,
+        query_string: Option<String>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            name: name.unwrap_or_else(|| self.name.clone()),
+            query_string: query_string.unwrap_or_else(|| self.query_string.clone()),
+        })
+    }
+}
+#[pymethods]
+impl Transaction {
+    #[new]
+    fn __new__(
+        header: EntryHeader,
+        flag: Flag,
+        payee: String,
+        narration: String,
+        postings: Vec<Posting>,
+    ) -> Self {
+        Self {
+            header,
+            flag,
+            payee: Some(payee),
+            narration: Some(narration),
+            postings,
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, flag=None, payee=None, narration=None, postings=None))]
+    fn _replace(
+        &self,
+        date: Option<Date>,
+        meta: Option<&Bound<'_, PyDict>>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+        flag: Option<Flag>,
+        payee: Option<String>,
+        narration: Option<String>,
+        postings: Option<Vec<Posting>>,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            header: self
+                .header
+                .replace_meta_tags_links(date, meta, tags, links)?,
+            flag: flag.unwrap_or(self.flag),
+            payee: payee.or_else(|| self.payee.clone()),
+            narration: narration.or_else(|| self.narration.clone()),
+            postings: postings.unwrap_or_else(|| self.postings.clone()),
+        })
+    }
+}
+
+/// Since all the entry types need the same additional getter functions, this macro provides them.
 macro_rules! pymethods_for_entry {
     ($a:ident) => {
         #[pymethods]
@@ -412,41 +863,31 @@ macro_rules! pymethods_for_entry {
                 &self.header.tags
             }
             #[getter]
-            fn meta(&self, py: Python) -> PyResult<Py<PyDict>> {
+            fn header(&self) -> EntryHeader {
+                self.header.clone()
+            }
+            #[getter]
+            fn meta<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
                 self.header.to_py_dict(py)
+            }
+            fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
+                match op {
+                    CompareOp::Eq => (self == other).into_py(py),
+                    CompareOp::Ne => (self != other).into_py(py),
+                    _ => py.NotImplemented(),
+                }
+            }
+            fn __hash__(&self) -> u64 {
+                // use a fixed hash function here and not the Rust DefaultHasher to keep it stable
+                let mut hasher = ahash::AHasher::default();
+                self.hash(&mut hasher);
+                hasher.finish()
+            }
+            fn to_json(&self) -> String {
+                serde_json::to_string(&Into::<Entry>::into(self.clone())).unwrap()
             }
         }
     };
-}
-
-// We need this newtype wrapper to define a pyclass for rust_decimal::Decimal
-#[pyclass(frozen, module = "uromyces", name = "Decimal")]
-pub(crate) struct DecimalPyWrapper(Decimal);
-
-#[pymethods]
-impl Posting {
-    #[getter]
-    fn account(&self, py: Python) -> PyObject {
-        self.account.to_object(py)
-    }
-    #[getter]
-    fn flag(&self) -> Option<Flag> {
-        self.flag
-    }
-    #[getter]
-    fn meta(&self, py: Python) -> PyResult<Py<PyDict>> {
-        let meta = PyDict::new(py);
-        meta.set_item(pyo3::intern!(py, "filename"), &self.filename)?;
-        meta.set_item(pyo3::intern!(py, "lineno"), self.line)?;
-        for kv in &self.meta {
-            meta.set_item(&kv.key, kv.value.to_object(py))?;
-        }
-        Ok(meta.into())
-    }
-    #[getter]
-    fn units(&self) -> Amount {
-        self.units.clone()
-    }
 }
 
 pymethods_for_entry!(Balance);
@@ -496,14 +937,14 @@ impl Entry {
             Self::Open(e) => &e.header,
             Self::Pad(e) => &e.header,
             Self::Price(e) => &e.header,
-            Self::Transaction(e) => &e.header,
             Self::Query(e) => &e.header,
+            Self::Transaction(e) => &e.header,
         }
     }
 
     /// Sort key for an entry.
     ///
-    /// Is used to implement the `[Ord]` and `[PartialOrd]` traits below.
+    /// Is used to implement the [`Ord`] and [`PartialOrd`] traits below.
     ///
     /// Entries are sorted by date, and on a day are sorted as follows:
     ///
@@ -524,8 +965,8 @@ impl Entry {
             Self::Open(e) => (&e.header.date, -2),
             Self::Pad(e) => (&e.header.date, 0),
             Self::Price(e) => (&e.header.date, 0),
-            Self::Transaction(e) => (&e.header.date, 0),
             Self::Query(e) => (&e.header.date, 0),
+            Self::Transaction(e) => (&e.header.date, 0),
         }
     }
 

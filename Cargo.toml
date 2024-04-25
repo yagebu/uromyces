@@ -1,30 +1,39 @@
 [package]
 name = "uromyces"
-version = "0.1.0"
+description = "urom implements parts of Beancount's plain text accounting functionality in Rust"
+version = "0.0.1"
 edition = "2021"
 license = "GPL-2.0-or-later"
+repository = "https://github.com/yagebu/uromyces/"
+keywords = ["accounting", "beancount", "finance"]
+categories = ["finance"]
 
 [lib]
 name = "uromyces"
 crate-type = ["lib", "cdylib"]
 
+[features]
+extension-module = ["pyo3/extension-module"]
+
 [dependencies]
-rust_decimal = "*"
-tree-sitter = "*"
-pyo3 = { version = "0.20.0", features = ["abi3-py37", "extension-module"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "*"
-log = "0.4.17"
-env_logger = "0.10.0"
-glob = "0.3.0"
-internment = { version = "0.7.0", features = ["arc", "serde"] }
-hashbrown = { version = "0.14.0", features = ["serde"] }
-chrono = { version = "0.4.23", features = ["serde"] }
-thin-vec = { version = "0.2.10", features = ["serde"] }
+ahash = { version = "0.8" }
+chrono = { version = "0.4", features = ["serde"] }
+glob = { version = "0.3" }
+hashbrown = { version = "0.14", features = ["serde"] }
+indexmap = { version = "2.2" }
+internment = { version = "0.8", features = ["arc", "serde"] }
+log = { version = "0.4" }
+pyo3 = { version = "0.22", features = ["abi3-py38", "multiple-pymethods"] }
+pyo3-log = { version = "0.11" }
+rust_decimal = { version = "1" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
+thin-vec = { version = "0.2", features = ["serde"] }
+tree-sitter = { version = "0.22" }
 
 [build-dependencies]
-cc = "*"
-regex = "1"
+cc = { version = "1" }
+regex = { version = "1" }
 
 [dev-dependencies]
-insta = { version = "*", features = ["glob", "json", "filters"] }
+insta = { version = "1", features = ["glob", "json", "filters"] }

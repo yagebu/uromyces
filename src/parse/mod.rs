@@ -1,5 +1,6 @@
 //! Parse a string to a raw list of Beancount entries.
 
+use serde::{Deserialize, Serialize};
 use tree_sitter::{Language, Node, Parser, Tree};
 
 use self::convert::{ConversionState, FromNode, TryFromNode};
@@ -35,7 +36,7 @@ fn init_parser() -> Parser {
     let mut parser = Parser::new();
     let language = get_beancount_language();
     parser
-        .set_language(language)
+        .set_language(&language)
         .expect("tree-sitter language and library version to match");
     parser
 }
@@ -65,11 +66,11 @@ pub fn string_to_tree(string: &str) -> Result<ParsedTree, ParsingError> {
 }
 
 /// The raw result of parsing the code of a single Beancount file.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct ParsedFile {
     /// The (raw) entries in the file.
     pub entries: Vec<RawEntry>,
-    /// Errors encountered on converting the parse tree to ParseResult.
+    /// Errors encountered on converting the parse tree to `ParseResult`.
     pub errors: Vec<UroError>,
     /// The directives (options, includes and plugins) in the file.
     pub directives: Vec<RawDirective>,
@@ -245,9 +246,7 @@ pub fn convert_syntax_tree(parsed_tree: &ParsedTree, filename: &Option<FilePath>
                 }
                 node_ids::POPMETA => {
                     let key = state.get_key(node.required_child(1));
-                    if let Some(index) = state.pushed_meta.iter().position(|v| v.key == key) {
-                        state.pushed_meta.remove(index);
-                    }
+                    state.pushed_meta.remove(key);
                 }
                 node_ids::POPTAG => {
                     let tag = state.get_tag_link(node.required_child(1));

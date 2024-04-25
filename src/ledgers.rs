@@ -1,20 +1,22 @@
+//!  Ledgers encompass all the data from parsed and booked input Beancount journals.
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::errors::UroError;
+use crate::errors::{error_from_py, UroError};
 use crate::options::BeancountOptions;
 #[cfg(test)]
 use crate::parse::ParsedFile;
+use crate::plugins::{run_named_plugin, run_validations};
 use crate::types::{Entry, FilePath, Plugin, RawEntry};
 
 /// The result of parsing a Beancount file and all its includes.
 #[derive(Debug)]
-pub(crate) struct RawLedger {
+pub struct RawLedger {
     /// The main filename.
     pub filename: FilePath,
     /// The (raw) sorted entries of the ledger.
     pub entries: Vec<RawEntry>,
-    /// Errors encountered on converting the parse tree to a ParseResult.
+    /// Errors encountered on converting the parse tree to a `ParseResult`.
     pub errors: Vec<UroError>,
     /// The options in the file.
     pub options: BeancountOptions,
@@ -55,22 +57,26 @@ impl RawLedger {
 }
 
 /// The result of parsing a Beancount file and all its includes and running booking.
-#[derive(Debug, Serialize, Deserialize)]
-#[pyclass]
-#[allow(clippy::unsafe_derive_deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[pyclass(module = "uromyces")]
 pub struct Ledger {
     /// The main filename.
+    #[pyo3(get)]
     pub filename: FilePath,
     /// The entries of the ledger (sorted).
     #[pyo3(get)]
     pub entries: Vec<Entry>,
     /// Errors that occured on parsing, booking or any later stage.
+    #[pyo3(get)]
     pub errors: Vec<UroError>,
     /// The options in the file.
+    #[pyo3(get)]
     pub options: BeancountOptions,
     // Included file paths.
+    #[pyo3(get)]
     pub includes: Vec<FilePath>,
     /// Plugins (with optional config)
+    #[pyo3(get)]
     pub plugins: Vec<Plugin>,
 }
 
@@ -85,5 +91,28 @@ impl Ledger {
             includes: raw_ledger.includes.clone(),
             plugins: raw_ledger.plugins.clone(),
         }
+    }
+}
+
+#[pymethods]
+impl Ledger {
+    /// Run the plugin with the given name (returns true if it exists)
+    pub fn run_plugin(&mut self, plugin: &str) -> bool {
+        run_named_plugin(self, plugin)
+    }
+
+    /// Run the validation plugins (and add any errors).
+    pub fn run_validations(&mut self) {
+        self.errors.append(&mut run_validations(self));
+    }
+
+    /// Replace the entries of this ledger.
+    pub fn replace_entries(&mut self, entries: Vec<Entry>) {
+        self.entries = entries;
+    }
+
+    /// Append some error (from the Python side).
+    pub fn add_error(&mut self, #[pyo3(from_py_with = "error_from_py")] error: UroError) {
+        self.errors.push(error);
     }
 }

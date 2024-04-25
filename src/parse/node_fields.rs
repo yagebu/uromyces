@@ -38,13 +38,13 @@ mod tests {
 
     use super::*;
 
-    fn get_id(l: Language, name: &str) -> u16 {
-        l.field_id_for_name(name).expect("")
+    fn get_id(l: &Language, name: &str) -> u16 {
+        l.field_id_for_name(name).expect("").into()
     }
 
     #[test]
     fn it_has_correct_ids() {
-        let l = crate::parse::get_beancount_language();
+        let l = &crate::parse::get_beancount_language();
         assert_eq!(get_id(l, "account"), ACCOUNT);
         assert_eq!(get_id(l, "amount"), AMOUNT);
         assert_eq!(get_id(l, "booking"), BOOKING);
