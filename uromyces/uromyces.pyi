@@ -102,7 +102,7 @@ class Close(_Directive, abc.Close):
         header: EntryHeader,
         account: str,
     ) -> Close: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Close,
         *,
         date: datetime.date | None = None,
@@ -120,7 +120,7 @@ class Commodity(_Directive, abc.Commodity):
         header: EntryHeader,
         currency: str,
     ) -> Commodity: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Commodity,
         *,
         date: datetime.date | None = None,
@@ -327,7 +327,7 @@ class Transaction(_Directive, abc.Transaction):
     narration: str
     postings: list[Posting]  # type: ignore[assignment]
 
-    def __new__(  # noqa: PLR0913, PYI034
+    def __new__(  # noqa: PYI034
         cls: Any,
         header: EntryHeader,
         flag: str,
