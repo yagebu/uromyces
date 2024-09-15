@@ -14,6 +14,7 @@ test:
 
 .PHONY: update
 update:
+	uv pip compile --quiet --extra dev --upgrade --output-file constraints.txt pyproject.toml
 	pre-commit autoupdate
 	cargo update
 	cargo outdated

@@ -19,6 +19,15 @@ dependencies = [
   "fava",
 ]
 
+[project.optional-dependencies]
+# Extra dependencies that are used in tests or for linting.
+dev = [
+    "maturin[patchelf]>=1.7",
+    "mypy>=1.11",
+    "pip>=24",
+    "pytest>=8",
+]
+
 [project.scripts]
 uro = "uromyces._cli:cli"
 
