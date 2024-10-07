@@ -118,7 +118,8 @@ pub fn clamp(
         &accounts.previous_balances,
     );
 
-    // TODO: add latest prices
+    // TODO: add latest prices from entries_before
+    //       for each currency, cost_currency price pair, keep the last one
 
     // Add all open entries from `entries_before`
     clamped_entries.extend(
@@ -127,6 +128,7 @@ pub fn clamp(
             .filter(|e| matches!(e, Entry::Open(..)))
             .cloned(),
     );
+
     // Add all entries in the time interval, except for Balance entries of income statement
     // accounts that we transfered to the previous earnings account.
     clamped_entries.extend(
@@ -143,7 +145,9 @@ pub fn clamp(
     );
 
     // TODO: conversions
-    //
+    //       we want to sum up all postings, and insert an entry with negative
+    //       positions for the costs
+
     clamped_entries.sort();
     clamped_entries
 }

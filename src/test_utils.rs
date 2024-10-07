@@ -28,3 +28,29 @@ pub fn postings_from_strings(postings: &[&str]) -> Vec<RawPosting> {
         _ => panic!("expected transaction"),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_c() {
+        assert_eq!(c("EUR"), Currency::from("EUR"));
+    }
+
+    #[test]
+    fn test_d() {
+        assert_eq!(d("1"), Decimal::ONE);
+    }
+
+    #[test]
+    fn test_a() {
+        assert_eq!(a("1 EUR"), Amount::new(Decimal::ONE, c("EUR")));
+    }
+
+    #[test]
+    #[should_panic(expected = "called `Result::unwrap()")]
+    fn test_a_panic() {
+        a("10");
+    }
+}

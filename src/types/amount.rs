@@ -114,11 +114,14 @@ impl FromStr for Amount {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut parts = s.split_whitespace();
-        let handle_err = |_| ();
+        let raw_number = parts.next().ok_or(())?;
+        let raw_currency = parts.next().ok_or(())?;
+        if parts.next().is_some() {
+            return Err(());
+        }
         Ok(Self {
-            number: Decimal::from_str_exact(parts.next().unwrap_or_default())
-                .map_err(handle_err)?,
-            currency: parts.next().unwrap_or_default().into(),
+            number: Decimal::from_str_exact(raw_number).map_err(|_| ())?,
+            currency: raw_currency.into(),
         })
     }
 }
@@ -129,4 +132,23 @@ impl FromStr for Amount {
 pub struct IncompleteAmount {
     pub number: Option<Decimal>,
     pub currency: Option<Currency>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_amount_from_string() {
+        let one = Decimal::ONE;
+        let eur = Currency::from("EUR");
+        assert_eq!(Amount::from_str("1 EUR"), Ok(Amount::new(one, eur.clone())));
+        assert_eq!(
+            Amount::from_str("1    EUR"),
+            Ok(Amount::new(one, eur.clone()))
+        );
+        assert_eq!(Amount::from_str("1    EUR   asdf"), Err(()));
+        assert_eq!(Amount::from_str("1"), Err(()));
+        assert_eq!(Amount::from_str("EUR"), Err(()));
+    }
 }

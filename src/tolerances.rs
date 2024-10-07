@@ -22,6 +22,10 @@ pub struct Tolerances {
     default: Decimal,
 }
 
+/// Derive the tolerance that should be used for a balance assertion.
+///
+/// The balance directive can specify an explicit tolerance which would then be used, otherwise
+/// infer a tolerance from the amount number (considering `options.inferred_tolerance_multiplier`).
 pub fn balance_tolerance(balance: &Balance, options: &BeancountOptions) -> Decimal {
     if let Some(explicit) = balance.tolerance {
         explicit

@@ -16,3 +16,16 @@ pub fn get_weight(posting: &Posting) -> Amount {
         posting.units.clone()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::test_utils::a;
+
+    use super::*;
+
+    #[test]
+    fn test_get_weight_units() {
+        let pos = Posting::new_simple("Assets:Cash".into(), a("10 EUR"));
+        assert_eq!(get_weight(&pos), a("10 EUR"));
+    }
+}
