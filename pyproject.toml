@@ -8,7 +8,7 @@ features = ["pyo3/extension-module"]
 
 [project]
 name = "uromyces"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -35,7 +35,7 @@ uro = "uromyces._cli:cli"
 line-length = 79
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py39"
 line-length = 79
 
 [tool.ruff.lint]
@@ -61,6 +61,5 @@ known-first-party = ["uromyces"]
 required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.per-file-ignores]
-"*.pyi" = ["D"]
 "tests/conftest.py" = ["S101"]
 "tests/test_*.py" = ["D", "S101"]
