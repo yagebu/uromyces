@@ -1,4 +1,3 @@
-//! Plugins that implement custom checks, validations and functionality.
 use crate::errors::UroError;
 use crate::ledgers::Ledger;
 use crate::types::Entry;

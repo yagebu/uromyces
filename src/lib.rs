@@ -5,8 +5,9 @@
 // enable some additional lint rules
 #![warn(clippy::unwrap_used)]
 // allow some rules enabled by the rules above
+// Stylistic, sometimes preferred to have the name in some function again.
 #![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
+// Warns on Deserialize on pyo3 structs which should be fine.
 #![allow(clippy::unsafe_derive_deserialize)]
 
 use std::path::Path;
@@ -59,7 +60,7 @@ fn summarize_clamp(
     )
 }
 
-/// A Python module implemented in Rust.
+/// [pymodule] The uromyces.uromyces Python extension module.
 #[pymodule]
 fn uromyces(py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     pyo3_log::init();
@@ -72,7 +73,6 @@ fn uromyces(py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // Base types
     m.add_class::<types::Amount>()?;
-    m.add_class::<types::Booking>()?;
     m.add_class::<types::Booking>()?;
     m.add_class::<types::Cost>()?;
     m.add_class::<types::CustomValue>()?;

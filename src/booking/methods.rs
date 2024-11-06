@@ -109,6 +109,8 @@ fn resolve_strict(
 }
 
 /// Close the matching positions.
+///
+/// Mutates the given posting in place and returns additional postings (can be empty) if needed.
 pub(super) fn resolve_matches(
     method: &BookingMethod,
     posting: &mut RawPosting,

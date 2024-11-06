@@ -18,6 +18,9 @@ mod errors;
 mod methods;
 
 /// Contains information about the booking methods that are specified per account.
+///
+/// This is constructed from a [`RawLedger`] and allows a quick lookup to get the per-account booking
+/// method (or the default, set per Beancount option).
 struct BookingMethods {
     map: HashMap<Account, Booking>,
     default_method: Booking,
@@ -25,6 +28,9 @@ struct BookingMethods {
 
 impl BookingMethods {
     /// Collect all specified booking methods (and the default).
+    ///
+    /// This iterates over all open directives in the ledger and collects the booking methods (if
+    /// specified). The default booking method to use as a fallback is read from the options.
     fn from_ledger(raw_ledger: &RawLedger) -> Self {
         let mut map = HashMap::new();
         for e in &raw_ledger.entries {
@@ -46,11 +52,13 @@ impl BookingMethods {
     }
 }
 
+type AccountBalances = HashMap<Account, Inventory>;
+
 /// Find positions in the account balances that can be closed with the given postings.
 ///
 /// This mutates the given list of raw postings in place.
 fn close_positions(
-    balances: &HashMap<Account, Inventory>,
+    balances: &AccountBalances,
     postings: &mut Vec<RawPosting>,
     methods: &BookingMethods,
 ) -> Result<(), BookingError> {
@@ -303,45 +311,49 @@ fn interpolate_and_fill_in_missing(
     Ok(complete_postings)
 }
 
+/// Update the running balances for all postings of a booked transaction.
+fn update_running_balances(balances: &mut AccountBalances, transaction: &Transaction) {
+    for posting in &transaction.postings {
+        balances
+            .raw_entry_mut()
+            .from_key(&posting.account)
+            .or_insert_with(|| (posting.account.clone(), Inventory::new()))
+            .1
+            .add_position(posting);
+    }
+}
+
 /// Book and interpolate to fill in all missing values.
 #[must_use]
 pub(crate) fn book_entries(raw_ledger: RawLedger) -> Ledger {
     let booking_methods = BookingMethods::from_ledger(&raw_ledger);
-    let mut balances = HashMap::new();
+    let mut balances = AccountBalances::new();
 
     // Closure to book a single transaction.
-    let mut handle_txn = |txn: RawTransaction| -> Result<_, _> {
-        let all_postings = {
-            let mut all_postings = Vec::with_capacity(txn.postings.len());
+    let handle_txn = |balances: &AccountBalances, txn: RawTransaction| -> Result<Transaction, _> {
+        let booked_postings = {
+            let mut booked_postings = Vec::with_capacity(txn.postings.len());
             let tolerances = Tolerances::infer_from_raw(&txn.postings, &raw_ledger.options);
 
             let groups = group_and_fill_in_currencies(&txn.postings)?;
             for (currency, mut postings) in groups {
-                close_positions(&balances, &mut postings, &booking_methods)?;
-                all_postings.append(&mut interpolate_and_fill_in_missing(
+                close_positions(balances, &mut postings, &booking_methods)?;
+                booked_postings.append(&mut interpolate_and_fill_in_missing(
                     postings,
                     &currency,
                     &tolerances,
                     txn.header.date,
                 )?);
             }
-            all_postings.sort_by_key(|p| p.line);
-            all_postings
+            booked_postings.sort_by_key(|p| p.line);
+            booked_postings
         };
-        for posting in &all_postings {
-            balances
-                .raw_entry_mut()
-                .from_key(&posting.account)
-                .or_insert_with(|| (posting.account.clone(), Inventory::new()))
-                .1
-                .add_position(posting);
-        }
         Ok(Transaction {
             flag: txn.flag,
             header: txn.header,
             payee: txn.payee,
             narration: txn.narration,
-            postings: all_postings,
+            postings: booked_postings,
         })
     };
 
@@ -353,8 +365,11 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> Ledger {
     for raw_entry in raw_ledger.entries {
         match raw_entry {
             RawEntry::Transaction(i) => {
-                match handle_txn(i) {
-                    Ok(txn) => entries.push(Entry::Transaction(txn)),
+                match handle_txn(&balances, i) {
+                    Ok(txn) => {
+                        update_running_balances(&mut balances, &txn);
+                        entries.push(Entry::Transaction(txn));
+                    }
                     Err(err) => errors.push(err),
                 };
             }

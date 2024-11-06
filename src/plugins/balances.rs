@@ -8,29 +8,11 @@ use crate::types::{Account, Balance, Entry, Posting};
 use crate::Ledger;
 
 /// A balance assertion failed.
-struct BalanceCheckError {
-    account: Account,
-    balance_entry: Balance,
-    diff_amount: Decimal,
-}
+struct BalanceCheckError<'a>(&'a Account, &'a Balance, Decimal);
 
-impl BalanceCheckError {
-    fn new(account: &Account, balance: &Balance, diff_amount: Decimal) -> Self {
-        Self {
-            account: account.clone(),
-            balance_entry: balance.clone(),
-            diff_amount,
-        }
-    }
-}
-
-impl From<BalanceCheckError> for crate::errors::UroError {
+impl From<BalanceCheckError<'_>> for crate::errors::UroError {
     fn from(e: BalanceCheckError) -> Self {
-        let BalanceCheckError {
-            account,
-            balance_entry,
-            diff_amount,
-        } = &e;
+        let BalanceCheckError(account, balance_entry, diff_amount) = &e;
         let diff_msg = if *diff_amount > Decimal::ZERO {
             format!("{diff_amount} too much")
         } else {
@@ -42,7 +24,7 @@ impl From<BalanceCheckError> for crate::errors::UroError {
         let msg = format!(
                 "Balance failed for '{account}': expected {expected_amount} != accumulated {balance} {currency} ({diff_msg})"
             );
-        Self::new(msg).with_entry(balance_entry)
+        Self::new(msg).with_entry(*balance_entry)
     }
 }
 
@@ -83,7 +65,7 @@ impl<'ledger> BalanceChecker<'ledger> {
 
         if diff_abs > balance_tolerance(entry, &self.ledger.options) {
             self.errors
-                .push(BalanceCheckError::new(account, entry, diff).into());
+                .push(BalanceCheckError(account, entry, diff).into());
         }
     }
 }

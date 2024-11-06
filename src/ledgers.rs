@@ -20,7 +20,7 @@ pub struct RawLedger {
     pub errors: Vec<UroError>,
     /// The options in the file.
     pub options: BeancountOptions,
-    // Included file paths.
+    /// Included file paths.
     pub includes: Vec<FilePath>,
     /// Plugins (with optional config)
     pub plugins: Vec<Plugin>,
@@ -72,7 +72,7 @@ pub struct Ledger {
     /// The options in the file.
     #[pyo3(get)]
     pub options: BeancountOptions,
-    // Included file paths.
+    /// Included file paths.
     #[pyo3(get)]
     pub includes: Vec<FilePath>,
     /// Plugins (with optional config)

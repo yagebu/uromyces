@@ -1,4 +1,4 @@
-//! Like `display_context` in Beancount, this keeps tracks of the precisions used for currencies.
+//! Like `display_context` in Beancount, keep track of per-currency precisions.
 //!
 //! To infer a sensible default for the displayed precision for a certain currency, we keep track
 //! of all numbers (with a matching currency) in the input files and count the number of times that

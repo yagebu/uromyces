@@ -1,4 +1,7 @@
 //! Parse a string to a raw list of Beancount entries.
+//!
+//! This uses a `tree_sitter` parser to parse the file to an AST and then constructs Beancount
+//! directives from that AST.
 
 use serde::{Deserialize, Serialize};
 use tree_sitter::{Language, Node, Parser, Tree};
@@ -29,6 +32,8 @@ fn get_beancount_language() -> Language {
 }
 
 /// Initialise a Beancount language `tree_sitter` parser.
+///
+/// # Panics
 ///
 /// Since we cannot do a lot in uromyces without the parser, panic if the Beancount language cannot
 /// be loaded due to a version mismatch.

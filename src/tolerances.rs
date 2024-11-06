@@ -9,11 +9,11 @@ use crate::types::{Balance, Currency, Decimal, Posting, RawPosting};
 
 /// Tolerances for currencies.
 ///
-/// Consists of a map of `Decimal`s for some `Currency`s as well as a default value for all others.
-/// Will mostly be inferred from the amounts in a transaction or a balance and is then used to
-/// check that a transaction or balance, well, balances, that is that the remainder of all postings
-/// in the transaction or the difference between the asserted and the computed balance is smaller
-/// than the tolerance for each currency.
+/// Consists of a map of [`Decimal`]s for some [`Currency`]s as well as a default value for all
+/// others. Will mostly be inferred from the amounts in a transaction or a balance and is then used
+/// to check that a transaction or balance, well, balances, that is that the remainder of all
+/// postings in the transaction or the difference between the asserted and the computed balance is
+/// smaller than the tolerance for each currency.
 ///
 /// In addition to validations, the tolerances can also be used to quantize numbers.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -103,6 +103,7 @@ impl Tolerances {
     }
 
     /// Infer tolerances from a list of raw postings.
+    #[must_use]
     pub fn infer_from_raw(postings: &[RawPosting], options: &BeancountOptions) -> Self {
         let mut tolerances = options.inferred_tolerance_default.clone();
 
@@ -122,6 +123,7 @@ impl Tolerances {
     }
 
     /// Infer tolerances from a list of booked postings.
+    #[must_use]
     pub fn infer_from_booked(postings: &[Posting], options: &BeancountOptions) -> Self {
         let mut tolerances = options.inferred_tolerance_default.clone();
 
