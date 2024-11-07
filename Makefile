@@ -1,25 +1,43 @@
-all: lint test
+all: .venv
 
-.PHONY: lint
-lint:
+# note: It's best to activate the venv before running the following
+#       targets to avoid rebuilds: https://github.com/PyO3/pyo3/issues/1708
+
+# Create and sync a dev environment.
+.venv: uv.lock pyproject.toml
+	uv sync
+	touch -m .venv
+
+# Compile Rust extension module
+dev: .venv
+	uv run maturin develop --uv --skip-install --release
+
+# Run linters
+lint: .venv
 	cargo fmt
 	cargo clippy
 	pre-commit run -a
+	uv run mypy uromyces tests
 
-.PHONY: test
-test:
+# Run Rust and Python tests
+test: .venv
 	cargo test
-	cargo doc --document-private-items
-	tox
+	uv run pytest
 
-.PHONY: update
-update:
-	uv pip compile --quiet --extra dev --upgrade --output-file constraints.txt pyproject.toml
+# Generate Rust documentation
+doc: .venv
+	cargo doc --document-private-items
+
+# Update lockfiles
+update: .venv
+	uv lock --upgrade
 	pre-commit autoupdate
 	cargo update
 	cargo outdated
 
-.PHONY: insta
-insta:
+# Update snapshot tests
+insta: .venv
 	-cargo insta test --unreferenced=delete
 	cargo insta review
+
+.PHONY: dev doc insta lint test update

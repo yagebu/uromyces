@@ -3,6 +3,13 @@
 urom is just a toy project to try out the Rust language to implement parts
 of Beancount's functionality.
 
+## How to use / run
+
+You can use the provided Makefile to set up a virtualenv (at `.venv`) and install uromyces
+in it with `make dev` and then try out e.g. `uro -v $BEANCOUNT_FILE` to run a bean-check
+like tool. For more elaborate playing around it's probably best to write a Python script
+that uses the `uromyces.load_file` function.
+
 ## Components
 
 Just like Beancount, this tries to go from an input file to an usable result of entries.

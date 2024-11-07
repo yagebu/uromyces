@@ -19,7 +19,7 @@ dependencies = [
   "fava",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 # Extra dependencies that are used in tests or for linting.
 dev = [
     "maturin[patchelf]>=1.7",
