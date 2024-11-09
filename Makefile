@@ -34,6 +34,7 @@ update: .venv
 	pre-commit autoupdate
 	cargo update
 	cargo outdated
+	uv run maturin generate-ci github > .github/workflows/maturin.yml
 
 # Update snapshot tests
 insta: .venv
