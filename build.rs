@@ -56,5 +56,8 @@ fn main() {
     cc::Build::new()
         .include(&dir)
         .file(parser)
+        // Enable C99 mode - required for tree-sitter, does not seem to be default in
+        // e.g. the aarch64 maturin CI build
+        .flag("-std=c99")
         .compile("tree-sitter-beancount");
 }

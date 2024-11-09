@@ -34,10 +34,19 @@ update: .venv
 	pre-commit autoupdate
 	cargo update
 	cargo outdated
+	uv run maturin generate-ci github > .github/workflows/maturin.yml
 
 # Update snapshot tests
 insta: .venv
 	-cargo insta test --unreferenced=delete
 	cargo insta review
 
-.PHONY: dev doc insta lint test update
+clean:
+	rm -rf .*cache
+	rm -rf .tox
+	rm -rf .venv
+	rm -rf target
+	find . -type f -name '*.py[c0]' -delete
+	find . -type d -name "__pycache__" -delete
+
+.PHONY: clean dev doc insta lint test update

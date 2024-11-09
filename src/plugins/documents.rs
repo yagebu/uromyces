@@ -2,7 +2,7 @@
 
 use crate::errors::UroError;
 use crate::ledgers::Ledger;
-use crate::types::{Account, Date, Document, Entry, EntryHeader};
+use crate::types::{Account, Date, Document, Entry, EntryHeader, FilePath};
 
 /// Get a sorted list of all open accounts in the ledger.
 fn get_all_open_accounts(ledger: &Ledger) -> Vec<&Account> {
@@ -25,6 +25,14 @@ fn get_all_open_accounts(ledger: &Ledger) -> Vec<&Account> {
     all_accounts
 }
 
+struct DocumentsDirectoryReadError<'a>(&'a Ledger, &'a FilePath);
+impl From<DocumentsDirectoryReadError<'_>> for UroError {
+    fn from(val: DocumentsDirectoryReadError) -> Self {
+        UroError::new(format!("Could not read documents directory: '{}'", val.1))
+            .with_filename(&val.0.filename)
+    }
+}
+
 /// Find documents for the specified document options of the ledger.
 pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
     let document_paths = &ledger.options.documents;
@@ -40,12 +48,7 @@ pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
     for document_path in document_paths {
         let documents_dir = ledger.filename.join_relative_to_file(document_path);
         if !documents_dir.as_ref().is_dir() {
-            new_errors.push(
-                UroError::new(format!(
-                    "Could not read documents directory: '{documents_dir}'"
-                ))
-                .with_filename(&ledger.filename),
-            );
+            new_errors.push(DocumentsDirectoryReadError(ledger, &documents_dir).into());
             continue;
         }
 
@@ -59,12 +62,7 @@ pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
             let Ok(read_dir) = account_dir.as_ref().read_dir() else {
                 // The directory exists (checked above), but there seems to be some other problem
                 // reading from it, so surface an error.
-                new_errors.push(
-                    UroError::new(format!(
-                        "Could not read documents directory: '{account_dir}'"
-                    ))
-                    .with_filename(&ledger.filename),
-                );
+                new_errors.push(DocumentsDirectoryReadError(ledger, &account_dir).into());
                 continue;
             };
 

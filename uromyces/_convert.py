@@ -144,6 +144,8 @@ def _(entry: Note) -> data.Note:
         entry.date,
         entry.account,
         entry.comment,
+        entry.tags,
+        entry.links,
     )
 
 
