@@ -9,6 +9,7 @@ pub const BINARY_NUM_EXPR: u16 = 91;
 pub const BOOL: u16 = 40;
 pub const CLOSE: u16 = 61;
 pub const COMMODITY: u16 = 62;
+pub const CURRENCY: u16 = 46;
 pub const CUSTOM: u16 = 63;
 pub const DATE: u16 = 41;
 pub const DOCUMENT: u16 = 64;
