@@ -1,6 +1,7 @@
 ---
 source: tests/load_test.rs
 expression: ledger
+snapshot_kind: text
 ---
 {
   "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
@@ -29,7 +30,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 17,
+      "line": 18,
       "account": "Equity:Opening-Balances",
       "currencies": [],
       "booking": null
@@ -41,7 +42,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 18,
+      "line": 19,
       "account": "Liabilities:AccountsPayable",
       "currencies": [],
       "booking": null
@@ -53,7 +54,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 21,
+      "line": 22,
       "account": "Expenses:Food:Groceries",
       "currencies": [],
       "booking": null
@@ -65,7 +66,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 22,
+      "line": 23,
       "account": "Expenses:Food:Restaurant",
       "currencies": [],
       "booking": null
@@ -77,7 +78,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 23,
+      "line": 24,
       "account": "Expenses:Food:Coffee",
       "currencies": [],
       "booking": null
@@ -89,7 +90,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 24,
+      "line": 25,
       "account": "Expenses:Food:Alcohol",
       "currencies": [],
       "booking": null
@@ -101,7 +102,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 25,
+      "line": 26,
       "account": "Expenses:Transport:Tram",
       "currencies": [],
       "booking": null
@@ -113,7 +114,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 26,
+      "line": 27,
       "account": "Expenses:Home:Rent",
       "currencies": [],
       "booking": null
@@ -125,7 +126,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 27,
+      "line": 28,
       "account": "Expenses:Home:Electricity",
       "currencies": [],
       "booking": null
@@ -137,7 +138,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 28,
+      "line": 29,
       "account": "Expenses:Home:Internet",
       "currencies": [],
       "booking": null
@@ -149,7 +150,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 29,
+      "line": 30,
       "account": "Expenses:Home:Phone",
       "currencies": [],
       "booking": null
@@ -161,7 +162,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 30,
+      "line": 31,
       "account": "Expenses:Financial",
       "currencies": [],
       "booking": null
@@ -173,7 +174,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 73,
+      "line": 74,
       "account": "Liabilities:US:Chase:Slate",
       "currencies": [
         "USD"
@@ -187,7 +188,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 203,
+      "line": 204,
       "account": "Income:US:Federal:PreTax401k",
       "currencies": [
         "IRAUSD"
@@ -201,7 +202,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 204,
+      "line": 205,
       "account": "Assets:US:Federal:PreTax401k",
       "currencies": [
         "IRAUSD"
@@ -216,6 +217,12 @@ expression: ledger
           "key": "name",
           "value": {
             "String": "Euro"
+          }
+        },
+        {
+          "key": "reference",
+          "value": {
+            "Currency": "USD"
           }
         }
       ],
@@ -251,7 +258,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 33,
+      "line": 34,
       "account": "Assets:US:BofA",
       "currencies": [],
       "booking": null
@@ -270,7 +277,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 37,
+      "line": 38,
       "account": "Assets:US:BofA:Checking",
       "currencies": [
         "USD",
@@ -285,7 +292,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 130,
+      "line": 131,
       "account": "Assets:US:ETrade:Cash",
       "currencies": [
         "USD"
@@ -299,7 +306,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 131,
+      "line": 132,
       "account": "Assets:US:ETrade:ITOT",
       "currencies": [
         "ITOT"
@@ -313,7 +320,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 132,
+      "line": 133,
       "account": "Assets:US:ETrade:VEA",
       "currencies": [
         "VEA"
@@ -327,7 +334,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 133,
+      "line": 134,
       "account": "Assets:US:ETrade:VHT",
       "currencies": [
         "VHT"
@@ -341,7 +348,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 134,
+      "line": 135,
       "account": "Assets:US:ETrade:GLD",
       "currencies": [
         "GLD"
@@ -355,7 +362,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 135,
+      "line": 136,
       "account": "Income:US:ETrade:PnL",
       "currencies": [
         "USD"
@@ -369,7 +376,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 136,
+      "line": 137,
       "account": "Income:US:ETrade:ITOT:Dividend",
       "currencies": [
         "USD"
@@ -383,7 +390,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 137,
+      "line": 138,
       "account": "Income:US:ETrade:VEA:Dividend",
       "currencies": [
         "USD"
@@ -397,7 +404,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 138,
+      "line": 139,
       "account": "Income:US:ETrade:VHT:Dividend",
       "currencies": [
         "USD"
@@ -411,7 +418,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 139,
+      "line": 140,
       "account": "Income:US:ETrade:GLD:Dividend",
       "currencies": [
         "USD"
@@ -425,7 +432,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 147,
+      "line": 148,
       "account": "Income:US:Hooli:Salary",
       "currencies": [
         "USD"
@@ -439,7 +446,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 148,
+      "line": 149,
       "account": "Income:US:Hooli:GroupTermLife",
       "currencies": [
         "USD"
@@ -453,7 +460,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 149,
+      "line": 150,
       "account": "Income:US:Hooli:Vacation",
       "currencies": [
         "VACHR"
@@ -467,7 +474,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 150,
+      "line": 151,
       "account": "Assets:US:Hooli:Vacation",
       "currencies": [
         "VACHR"
@@ -481,7 +488,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 151,
+      "line": 152,
       "account": "Expenses:Vacation",
       "currencies": [
         "VACHR"
@@ -495,7 +502,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 152,
+      "line": 153,
       "account": "Expenses:Health:Life:GroupTermLife",
       "currencies": [],
       "booking": null
@@ -507,7 +514,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 153,
+      "line": 154,
       "account": "Expenses:Health:Medical:Insurance",
       "currencies": [],
       "booking": null
@@ -519,7 +526,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 154,
+      "line": 155,
       "account": "Expenses:Health:Dental:Insurance",
       "currencies": [],
       "booking": null
@@ -531,7 +538,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 155,
+      "line": 156,
       "account": "Expenses:Health:Vision:Insurance",
       "currencies": [],
       "booking": null
@@ -543,7 +550,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 210,
+      "line": 211,
       "account": "Expenses:Taxes:Y2022:US:Federal:PreTax401k",
       "currencies": [
         "IRAUSD"
@@ -557,7 +564,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 211,
+      "line": 212,
       "account": "Expenses:Taxes:Y2022:US:Medicare",
       "currencies": [
         "USD"
@@ -571,7 +578,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 212,
+      "line": 213,
       "account": "Expenses:Taxes:Y2022:US:Federal",
       "currencies": [
         "USD"
@@ -585,7 +592,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 213,
+      "line": 214,
       "account": "Expenses:Taxes:Y2022:US:CityNYC",
       "currencies": [
         "USD"
@@ -599,7 +606,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 214,
+      "line": 215,
       "account": "Expenses:Taxes:Y2022:US:SDI",
       "currencies": [
         "USD"
@@ -613,7 +620,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 215,
+      "line": 216,
       "account": "Expenses:Taxes:Y2022:US:State",
       "currencies": [
         "USD"
@@ -627,7 +634,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 216,
+      "line": 217,
       "account": "Expenses:Taxes:Y2022:US:SocSec",
       "currencies": [
         "USD"
@@ -641,7 +648,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 218,
+      "line": 219,
       "account": "Assets:US:Federal:PreTax401k",
       "amount": {
         "number": "0",
@@ -656,14 +663,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 40,
+      "line": 41,
       "flag": "*",
       "payee": null,
       "narration": "Opening Balance for checking account",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 41,
+          "line": 42,
           "meta": [],
           "account": "Assets:US:BofA:Checking",
           "units": {
@@ -676,7 +683,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 42,
+          "line": 43,
           "meta": [],
           "account": "Equity:Opening-Balances",
           "units": {
@@ -696,7 +703,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 157,
+      "line": 158,
       "type": "employer",
       "description": "Hooli, 1 Carloston Rd, Mountain Beer, CA"
     },
@@ -707,14 +714,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 220,
+      "line": 221,
       "flag": "*",
       "payee": null,
       "narration": "Allowed contributions for one year",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 221,
+          "line": 222,
           "meta": [],
           "account": "Income:US:Federal:PreTax401k",
           "units": {
@@ -727,7 +734,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 222,
+          "line": 223,
           "meta": [],
           "account": "Assets:US:Federal:PreTax401k",
           "units": {
@@ -747,7 +754,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 45,
+      "line": 46,
       "account": "Assets:US:BofA:Checking",
       "amount": {
         "number": "2404.00",
@@ -762,7 +769,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 47,
+      "line": 48,
       "account": "Assets:US:BofA:Checking",
       "amount": {
         "number": "2404.00",
@@ -777,7 +784,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 44,
+      "line": 45,
       "account": "Assets:US:BofA:Checking",
       "comment": "Some note"
     },
@@ -788,7 +795,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 46,
+      "line": 47,
       "account": "Assets:US:BofA:Checking",
       "amount": {
         "number": "2404.00",
@@ -803,14 +810,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 49,
+      "line": 50,
       "flag": "*",
       "payee": "BANK FEES",
       "narration": "Monthly bank fee",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 50,
+          "line": 51,
           "meta": [],
           "account": "Assets:US:BofA:Checking",
           "units": {
@@ -823,7 +830,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 51,
+          "line": 52,
           "meta": [],
           "account": "Expenses:Financial:Fees",
           "units": {
@@ -843,14 +850,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 53,
+      "line": 54,
       "flag": "*",
       "payee": "RiverBank Properties",
       "narration": "Paying the rent",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 54,
+          "line": 55,
           "meta": [],
           "account": "Assets:US:BofA:Checking",
           "units": {
@@ -863,7 +870,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 55,
+          "line": 56,
           "meta": [],
           "account": "Expenses:Home:Rent",
           "units": {
@@ -883,14 +890,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 76,
+      "line": 77,
       "flag": "*",
       "payee": "Rose Flower",
       "narration": "Eating out alone",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 77,
+          "line": 78,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -903,7 +910,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 78,
+          "line": 79,
           "meta": [],
           "account": "Expenses:Food:Restaurant",
           "units": {
@@ -923,14 +930,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 159,
+      "line": 160,
       "flag": "*",
       "payee": "Hooli",
       "narration": "Payroll",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 160,
+          "line": 161,
           "meta": [],
           "account": "Assets:US:BofA:Checking",
           "units": {
@@ -943,7 +950,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 161,
+          "line": 162,
           "meta": [],
           "account": "Assets:US:Vanguard:Cash",
           "units": {
@@ -956,7 +963,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 162,
+          "line": 163,
           "meta": [],
           "account": "Income:US:Hooli:Salary",
           "units": {
@@ -969,7 +976,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 163,
+          "line": 164,
           "meta": [],
           "account": "Income:US:Hooli:GroupTermLife",
           "units": {
@@ -982,7 +989,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 164,
+          "line": 165,
           "meta": [],
           "account": "Expenses:Health:Life:GroupTermLife",
           "units": {
@@ -995,7 +1002,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 165,
+          "line": 166,
           "meta": [],
           "account": "Expenses:Health:Dental:Insurance",
           "units": {
@@ -1008,7 +1015,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 166,
+          "line": 167,
           "meta": [],
           "account": "Expenses:Health:Medical:Insurance",
           "units": {
@@ -1021,7 +1028,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 167,
+          "line": 168,
           "meta": [],
           "account": "Expenses:Health:Vision:Insurance",
           "units": {
@@ -1034,7 +1041,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 168,
+          "line": 169,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:Medicare",
           "units": {
@@ -1047,7 +1054,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 169,
+          "line": 170,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:Federal",
           "units": {
@@ -1060,7 +1067,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 170,
+          "line": 171,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:State",
           "units": {
@@ -1073,7 +1080,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 171,
+          "line": 172,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:CityNYC",
           "units": {
@@ -1086,7 +1093,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 172,
+          "line": 173,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:SDI",
           "units": {
@@ -1099,7 +1106,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 173,
+          "line": 174,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:SocSec",
           "units": {
@@ -1112,7 +1119,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 174,
+          "line": 175,
           "meta": [],
           "account": "Assets:US:Federal:PreTax401k",
           "units": {
@@ -1125,7 +1132,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 175,
+          "line": 176,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:Federal:PreTax401k",
           "units": {
@@ -1138,7 +1145,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 176,
+          "line": 177,
           "meta": [],
           "account": "Assets:US:Hooli:Vacation",
           "units": {
@@ -1151,7 +1158,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 177,
+          "line": 178,
           "meta": [],
           "account": "Income:US:Hooli:Vacation",
           "units": {
@@ -1171,14 +1178,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 80,
+      "line": 81,
       "flag": "*",
       "payee": "Cafe Modagor",
       "narration": "Eating out with Natasha",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 81,
+          "line": 82,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1191,7 +1198,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 82,
+          "line": 83,
           "meta": [],
           "account": "Expenses:Food:Restaurant",
           "units": {
@@ -1211,14 +1218,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 84,
+      "line": 85,
       "flag": "*",
       "payee": "Farmer Fresh",
       "narration": "Buying groceries",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 85,
+          "line": 86,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1231,7 +1238,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 86,
+          "line": 87,
           "meta": [],
           "account": "Expenses:Food:Groceries",
           "units": {
@@ -1251,14 +1258,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 57,
+      "line": 58,
       "flag": "*",
       "payee": "EDISON POWER",
       "narration": "",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 58,
+          "line": 59,
           "meta": [],
           "account": "Assets:US:BofA:Checking",
           "units": {
@@ -1271,7 +1278,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 59,
+          "line": 60,
           "meta": [],
           "account": "Expenses:Home:Electricity",
           "units": {
@@ -1291,14 +1298,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 88,
+      "line": 89,
       "flag": "*",
       "payee": "Goba Goba",
       "narration": "Eating out ",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 89,
+          "line": 90,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1311,7 +1318,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 90,
+          "line": 91,
           "meta": [],
           "account": "Expenses:Food:Restaurant",
           "units": {
@@ -1331,14 +1338,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 92,
+      "line": 93,
       "flag": "*",
       "payee": "Chichipotle",
       "narration": "Eating out with Joe",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 93,
+          "line": 94,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1351,7 +1358,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 94,
+          "line": 95,
           "meta": [],
           "account": "Expenses:Food:Restaurant",
           "units": {
@@ -1371,14 +1378,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 96,
+      "line": 97,
       "flag": "*",
       "payee": "Rose Flower",
       "narration": "Eating out ",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 97,
+          "line": 98,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1391,7 +1398,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 98,
+          "line": 99,
           "meta": [],
           "account": "Expenses:Food:Restaurant",
           "units": {
@@ -1411,14 +1418,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 61,
+      "line": 62,
       "flag": "*",
       "payee": "Verizon Wireless",
       "narration": "",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 62,
+          "line": 63,
           "meta": [],
           "account": "Assets:US:BofA:Checking",
           "units": {
@@ -1431,7 +1438,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 63,
+          "line": 64,
           "meta": [],
           "account": "Expenses:Home:Phone",
           "units": {
@@ -1451,14 +1458,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 179,
+      "line": 180,
       "flag": "*",
       "payee": "Hooli",
       "narration": "Payroll",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 180,
+          "line": 181,
           "meta": [],
           "account": "Assets:US:BofA:Checking",
           "units": {
@@ -1471,7 +1478,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 181,
+          "line": 182,
           "meta": [],
           "account": "Assets:US:Vanguard:Cash",
           "units": {
@@ -1484,7 +1491,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 182,
+          "line": 183,
           "meta": [],
           "account": "Income:US:Hooli:Salary",
           "units": {
@@ -1497,7 +1504,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 183,
+          "line": 184,
           "meta": [],
           "account": "Income:US:Hooli:GroupTermLife",
           "units": {
@@ -1510,7 +1517,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 184,
+          "line": 185,
           "meta": [],
           "account": "Expenses:Health:Life:GroupTermLife",
           "units": {
@@ -1523,7 +1530,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 185,
+          "line": 186,
           "meta": [],
           "account": "Expenses:Health:Dental:Insurance",
           "units": {
@@ -1536,7 +1543,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 186,
+          "line": 187,
           "meta": [],
           "account": "Expenses:Health:Medical:Insurance",
           "units": {
@@ -1549,7 +1556,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 187,
+          "line": 188,
           "meta": [],
           "account": "Expenses:Health:Vision:Insurance",
           "units": {
@@ -1562,7 +1569,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 188,
+          "line": 189,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:Medicare",
           "units": {
@@ -1575,7 +1582,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 189,
+          "line": 190,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:Federal",
           "units": {
@@ -1588,7 +1595,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 190,
+          "line": 191,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:State",
           "units": {
@@ -1601,7 +1608,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 191,
+          "line": 192,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:CityNYC",
           "units": {
@@ -1614,7 +1621,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 192,
+          "line": 193,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:SDI",
           "units": {
@@ -1627,7 +1634,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 193,
+          "line": 194,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:SocSec",
           "units": {
@@ -1640,7 +1647,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 194,
+          "line": 195,
           "meta": [],
           "account": "Assets:US:Federal:PreTax401k",
           "units": {
@@ -1653,7 +1660,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 195,
+          "line": 196,
           "meta": [],
           "account": "Expenses:Taxes:Y2022:US:Federal:PreTax401k",
           "units": {
@@ -1666,7 +1673,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 196,
+          "line": 197,
           "meta": [],
           "account": "Assets:US:Hooli:Vacation",
           "units": {
@@ -1679,7 +1686,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 197,
+          "line": 198,
           "meta": [],
           "account": "Income:US:Hooli:Vacation",
           "units": {
@@ -1699,14 +1706,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 65,
+      "line": 66,
       "flag": "*",
       "payee": "Wine-Tarner Cable",
       "narration": "",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 66,
+          "line": 67,
           "meta": [],
           "account": "Assets:US:BofA:Checking",
           "units": {
@@ -1719,7 +1726,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 67,
+          "line": 68,
           "meta": [],
           "account": "Expenses:Home:Internet",
           "units": {
@@ -1739,7 +1746,7 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 100,
+      "line": 101,
       "account": "Liabilities:US:Chase:Slate",
       "amount": {
         "number": "-216.77",
@@ -1754,14 +1761,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 102,
+      "line": 103,
       "flag": "*",
       "payee": "Jewel of Morroco",
       "narration": "Eating out ",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 103,
+          "line": 104,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1774,7 +1781,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 104,
+          "line": 105,
           "meta": [],
           "account": "Expenses:Food:Restaurant",
           "units": {
@@ -1794,14 +1801,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 106,
+      "line": 107,
       "flag": "*",
       "payee": "Corner Deli",
       "narration": "Buying groceries",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 107,
+          "line": 108,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1814,7 +1821,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 108,
+          "line": 109,
           "meta": [],
           "account": "Expenses:Food:Groceries",
           "units": {
@@ -1834,14 +1841,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 110,
+      "line": 111,
       "flag": "*",
       "payee": "Chichipotle",
       "narration": "Eating out with Joe",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 111,
+          "line": 112,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1854,7 +1861,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 112,
+          "line": 113,
           "meta": [],
           "account": "Expenses:Food:Restaurant",
           "units": {
@@ -1874,14 +1881,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 114,
+      "line": 115,
       "flag": "*",
       "payee": "Cafe Modagor",
       "narration": "Eating out alone",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 115,
+          "line": 116,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1894,7 +1901,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 116,
+          "line": 117,
           "meta": [],
           "account": "Expenses:Food:Restaurant",
           "units": {
@@ -1914,14 +1921,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 118,
+      "line": 119,
       "flag": "*",
       "payee": "Metro Transport Authority",
       "narration": "Tram tickets",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 119,
+          "line": 120,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1934,7 +1941,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 120,
+          "line": 121,
           "meta": [],
           "account": "Expenses:Transport:Tram",
           "units": {
@@ -1954,14 +1961,14 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 122,
+      "line": 123,
       "flag": "*",
       "payee": "Cafe Modagor",
       "narration": "Eating out with Natasha",
       "postings": [
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 123,
+          "line": 124,
           "meta": [],
           "account": "Liabilities:US:Chase:Slate",
           "units": {
@@ -1974,7 +1981,7 @@ expression: ledger
         },
         {
           "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-          "line": 124,
+          "line": 125,
           "meta": [],
           "account": "Expenses:Food:Restaurant",
           "units": {
@@ -1994,24 +2001,24 @@ expression: ledger
       "tags": [],
       "links": [],
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 74,
+      "line": 75,
       "account": "Liabilities:US:Chase:Slate"
     }
   ],
   "errors": [
     {
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 49,
+      "line": 50,
       "message": "Invalid reference to unknown account Expenses:Financial:Fees."
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 159,
+      "line": 160,
       "message": "Invalid reference to unknown account Assets:US:Vanguard:Cash."
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
-      "line": 179,
+      "line": 180,
       "message": "Invalid reference to unknown account Assets:US:Vanguard:Cash."
     }
   ],

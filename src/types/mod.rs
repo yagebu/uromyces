@@ -137,6 +137,7 @@ impl CustomValue {
             MetaValue::Bool(_) => get_python_types(py).bool.bind(py),
             MetaValue::Amount(_) => get_python_types(py).amount.bind(py),
             MetaValue::Number(_) => get_python_types(py).decimal.bind(py),
+            MetaValue::Currency(_) => get_python_types(py).str.bind(py),
         }
     }
 }
