@@ -144,6 +144,7 @@ impl Position for InventoryPosition<'_> {
 }
 
 /// An inventory position of number, currency and cost, when filtering on positions with cost.
+#[derive(Debug)]
 pub struct PositionWithCost<'inv> {
     /// The number of units of this position.
     pub number: &'inv Decimal,

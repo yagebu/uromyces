@@ -51,7 +51,8 @@ fn resolve_ordered(
         }
     };
     for position in matches {
-        if remaining.is_sign_negative() {
+        // We only need to continue if we have a positive non-zero amount remaining.
+        if remaining.is_sign_negative() || remaining.is_zero() {
             break;
         }
 
@@ -84,11 +85,31 @@ fn resolve_strict(
     let mut remaining = posting_units.number.abs();
 
     if matches.len() > 1 {
-        // let sum = matches.iter().map(|p| p.number).sum();
-        todo!("check for matching sum");
+        // If the total requested to reduce matches the sum of all the
+        // ambiguous postings, match against all of them.
+        let sum_matches: Decimal = matches.iter().map(|p| p.number).sum();
+        if sum_matches == -posting_units.number {
+            let resolved: Vec<(IncompleteAmount, CostSpec)> = matches
+                .iter()
+                .map(|position| {
+                    let mut reduced = std::cmp::min(position.number.abs(), remaining);
+                    remaining -= reduced;
+                    reduced.set_sign_positive(sign_positive);
+                    (
+                        IncompleteAmount {
+                            number: Some(reduced),
+                            currency: Some(position.currency.clone()),
+                        },
+                        position.cost.into(),
+                    )
+                })
+                .collect();
+            Ok(resolved)
+        } else {
+            Err(BookingErrorKind::AmbiguousMatches)
+        }
     } else {
         let position = &matches[0];
-
         let mut reduced = std::cmp::min(position.number.abs(), remaining);
 
         remaining -= reduced;
