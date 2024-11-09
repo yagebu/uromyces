@@ -29,6 +29,7 @@ pub(super) enum BookingErrorKind {
     InsufficientLots,
     NoMatchesForReduction,
     UnsupportedAverageBooking,
+    AmbiguousMatches,
     // Interpolation
     TooManyMissingNumbers,
     MissingAmountNumber,
@@ -53,6 +54,7 @@ impl std::fmt::Display for BookingError {
             T::UnsupportedAverageBooking => {
                 write!(f, "The AVERAGE booking method is not supported")
             }
+            T::AmbiguousMatches => write!(f, "Ambiguous matches"),
             T::TooManyMissingNumbers => write!(f, "Too many missing numbers in transaction"),
             T::MissingAmountNumber => write!(f, "Amount is missing a number"),
             T::MissingCostNumber => write!(f, "Cost is missing a number"),
