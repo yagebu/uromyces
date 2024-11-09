@@ -11,6 +11,7 @@ option "inferred_tolerance_default" "EUR:0.005"
 
 1999-01-01 commodity EUR
   name: "Euro"
+  reference: USD
 
 * Equity Accounts
 

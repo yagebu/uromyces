@@ -177,7 +177,9 @@ impl TryFromNode for Decimal {
                     _ => left / right,
                 })
             }
-            _ => panic!("Invalid number node."),
+            _ => {
+                panic!("Invalid number node: {:?}", node);
+            }
         }
     }
 }
@@ -310,10 +312,13 @@ impl TryFromNode for MetaValue {
             node_ids::ACCOUNT => Self::Account(Account::from_node(node, s)),
             node_ids::BOOL => Self::Bool(s.get_str(node) == "TRUE"),
             node_ids::AMOUNT => Self::Amount(Amount::try_from_node(node, s)?),
-            _ => Self::Number(Decimal::try_from_node(node, s)?),
+            node_ids::CURRENCY => Self::Currency(Currency::from_node(node, s)),
+            node_ids::NUMBER => Self::Number(Decimal::try_from_node(node, s)?),
+            _ => panic!("Invalid metadata value node: {:?}", node),
         })
     }
 }
+
 impl TryFromNode for MetaKeyValuePair {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "key_value");

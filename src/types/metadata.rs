@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::py_bindings::{decimal_to_py, py_to_decimal};
 
-use super::{Account, Amount, Date, FilePath, LineNumber, TagsLinks};
+use super::{Account, Amount, Currency, Date, FilePath, LineNumber, TagsLinks};
 
 /// Possible metadata values (this is also used for custom entries).
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, FromPyObject)]
@@ -16,6 +16,7 @@ pub enum MetaValue {
     Date(Date),
     Bool(bool),
     Amount(Amount),
+    Currency(Currency),
     Number(#[pyo3(from_py_with = "py_to_decimal")] Decimal),
 }
 
@@ -40,6 +41,7 @@ impl ToPyObject for MetaValue {
             Self::Bool(v) => v.to_object(py),
             Self::Amount(v) => v.clone().into_py(py),
             Self::Number(v) => decimal_to_py(py, *v),
+            Self::Currency(v) => v.to_object(py),
         }
     }
 }
