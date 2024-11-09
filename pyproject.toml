@@ -15,9 +15,13 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "click",
+  "click>=7,<9",
+  "beancount>=3",
   "fava",
 ]
+
+[tool.uv.sources]
+fava = { git = "https://github.com/beancount/fava" }
 
 [dependency-groups]
 # Extra dependencies that are used in tests or for linting.

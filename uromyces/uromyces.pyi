@@ -217,7 +217,7 @@ class Note(_Directive, abc.Note):
 
 class Open(_Directive, abc.Open):
     account: str
-    currencies: list[str] | None
+    currencies: list[str]
     booking: Booking | None
 
     def __new__(  # noqa: PYI034
