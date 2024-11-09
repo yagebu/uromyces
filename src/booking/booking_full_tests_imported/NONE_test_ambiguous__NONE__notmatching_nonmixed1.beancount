@@ -1,0 +1,26 @@
+;==============================================================================
+; NONE_test_ambiguous__NONE__notmatching_nonmixed1
+;==============================================================================
+
+2015-01-01 * #ante
+  Assets:Account          5 HOOL {100.00 USD, 2015-10-01}
+  Assets:Account          5 HOOL {101.00 USD, 2015-10-01}
+
+2015-06-01 * #apply #booked
+  Assets:Account         -2 HOOL {102.00 USD, 2015-06-01}
+
+2015-01-01 * #ex
+  Assets:Account          5 HOOL {100.00 USD, 2015-10-01}
+  Assets:Account          5 HOOL {101.00 USD, 2015-10-01}
+  Assets:Account         -2 HOOL {102.00 USD, 2015-06-01}
+
+;------------------------------------------------------------------------------
+; errors=[]
+; booked=[
+;     "units=-2 HOOL, cost=102.00 USD, 2015-06-01",
+; ]
+; ex_balances=[
+;     "units=5 HOOL, cost=100.00 USD, 2015-10-01",
+;     "units=5 HOOL, cost=101.00 USD, 2015-10-01",
+;     "units=-2 HOOL, cost=102.00 USD, 2015-06-01",
+; ]

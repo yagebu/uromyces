@@ -1,0 +1,51 @@
+;==============================================================================
+; STRICT_test_reduce__no_match
+;==============================================================================
+
+2016-01-01 * #ante
+  Assets:Account          10 HOOL {123.45 USD, 2016-04-15}
+
+2016-05-02 * #apply
+  Assets:Account          -5 HOOL {123.00 USD}
+
+2016-05-02 * #apply
+  Assets:Account          -5 HOOL {123.45 CAD}
+
+2016-05-02 * #apply
+  Assets:Account          -5 HOOL {123.45 USD, 2016-04-16}
+
+2016-05-02 * #apply
+  Assets:Account          -5 HOOL {123.45 USD, "lot1"}
+
+2016-05-02 * #booked
+  error: "No position matches"
+  Assets:Dummy
+
+;------------------------------------------------------------------------------
+; errors=[
+;     "No matching lots in inventory to reduce position",
+; ]
+; ex_balances=[
+;     "units=10 HOOL, cost=123.45 USD, 2016-04-15",
+; ]
+; -----------------------------------------------------------------------------
+; errors=[
+;     "No matching lots in inventory to reduce position",
+; ]
+; ex_balances=[
+;     "units=10 HOOL, cost=123.45 USD, 2016-04-15",
+; ]
+; -----------------------------------------------------------------------------
+; errors=[
+;     "No matching lots in inventory to reduce position",
+; ]
+; ex_balances=[
+;     "units=10 HOOL, cost=123.45 USD, 2016-04-15",
+; ]
+; -----------------------------------------------------------------------------
+; errors=[
+;     "No matching lots in inventory to reduce position",
+; ]
+; ex_balances=[
+;     "units=10 HOOL, cost=123.45 USD, 2016-04-15",
+; ]

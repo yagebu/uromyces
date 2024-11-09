@@ -41,6 +41,11 @@ insta: .venv
 	-cargo insta test --unreferenced=delete
 	cargo insta review
 
+# Import Beancount booking_full_test DSL-based tests
+import-booking-tests:
+	rm -f src/booking/test_inputs/*.beancount
+	uv run contrib/scripts.py import-booking-tests
+
 clean:
 	rm -rf .*cache
 	rm -rf .tox

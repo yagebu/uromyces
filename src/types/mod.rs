@@ -72,7 +72,7 @@ pub use amount::{Amount, IncompleteAmount};
 pub use booking::Booking;
 pub use cost::{Cost, CostSpec};
 pub use currency::Currency;
-pub use date::Date;
+pub use date::{Date, MIN_DATE};
 pub use flag::Flag;
 pub use metadata::{EntryHeader, Meta, MetaKeyValuePair, MetaValue};
 pub use paths::FilePath;
@@ -993,6 +993,25 @@ impl Entry {
 }
 
 impl RawEntry {
+    /// Get the entry header.
+    #[must_use]
+    pub fn get_header(&self) -> &EntryHeader {
+        match self {
+            Self::Balance(e) => &e.header,
+            Self::Close(e) => &e.header,
+            Self::Commodity(e) => &e.header,
+            Self::Custom(e) => &e.header,
+            Self::Document(e) => &e.header,
+            Self::Event(e) => &e.header,
+            Self::Note(e) => &e.header,
+            Self::Open(e) => &e.header,
+            Self::Pad(e) => &e.header,
+            Self::Price(e) => &e.header,
+            Self::Query(e) => &e.header,
+            Self::Transaction(e) => &e.header,
+        }
+    }
+
     /// Sort key for an entry.
     ///
     /// Is used to implement the `[Ord]` and `[PartialOrd]` traits below.

@@ -10,7 +10,7 @@ use crate::plugins::{run_named_plugin, run_validations};
 use crate::types::{Entry, FilePath, Plugin, RawEntry};
 
 /// The result of parsing a Beancount file and all its includes.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RawLedger {
     /// The main filename.
     pub filename: FilePath,

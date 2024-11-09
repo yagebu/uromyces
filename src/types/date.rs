@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 
 use chrono::{Datelike, Days, NaiveDate};
 use pyo3::prelude::*;
@@ -15,6 +15,8 @@ use crate::py_bindings::date_to_py;
 pub struct Date(NaiveDate);
 
 const ONE_DAY: Days = Days::new(1);
+
+pub const MIN_DATE: Date = Date(NaiveDate::MIN);
 
 impl Date {
     /// Try to parse a date from a string like "2012-12-12".
@@ -57,10 +59,21 @@ impl Date {
     }
 }
 
+impl Display for Date {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{:04}-{:02}-{:02}",
+            self.year(),
+            self.month(),
+            self.day()
+        )
+    }
+}
+
 impl Debug for Date {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let date = format!("{:04}-{:02}-{:02}", self.year(), self.month(), self.day());
-        f.debug_tuple("Date").field(&date).finish()
+        f.debug_tuple("Date").field(&self.to_string()).finish()
     }
 }
 
@@ -98,6 +111,7 @@ mod test {
         assert_eq!(date.year(), 2023);
         assert_eq!(date.month(), 1);
         assert_eq!(date.day(), 3);
+        assert_eq!(date.to_string(), "2023-01-03");
     }
 
     #[test]

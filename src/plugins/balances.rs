@@ -150,7 +150,7 @@ mod tests {
     fn check(s: &str) -> Vec<String> {
         let res = parse::parse_string(s, &None);
         let raw_ledger = RawLedger::from_single_parsed_file("/test/path".try_into().unwrap(), res);
-        let ledger = booking::book_entries(raw_ledger);
+        let (ledger, _) = booking::book_entries(raw_ledger);
         check_balance_assertions(&ledger)
             .into_iter()
             .map(|e| e.message().into())

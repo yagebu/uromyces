@@ -1,0 +1,21 @@
+;==============================================================================
+; STRICT_test_augment__from_empty__incomplete_cost__with_currency
+;==============================================================================
+
+2015-10-01 * #apply
+  Assets:Account          1 HOOL {USD}
+
+2015-10-01 * #booked
+  Assets:Account          1 HOOL {0 USD, 2015-10-01}
+
+2015-10-01 * #reduced
+  S Assets:Account          1 HOOL {USD, 2015-10-01}
+
+;------------------------------------------------------------------------------
+; errors=[]
+; booked=[
+;     "units=1 HOOL, cost=0 USD, 2015-10-01",
+; ]
+; ex_balances=[
+;     "units=1 HOOL, cost=0 USD, 2015-10-01",
+; ]

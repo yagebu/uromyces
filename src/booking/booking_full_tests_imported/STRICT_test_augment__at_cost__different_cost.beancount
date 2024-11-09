@@ -1,0 +1,26 @@
+;==============================================================================
+; STRICT_test_augment__at_cost__different_cost
+;==============================================================================
+
+2015-10-01 * #ante
+  Assets:Account          1 HOOL {100.00 USD}
+
+2015-10-01 * #apply
+  Assets:Account          2 HOOL {101.00 USD}
+
+2015-10-01 * #booked
+  Assets:Account          2 HOOL {101.00 USD, 2015-10-01}
+
+2015-11-01 * #ex
+  Assets:Account          1 HOOL {100.00 USD, 2015-10-01}
+  Assets:Account          2 HOOL {101.00 USD, 2015-10-01}
+
+;------------------------------------------------------------------------------
+; errors=[]
+; booked=[
+;     "units=2 HOOL, cost=101.00 USD, 2015-10-01",
+; ]
+; ex_balances=[
+;     "units=1 HOOL, cost=100.00 USD, 2015-10-01",
+;     "units=2 HOOL, cost=101.00 USD, 2015-10-01",
+; ]

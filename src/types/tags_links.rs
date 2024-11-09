@@ -29,6 +29,12 @@ impl TagsLinks {
         }
     }
 
+    /// Check whether a certain value is contained in the set.
+    #[must_use]
+    pub fn contains(&self, value: &str) -> bool {
+        self.0.iter().any(|v| *v == value)
+    }
+
     /// Reomve a tag or link. Returns whether it was present in the set.
     pub fn remove(&mut self, value: &str) -> bool {
         if let Some(index) = self.0.iter().position(|v| *v == value) {

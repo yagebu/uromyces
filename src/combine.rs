@@ -33,7 +33,7 @@ pub fn load(main_path: &FilePath) -> Ledger {
     let raw_ledger = combine_files(paths_and_results);
 
     let mut t = SimpleTimer::new();
-    let mut ledger = booking::book_entries(raw_ledger);
+    let (mut ledger, _) = booking::book_entries(raw_ledger);
     t.log_elapsed("booking");
 
     crate::plugins::run_pre(&mut ledger);

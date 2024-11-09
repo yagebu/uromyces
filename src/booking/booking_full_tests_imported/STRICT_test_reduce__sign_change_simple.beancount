@@ -1,0 +1,24 @@
+;==============================================================================
+; STRICT_test_reduce__sign_change_simple
+;==============================================================================
+
+2016-01-01 * #ante
+  Assets:Account         10 HOOL {33.33 USD, 2016-01-01}
+
+2016-05-08 * #apply
+  Assets:Account        -13 HOOL {USD}
+
+2016-05-08 * #booked
+  error: "Not enough lots to reduce"
+  Assets:Dummy
+
+2016-01-01 * #ex
+  Assets:Account         10 HOOL {33.33 USD, 2016-01-01}
+
+;------------------------------------------------------------------------------
+; errors=[
+;     "Not enough lots in inventory to reduce position",
+; ]
+; ex_balances=[
+;     "units=10 HOOL, cost=33.33 USD, 2016-01-01",
+; ]

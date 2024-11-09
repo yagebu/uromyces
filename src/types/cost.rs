@@ -1,4 +1,7 @@
-use std::hash::{DefaultHasher, Hash, Hasher};
+use std::{
+    fmt::Display,
+    hash::{DefaultHasher, Hash, Hasher},
+};
 
 use pyo3::{basic::CompareOp, prelude::*};
 use serde::{Deserialize, Serialize};
@@ -25,6 +28,28 @@ pub struct Cost {
     /// An optional label to identify a position.
     #[pyo3(get)]
     pub label: Option<String>,
+}
+
+impl Cost {
+    #[must_use]
+    pub fn new(number: Decimal, currency: Currency, date: Date, label: Option<String>) -> Self {
+        Self {
+            number,
+            currency,
+            date,
+            label,
+        }
+    }
+}
+
+impl Display for Cost {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} {}, {}", self.number, self.currency, self.date)?;
+        if let Some(label) = &self.label {
+            write!(f, ", {label}")?;
+        };
+        Ok(())
+    }
 }
 
 #[pymethods]
@@ -88,6 +113,31 @@ pub fn option_cost_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Option<Cost>> {
     } else {
         Some(cost_from_py(ob)?)
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cost_to_string() {
+        let one = Decimal::ONE;
+        let eur = Currency::from("EUR");
+        let cost = Cost::new(
+            one,
+            eur.clone(),
+            Date::try_from_str("2012-12-12").unwrap(),
+            None,
+        );
+        assert_eq!(cost.to_string(), "1 EUR, 2012-12-12");
+        let cost_with_label = Cost::new(
+            one,
+            eur,
+            Date::try_from_str("2012-12-12").unwrap(),
+            Some("lot-1".into()),
+        );
+        assert_eq!(cost_with_label.to_string(), "1 EUR, 2012-12-12, lot-1");
+    }
 }
 
 /// A possibly incomplete cost as specified in the Beancount file.

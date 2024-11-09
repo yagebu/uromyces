@@ -16,6 +16,8 @@ use methods::{close_with_resolved_matches, resolve_matches, BookingMethod};
 mod currency_groups;
 mod errors;
 mod methods;
+#[cfg(test)]
+mod tests;
 
 /// Contains information about the booking methods that are specified per account.
 ///
@@ -294,6 +296,8 @@ fn interpolate_and_fill_in_missing(
             }
             MissingNumber::CostPerUnit(units, price) => {
                 let mut cost_spec = posting.cost.clone().expect("should have a cost");
+                // TODO: this needs to error
+                debug_assert!(!units.number.is_zero(), "{cost_spec:?}{units:?}");
                 cost_spec.number_per = Some(weight / units.number);
                 let cost = complete_cost_spec(&cost_spec, date, posting.units.number)
                     .expect("cost to not have missing number or currency");
@@ -334,7 +338,7 @@ fn update_running_balances(balances: &mut AccountBalances, transaction: &Transac
 
 /// Book and interpolate to fill in all missing values.
 #[must_use]
-pub(crate) fn book_entries(raw_ledger: RawLedger) -> Ledger {
+pub(crate) fn book_entries(raw_ledger: RawLedger) -> (Ledger, AccountBalances) {
     let booking_methods = BookingMethods::from_ledger(&raw_ledger);
     let mut balances = AccountBalances::new();
 
@@ -398,5 +402,5 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> Ledger {
 
     ledger.entries = entries;
     ledger.errors.append(&mut errors);
-    ledger
+    (ledger, balances)
 }

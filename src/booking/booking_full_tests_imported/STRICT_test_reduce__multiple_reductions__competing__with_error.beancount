@@ -1,0 +1,22 @@
+;==============================================================================
+; STRICT_test_reduce__multiple_reductions__competing__with_error
+;==============================================================================
+
+2016-01-01 * #ante
+  Assets:Account            5 HOOL {115.00 USD, 2016-01-15}
+
+2016-05-02 * #apply
+  Assets:Account           -4 HOOL {115.00 USD}
+  Assets:Account           -4 HOOL {2016-01-15}
+
+2016-05-02 * #booked
+  error: "Not enough lots to reduce"
+  Assets:Dummy
+
+;------------------------------------------------------------------------------
+; errors=[
+;     "Not enough lots in inventory to reduce position",
+; ]
+; ex_balances=[
+;     "units=5 HOOL, cost=115.00 USD, 2016-01-15",
+; ]

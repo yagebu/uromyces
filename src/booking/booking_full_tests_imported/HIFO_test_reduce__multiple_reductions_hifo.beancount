@@ -1,0 +1,36 @@
+;==============================================================================
+; HIFO_test_reduce__multiple_reductions_hifo
+;==============================================================================
+
+2016-01-01 * #ante
+  Assets:Account           50 HOOL {115.00 USD, 2016-01-15}
+  Assets:Account           50 HOOL {116.00 USD, 2016-01-16}
+  Assets:Account           50 HOOL {114.00 USD, 2016-01-17}
+
+2016-05-02 * #apply
+  Assets:Account          -40 HOOL {USD}
+  Assets:Account          -35 HOOL {USD}
+  Assets:Account          -30 HOOL {USD}
+
+2016-05-02 * #booked
+  Assets:Account          -40 HOOL {116.00 USD, 2016-01-16}
+  Assets:Account          -10 HOOL {116.00 USD, 2016-01-16}
+  Assets:Account          -25 HOOL {115.00 USD, 2016-01-15}
+  Assets:Account          -25 HOOL {115.00 USD, 2016-01-15}
+  Assets:Account           -5 HOOL {114.00 USD, 2016-01-17}
+
+2016-01-01 * #ex
+  Assets:Account           45 HOOL {114.00 USD, 2016-01-17}
+
+;------------------------------------------------------------------------------
+; errors=[]
+; booked=[
+;     "units=-40 HOOL, cost=116.00 USD, 2016-01-16",
+;     "units=-10 HOOL, cost=116.00 USD, 2016-01-16",
+;     "units=-25 HOOL, cost=115.00 USD, 2016-01-15",
+;     "units=-25 HOOL, cost=115.00 USD, 2016-01-15",
+;     "units=-5 HOOL, cost=114.00 USD, 2016-01-17",
+; ]
+; ex_balances=[
+;     "units=45 HOOL, cost=114.00 USD, 2016-01-17",
+; ]

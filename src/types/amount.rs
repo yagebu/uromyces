@@ -134,6 +134,29 @@ pub struct IncompleteAmount {
     pub currency: Option<Currency>,
 }
 
+impl Display for IncompleteAmount {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self {
+                number: Some(n),
+                currency: Some(c),
+            } => write!(f, "{n} {c}"),
+            Self {
+                number: None,
+                currency: Some(c),
+            } => write!(f, "{c}"),
+            Self {
+                number: Some(n),
+                currency: None,
+            } => write!(f, "{n}"),
+            Self {
+                number: None,
+                currency: None,
+            } => write!(f, ""),
+        }
+    }
+}
+
 impl From<Amount> for IncompleteAmount {
     fn from(amount: Amount) -> Self {
         Self {

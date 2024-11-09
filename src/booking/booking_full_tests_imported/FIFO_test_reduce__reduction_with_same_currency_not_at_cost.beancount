@@ -1,0 +1,21 @@
+;==============================================================================
+; FIFO_test_reduce__reduction_with_same_currency_not_at_cost
+;==============================================================================
+
+2016-01-01 * #ante
+  Assets:Account   50 HOOL @ 14.33 USD
+
+2016-05-02 * #apply
+  Assets:Account  -40 HOOL {14.33 USD} @ 14.33 USD
+
+2016-05-02 * #booked
+  error: "No position matches"
+  Assets:Dummy
+
+;------------------------------------------------------------------------------
+; errors=[
+;     "No matching lots in inventory to reduce position",
+; ]
+; ex_balances=[
+;     "units=50 HOOL, cost=None",
+; ]

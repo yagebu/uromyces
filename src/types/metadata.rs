@@ -86,6 +86,11 @@ impl Meta {
             self.0.remove(index);
         }
     }
+    #[must_use]
+    pub fn contains_key(&self, key: &str) -> bool {
+        self.0.iter().any(|m| m.key == key)
+    }
+
     /// Convert the metadata to a Python dict with the provied filename and lineno.
     ///
     /// # Errors

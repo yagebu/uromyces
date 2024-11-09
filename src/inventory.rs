@@ -80,6 +80,17 @@ pub trait Position {
             self.units()
         }
     }
+
+    #[cfg(test)]
+    /// Print out (mainly for snapshot tests).
+    fn print_units_and_cost(&self) -> String {
+        format!(
+            "units={number} {currency}, cost={cost}",
+            number = self.number(),
+            currency = self.currency(),
+            cost = self.cost().map_or("None".to_string(), |c| c.to_string())
+        )
+    }
 }
 
 impl Position for Amount {
@@ -160,6 +171,7 @@ pub struct PositionWithCost<'inv> {
     /// The cost.
     pub cost: &'inv Cost,
 }
+
 impl Position for PositionWithCost<'_> {
     fn number(&self) -> Decimal {
         *self.number

@@ -1,0 +1,24 @@
+;==============================================================================
+; FIFO_test_reduce__multiple_reductions__overflowing__with_error
+;==============================================================================
+
+2016-01-01 * #ante
+  Assets:Account           50 HOOL {115.00 USD, 2016-01-15}
+  Assets:Account           50 HOOL {116.00 USD, 2016-01-16}
+
+2016-05-02 * #apply
+  Assets:Account          -40 HOOL {USD}
+  Assets:Account          -65 HOOL {USD}
+
+2016-05-02 * #booked
+  error: "Not enough lots to reduce"
+  Assets:Dummy
+
+;------------------------------------------------------------------------------
+; errors=[
+;     "Not enough lots in inventory to reduce position",
+; ]
+; ex_balances=[
+;     "units=50 HOOL, cost=115.00 USD, 2016-01-15",
+;     "units=50 HOOL, cost=116.00 USD, 2016-01-16",
+; ]
