@@ -11,7 +11,7 @@ use crate::types::{
 
 use currency_groups::group_and_fill_in_currencies;
 use errors::{BookingError, BookingErrorKind};
-use methods::{resolve_matches, BookingMethod};
+use methods::{close_with_resolved_matches, resolve_matches, BookingMethod};
 
 mod currency_groups;
 mod errors;
@@ -63,9 +63,11 @@ fn close_positions(
     methods: &BookingMethods,
 ) -> Result<(), BookingError> {
     let mut additional_postings = Vec::new();
+    let mut local_balances = AccountBalances::new();
 
     for posting in &mut *postings {
         debug_assert!(posting.units.currency.is_some());
+
         let Some(cost) = &posting.cost else {
             continue;
         };
@@ -75,9 +77,19 @@ fn close_positions(
         let Some(units_currency) = &posting.units.currency else {
             continue;
         };
-        let Some(balance) = balances.get(&posting.account) else {
-            continue;
-        };
+
+        // Get the value from our local balances (or insert, getting the value from the passed in
+        // balances).
+        let balance = local_balances
+            .raw_entry_mut()
+            .from_key(&posting.account)
+            .or_insert_with(|| {
+                (
+                    posting.account.clone(),
+                    balances.get(&posting.account).cloned().unwrap_or_default(),
+                )
+            })
+            .1;
 
         let units = Amount::new(units_number, units_currency.clone());
         let booking = methods.get_account_booking_method(&posting.account);
@@ -112,12 +124,9 @@ fn close_positions(
                     BookingErrorKind::NoMatchesForReduction,
                 ));
             }
-            additional_postings.append(&mut resolve_matches(
-                &booking_method,
-                posting,
-                matches,
-                &units,
-            )?);
+            let resolved_matches = resolve_matches(&booking_method, posting, matches, &units)?;
+            let mut resolved = close_with_resolved_matches(posting, balance, resolved_matches);
+            additional_postings.append(&mut resolved);
         }
     }
     postings.append(&mut additional_postings);

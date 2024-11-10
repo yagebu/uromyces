@@ -108,6 +108,18 @@ pub struct CostSpec {
     pub merge: bool,
 }
 
+impl From<Cost> for CostSpec {
+    fn from(cost: Cost) -> Self {
+        Self {
+            number_per: Some(cost.number),
+            number_total: None,
+            currency: Some(cost.currency),
+            date: Some(cost.date),
+            label: cost.label,
+            merge: false,
+        }
+    }
+}
 impl From<&Cost> for CostSpec {
     fn from(cost: &Cost) -> Self {
         Self {

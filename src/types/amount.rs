@@ -134,6 +134,15 @@ pub struct IncompleteAmount {
     pub currency: Option<Currency>,
 }
 
+impl From<Amount> for IncompleteAmount {
+    fn from(amount: Amount) -> Self {
+        Self {
+            number: Some(amount.number),
+            currency: Some(amount.currency),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

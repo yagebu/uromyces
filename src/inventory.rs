@@ -29,10 +29,16 @@ use rust_decimal::prelude::Signed;
 use crate::types::{Amount, Cost, Currency, Decimal, Posting};
 
 /// A single item in an inventory is keyed by currency and optional cost.
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
 struct InventoryKey {
     currency: Currency,
     cost: Option<Cost>,
+}
+
+impl InventoryKey {
+    fn new(currency: Currency, cost: Option<Cost>) -> Self {
+        Self { currency, cost }
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -131,6 +137,7 @@ pub struct InventoryPosition<'inv> {
     /// The cost, if this position is held at cost.
     pub cost: &'inv Option<Cost>,
 }
+
 impl Position for InventoryPosition<'_> {
     fn number(&self) -> Decimal {
         *self.number
@@ -166,7 +173,7 @@ impl Position for PositionWithCost<'_> {
 }
 
 /// An inventory, basically a map of [`Currency`], Option<[`Cost`]> pairs to [`Decimal`]s.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Inventory {
     map: IndexMap<InventoryKey, Decimal>,
 }
@@ -195,7 +202,7 @@ impl Inventory {
     /// The number of positions in this inventory.
     #[must_use]
     pub fn get(&self, currency: Currency, cost: Option<Cost>) -> Option<Decimal> {
-        self.map.get(&InventoryKey { currency, cost }).copied()
+        self.map.get(&InventoryKey::new(currency, cost)).copied()
     }
 
     /// Get the list of currencies contained in this inventory.
@@ -237,13 +244,7 @@ impl Inventory {
         }
     }
 
-    /// Add a position to the inventory.
-    pub fn add_position(&mut self, pos: &impl Position) -> BookingResult {
-        let key = InventoryKey {
-            currency: pos.currency(),
-            cost: pos.cost(),
-        };
-        let number = pos.number();
+    fn add_to_key(&mut self, key: InventoryKey, number: Decimal) -> BookingResult {
         let pos = self.map.get_mut(&key);
         if let Some(num) = pos {
             let result_type = if num.signum() == number.signum() {
@@ -264,6 +265,13 @@ impl Inventory {
             self.map.insert(key, number);
             BookingResult::CREATED
         }
+    }
+
+    /// Add a position to the inventory.
+    pub fn add_position(&mut self, pos: &impl Position) -> BookingResult {
+        let key = InventoryKey::new(pos.currency(), pos.cost());
+        let number = pos.number();
+        self.add_to_key(key, number)
     }
 
     /// Check whether the given amount could reduce this inventory (without checking costs)
