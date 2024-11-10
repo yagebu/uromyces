@@ -131,13 +131,14 @@ impl CustomValue {
     #[getter]
     fn dtype<'py>(&self, py: Python<'py>) -> &Bound<'py, PyAny> {
         match self.0 {
-            MetaValue::String(_) | MetaValue::Tag(_) => get_python_types(py).str.bind(py),
+            MetaValue::Currency(_) | MetaValue::String(_) | MetaValue::Tag(_) => {
+                get_python_types(py).str.bind(py)
+            }
             MetaValue::Date(_) => get_python_types(py).date.bind(py),
             MetaValue::Account(_) => get_python_types(py).account_dummy.bind(py),
             MetaValue::Bool(_) => get_python_types(py).bool.bind(py),
             MetaValue::Amount(_) => get_python_types(py).amount.bind(py),
             MetaValue::Number(_) => get_python_types(py).decimal.bind(py),
-            MetaValue::Currency(_) => get_python_types(py).str.bind(py),
         }
     }
 }

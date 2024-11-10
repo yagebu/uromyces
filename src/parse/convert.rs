@@ -178,7 +178,7 @@ impl TryFromNode for Decimal {
                 })
             }
             _ => {
-                panic!("Invalid number node: {:?}", node);
+                panic!("Invalid number node: {node:?}");
             }
         }
     }
@@ -314,7 +314,7 @@ impl TryFromNode for MetaValue {
             node_ids::AMOUNT => Self::Amount(Amount::try_from_node(node, s)?),
             node_ids::CURRENCY => Self::Currency(Currency::from_node(node, s)),
             node_ids::NUMBER => Self::Number(Decimal::try_from_node(node, s)?),
-            _ => panic!("Invalid metadata value node: {:?}", node),
+            _ => panic!("Invalid metadata value node: {node:?}"),
         })
     }
 }
