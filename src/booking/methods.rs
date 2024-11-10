@@ -33,6 +33,63 @@ impl BookingMethod {
     }
 }
 
+/// Keep track of initial posting units and reductions.
+///
+/// This abstracts the sign-juggling involved to "reduce" both positive and negative amounts
+/// correctly and truncation to never reduce below zero.
+pub struct Remainder {
+    remaining_number: Decimal,
+    sign_positive: bool,
+}
+
+impl Remainder {
+    /// Initialise a remainder from the posting units we're trying to reduce.
+    fn new(number: Decimal) -> Self {
+        Self {
+            remaining_number: number.abs(),
+            sign_positive: number.is_sign_positive(),
+        }
+    }
+    /// Reduce by a number from a matching position.
+    fn reduce(&mut self, number: &Decimal) -> Decimal {
+        let mut reduced = std::cmp::min(number.abs(), self.remaining_number);
+        self.remaining_number -= reduced;
+        // we never go below zero due to the min above
+        debug_assert!(self.remaining_number.is_sign_positive());
+        reduced.set_sign_positive(self.sign_positive);
+        reduced
+    }
+    /// Whether we still need to continue.
+    fn is_strictly_positive(&self) -> bool {
+        assert!(self.remaining_number.is_sign_positive());
+        !self.remaining_number.is_zero()
+    }
+}
+
+#[cfg(test)]
+#[test]
+fn test_remainder() {
+    use crate::test_utils::d;
+
+    let mut remainder = Remainder::new(d("1"));
+    assert!(remainder.is_strictly_positive());
+    assert_eq!(remainder.reduce(&d("1")), d("1"));
+    assert!(!remainder.is_strictly_positive());
+
+    let mut remainder = Remainder::new(d("2"));
+    assert!(remainder.is_strictly_positive());
+    assert_eq!(remainder.reduce(&d("1")), d("1"));
+    assert!(remainder.is_strictly_positive());
+
+    let mut remainder = Remainder::new(d("2"));
+    assert!(remainder.is_strictly_positive());
+    assert_eq!(remainder.reduce(&d("5")), d("2"));
+    assert!(!remainder.is_strictly_positive());
+
+    let remainder_neg = Remainder::new(d("-1"));
+    assert!(remainder_neg.is_strictly_positive());
+}
+
 /// Close positions using either
 /// - FIFO (first-in-first-out)
 /// - LIFO (last-in-first-out)
@@ -43,9 +100,7 @@ fn resolve_ordered(
     order: &ClosingOrder,
 ) -> Result<Vec<(Amount, Cost)>, BookingErrorKind> {
     let mut resolved = vec![];
-
-    let sign_positive = posting_units.number.is_sign_positive();
-    let mut remaining = posting_units.number.abs();
+    let mut remainder = Remainder::new(posting_units.number);
 
     match order {
         ClosingOrder::Fifo => {
@@ -60,22 +115,18 @@ fn resolve_ordered(
     };
     for position in matches {
         // We only need to continue if we have a positive non-zero amount remaining.
-        if remaining.is_sign_negative() || remaining.is_zero() {
+        if !remainder.is_strictly_positive() {
             break;
         }
 
-        let cost = position.cost;
-        let mut reduced = std::cmp::min(position.number.abs(), remaining);
-        remaining -= reduced;
-        reduced.set_sign_positive(sign_positive);
-
+        let reduced = remainder.reduce(position.number);
         resolved.push((
             Amount::new(reduced, position.currency.clone()),
-            cost.clone(),
+            position.cost.clone(),
         ));
     }
 
-    if remaining > Decimal::ZERO {
+    if remainder.is_strictly_positive() {
         Err(BookingErrorKind::InsufficientLots)
     } else {
         Ok(resolved)
@@ -86,8 +137,7 @@ fn resolve_strict(
     posting_units: &Amount,
     matches: &[PositionWithCost],
 ) -> Result<Vec<(Amount, Cost)>, BookingErrorKind> {
-    let sign_positive = posting_units.number.is_sign_positive();
-    let mut remaining = posting_units.number.abs();
+    let mut remainder = Remainder::new(posting_units.number);
 
     if matches.len() > 1 {
         // If the total requested to reduce matches the sum of all the
@@ -97,9 +147,7 @@ fn resolve_strict(
             let resolved = matches
                 .iter()
                 .map(|position| {
-                    let mut reduced = std::cmp::min(position.number.abs(), remaining);
-                    remaining -= reduced;
-                    reduced.set_sign_positive(sign_positive);
+                    let reduced = remainder.reduce(position.number);
                     (
                         Amount::new(reduced, position.currency.clone()),
                         position.cost.clone(),
@@ -112,12 +160,9 @@ fn resolve_strict(
         }
     } else {
         let position = &matches[0];
-        let mut reduced = std::cmp::min(position.number.abs(), remaining);
+        let reduced = remainder.reduce(position.number);
 
-        remaining -= reduced;
-        reduced.set_sign_positive(sign_positive);
-
-        if remaining > Decimal::ZERO {
+        if remainder.is_strictly_positive() {
             Err(BookingErrorKind::InsufficientLots)
         } else {
             Ok(vec![(
