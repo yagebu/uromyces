@@ -7,8 +7,9 @@ use super::errors::{BookingError, BookingErrorKind};
 
 /// Order in which existing might be reduced.
 pub(super) enum ClosingOrder {
-    Lifo,
     Fifo,
+    Hifo,
+    Lifo,
 }
 
 /// Booking methods that can be used to reduce inventories.
@@ -24,6 +25,7 @@ impl BookingMethod {
         match b {
             Booking::Average => Some(Self::Average),
             Booking::Fifo => Some(Self::Ordered(ClosingOrder::Fifo)),
+            Booking::Hifo => Some(Self::Ordered(ClosingOrder::Hifo)),
             Booking::Lifo => Some(Self::Ordered(ClosingOrder::Lifo)),
             Booking::Strict => Some(Self::Strict),
             Booking::None => None,
@@ -45,6 +47,9 @@ fn resolve_ordered(
     match order {
         ClosingOrder::Fifo => {
             matches.sort_by_key(|position| position.cost.date);
+        }
+        ClosingOrder::Hifo => {
+            matches.sort_by_key(|position| Reverse(position.cost.number));
         }
         ClosingOrder::Lifo => {
             matches.sort_by_key(|position| Reverse(position.cost.date));

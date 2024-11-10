@@ -14,6 +14,8 @@ pub enum Booking {
     Average,
     #[pyo3(name = "FIFO")]
     Fifo,
+    #[pyo3(name = "HIFO")]
+    Hifo,
     #[pyo3(name = "LIFO")]
     Lifo,
 }
@@ -28,6 +30,7 @@ impl Booking {
             Self::None => pyo3::intern!(py, "NONE"),
             Self::Average => pyo3::intern!(py, "AVERAGE"),
             Self::Fifo => pyo3::intern!(py, "FIFO"),
+            Self::Hifo => pyo3::intern!(py, "HIFO"),
             Self::Lifo => pyo3::intern!(py, "LIFO"),
         }
     }
@@ -40,8 +43,9 @@ impl TryFrom<&str> for Booking {
         match value {
             "NONE" => Ok(Self::None),
             "AVERAGE" => Ok(Self::Average),
-            "LIFO" => Ok(Self::Lifo),
             "FIFO" => Ok(Self::Fifo),
+            "HIFO" => Ok(Self::Hifo),
+            "LIFO" => Ok(Self::Lifo),
             "STRICT" => Ok(Self::Strict),
             _ => Err(()),
         }
