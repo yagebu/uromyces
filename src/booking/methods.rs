@@ -45,6 +45,7 @@ pub struct Remainder {
 impl Remainder {
     /// Initialise a remainder from the posting units we're trying to reduce.
     fn new(number: Decimal) -> Self {
+        assert!(!number.is_zero());
         Self {
             remaining_number: number.abs(),
             sign_positive: number.is_sign_positive(),
@@ -52,6 +53,8 @@ impl Remainder {
     }
     /// Reduce by a number from a matching position.
     fn reduce(&mut self, number: &Decimal) -> Decimal {
+        // assert here that we're not reducing by mixed amounts
+        assert_eq!(self.sign_positive, number.is_sign_negative());
         let mut reduced = std::cmp::min(number.abs(), self.remaining_number);
         self.remaining_number -= reduced;
         // we never go below zero due to the min above
@@ -72,18 +75,19 @@ fn test_remainder() {
     use crate::test_utils::d;
 
     let mut remainder = Remainder::new(d("1"));
+    assert!(remainder.sign_positive);
     assert!(remainder.is_strictly_positive());
-    assert_eq!(remainder.reduce(&d("1")), d("1"));
+    assert_eq!(remainder.reduce(&d("-1")), d("1"));
     assert!(!remainder.is_strictly_positive());
 
     let mut remainder = Remainder::new(d("2"));
     assert!(remainder.is_strictly_positive());
-    assert_eq!(remainder.reduce(&d("1")), d("1"));
+    assert_eq!(remainder.reduce(&d("-1")), d("1"));
     assert!(remainder.is_strictly_positive());
 
-    let mut remainder = Remainder::new(d("2"));
+    let mut remainder = Remainder::new(d("-2"));
     assert!(remainder.is_strictly_positive());
-    assert_eq!(remainder.reduce(&d("5")), d("2"));
+    assert_eq!(remainder.reduce(&d("5")), d("-2"));
     assert!(!remainder.is_strictly_positive());
 
     let remainder_neg = Remainder::new(d("-1"));
@@ -181,6 +185,7 @@ pub(super) fn resolve_matches(
     units: &Amount,
 ) -> Result<Vec<(Amount, Cost)>, BookingError> {
     debug_assert!(posting.cost.is_some());
+    debug_assert!(!units.number.is_zero());
 
     match method {
         BookingMethod::Ordered(order) => {
