@@ -26,14 +26,8 @@ def cli() -> None:
     """Various utilities."""
 
 
-IGNORED_TESTS = {
-    # These try to reduce 0 HOOL {} which panics right now
-    "LIFO_test_ambiguous__LIFO__no_match_against_any_lots",
-    "FIFO_test_ambiguous__FIFO__no_match_against_any_lots",
-    # This has a missing units number - uromyces currently books a zero posting
-    # here
-    "STRICT_test_reduce__missing_units_number",
-}
+# None right now :)
+IGNORED_TESTS: frozenset[str] = frozenset()
 
 
 def _format_snapshot(title: str, contents: str, expected: str) -> str:

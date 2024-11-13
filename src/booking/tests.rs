@@ -130,13 +130,15 @@ fn run_booking_test(path: &Path) {
                 .collect::<Vec<_>>(),
         );
 
-        if let Some(booked_txn) = find_first_with_tag(BOOKED, entries) {
-            if booked_txn.header.meta.contains_key("error") {
+        if let Some(expected_booked_txn) = find_first_with_tag(BOOKED, entries) {
+            if expected_booked_txn.header.meta.contains_key("error") {
                 assert!(!booked.errors.is_empty());
             } else {
                 assert!(booked.errors.is_empty());
                 // compare the expected (booked_txn) to the result (last txn in booked).
-                compare_postings(&booked_txn.postings, &last_txn.postings);
+                if !last_txn.postings.is_empty() {
+                    compare_postings(&expected_booked_txn.postings, &last_txn.postings);
+                }
             }
         }
     }

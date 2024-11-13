@@ -276,49 +276,56 @@ fn interpolate_and_fill_in_missing(
             Decimal::ZERO
         };
 
-        let (units, price, cost) = match missing {
+        if let Some((units, price, cost)) = match missing {
             MissingNumber::UnitsNumber(price, cost) => {
-                let number = if let Some(c) = &cost {
-                    debug_assert_eq!(&c.currency, group_currency);
-                    weight / c.number
-                } else if let Some(p) = &price {
-                    debug_assert_eq!(&p.currency, group_currency);
-                    weight / p.number
+                if weight.is_zero() {
+                    None
                 } else {
-                    weight
-                };
-                let units = Amount::new(
-                    tolerances.quantize(group_currency, number),
-                    group_currency.clone(),
-                );
+                    let number = if let Some(c) = &cost {
+                        debug_assert_eq!(&c.currency, group_currency);
+                        weight / c.number
+                    } else if let Some(p) = &price {
+                        debug_assert_eq!(&p.currency, group_currency);
+                        weight / p.number
+                    } else {
+                        weight
+                    };
+                    let units = Amount::new(
+                        tolerances.quantize(group_currency, number),
+                        group_currency.clone(),
+                    );
 
-                (units, price, cost)
+                    Some((units, price, cost))
+                }
             }
             MissingNumber::CostPerUnit(units, price) => {
                 let mut cost_spec = posting.cost.clone().expect("should have a cost");
-                // TODO: this needs to error
-                debug_assert!(!units.number.is_zero(), "{cost_spec:?}{units:?}");
-                cost_spec.number_per = Some(weight / units.number);
-                let cost = complete_cost_spec(&cost_spec, date, posting.units.number)
-                    .expect("cost to not have missing number or currency");
-                (units, price, Some(cost))
+                if units.number.is_zero() {
+                    None
+                } else {
+                    cost_spec.number_per = Some(weight / units.number);
+                    let cost = complete_cost_spec(&cost_spec, date, posting.units.number)
+                        .expect("cost to not have missing number or currency");
+                    Some((units, price, Some(cost)))
+                }
             }
             MissingNumber::PriceNumber(units, cost) => {
                 let price = Amount::new(weight / units.number, group_currency.clone());
-                (units, Some(price), cost)
+                Some((units, Some(price), cost))
             }
-            MissingNumber::None(units, price, cost) => (units, price, cost),
+            MissingNumber::None(units, price, cost) => Some((units, price, cost)),
+        } {
+            complete_postings.push(Posting {
+                filename: posting.filename,
+                line: posting.line,
+                meta: posting.meta,
+                account: posting.account,
+                flag: posting.flag,
+                units,
+                price,
+                cost,
+            });
         };
-        complete_postings.push(Posting {
-            filename: posting.filename,
-            line: posting.line,
-            meta: posting.meta,
-            account: posting.account,
-            flag: posting.flag,
-            units,
-            price,
-            cost,
-        });
     }
 
     Ok(complete_postings)

@@ -1,9 +1,15 @@
 ;==============================================================================
-; STRICT_reduct_missing_units_number
+; STRICT_test_reduce__missing_units_number
 ;==============================================================================
 
+2016-01-01 * #ante
+  Assets:Dummy
+
 2016-05-02 * #apply
-  Assets:Account          HOOL {100 USD}
+  Assets:Account              HOOL {115.00 USD}
+
+2016-01-01 * #booked
+  Assets:Dummy
 
 ;------------------------------------------------------------------------------
 ; errors=[]

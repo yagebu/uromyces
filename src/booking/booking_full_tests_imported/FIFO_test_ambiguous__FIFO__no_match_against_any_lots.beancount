@@ -1,0 +1,31 @@
+;==============================================================================
+; FIFO_test_ambiguous__FIFO__no_match_against_any_lots
+;==============================================================================
+
+2015-01-01 * #ante
+  Assets:Account          5 HOOL {111.11 USD, 2015-10-02}
+  Assets:Account          4 HOOL {100.00 USD, 2015-10-01}
+  Assets:Account          6 HOOL {122.22 USD, 2015-10-03}
+
+2015-02-22 * #apply
+  Assets:Account          0 HOOL {}
+
+2015-02-22 * #reduced
+  S Assets:Account          0 HOOL {USD, 2015-02-22}
+
+2015-02-22 * #booked
+  Assets:Dummy
+
+2015-01-01 * #ex
+  Assets:Account          5 HOOL {111.11 USD, 2015-10-02}
+  Assets:Account          4 HOOL {100.00 USD, 2015-10-01}
+  Assets:Account          6 HOOL {122.22 USD, 2015-10-03}
+
+;------------------------------------------------------------------------------
+; errors=[]
+; booked=[]
+; ex_balances=[
+;     "units=5 HOOL, cost=111.11 USD, 2015-10-02",
+;     "units=4 HOOL, cost=100.00 USD, 2015-10-01",
+;     "units=6 HOOL, cost=122.22 USD, 2015-10-03",
+; ]
