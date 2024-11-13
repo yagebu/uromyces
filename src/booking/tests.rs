@@ -65,7 +65,7 @@ fn run_booking_test(path: &Path) {
         .title()
         .split('_')
         .next()
-        .unwrap()
+        .unwrap_or("")
         .try_into()
         .expect("valid booking method");
     let entries = &raw_ledger.entries;
@@ -102,9 +102,13 @@ fn run_booking_test(path: &Path) {
                 .collect::<Vec<_>>(),
         );
 
-        let Entry::Transaction(last_txn) = booked.entries.last().unwrap() else {
-            panic!("expected a txn")
+        let Some(last_entry) = booked.entries.last() else {
+            continue;
         };
+        let Entry::Transaction(last_txn) = last_entry else {
+            continue;
+        };
+
         if booked.errors.is_empty() {
             snapshot.add_debug_output(
                 "booked",

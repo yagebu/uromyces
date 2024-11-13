@@ -27,12 +27,11 @@ def cli() -> None:
 
 
 IGNORED_TESTS = {
-    # Should fail at categorisation but doesn't due to our workaround.
-    "STRICT_test_augment__from_empty__incomplete_cost__empty",
-    # These two try to reduce 0 HOOL {} which panics right now
+    # These try to reduce 0 HOOL {} which panics right now
     "LIFO_test_ambiguous__LIFO__no_match_against_any_lots",
     "FIFO_test_ambiguous__FIFO__no_match_against_any_lots",
-    # This has txn without postings - worked around, investigate error
+    # This has a missing units number - uromyces currently books a zero posting
+    # here
     "STRICT_test_reduce__missing_units_number",
 }
 

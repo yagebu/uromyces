@@ -1,0 +1,15 @@
+;==============================================================================
+; STRICT_test_augment__from_empty__incomplete_cost__empty
+;==============================================================================
+
+2015-10-01 * #apply
+  Assets:Account          1 HOOL {}
+
+2015-10-01 * #booked
+  error: "Failed to categorize posting"
+  Assets:Dummy
+
+;------------------------------------------------------------------------------
+; errors=[
+;     "Unresolved cost currency",
+; ]
