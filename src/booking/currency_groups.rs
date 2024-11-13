@@ -1,6 +1,7 @@
 use crate::types::{CostSpec, Currency, IncompleteAmount, RawPosting};
 
 use super::errors::{BookingError, BookingErrorKind};
+use super::AccountBalances;
 
 /// Get the currency group for this posting.
 ///
@@ -66,6 +67,7 @@ fn check_posting_currencies(posting: &RawPosting) -> Result<(), BookingError> {
 /// Unlike Beancount, this does not try to fill in currencies from the account balances.
 pub(super) fn group_and_fill_in_currencies(
     postings: &[RawPosting],
+    balances: &AccountBalances,
 ) -> Result<GroupedPostings, BookingError> {
     let mut auto_posting = None;
     let mut groups: GroupedPostings = Vec::new();
@@ -134,9 +136,29 @@ pub(super) fn group_and_fill_in_currencies(
             groups[0].1.push(unknown_posting);
         }
     }
-    // if we had more than one unknwon posting, this should now bubble up an error
-    for posting in unknown {
+
+    // If we had more than one unknown posting, we infer cost currencies from existing account
+    // balances.
+    // Otherwise, we will bubble up an error.
+    for mut posting in unknown {
+        if let Some(balance) = balances.get(&posting.account) {
+            if let Some(ref mut cost) = posting.cost {
+                if cost.currency.is_none() {
+                    let cost_currencies = balance.cost_currencies();
+                    if cost_currencies.len() == 1 {
+                        cost.currency = cost_currencies.into_iter().next().cloned();
+                    }
+                }
+            }
+        }
         check_posting_currencies(&posting)?;
+        let currency =
+            get_posting_currency_group(&posting).expect("we just checked it has currencies");
+        if let Some((_, group_postings)) = groups.iter_mut().find(|(c, _)| c == currency) {
+            group_postings.push(posting);
+        } else {
+            groups.push((currency.clone(), vec![posting]));
+        }
     }
 
     if let Some(auto_posting) = auto_posting {
@@ -189,7 +211,7 @@ mod tests {
         posting_strings: &[&str],
     ) -> Vec<RawPosting> {
         let posting = &postings_from_strings(posting_strings);
-        let groups = group_and_fill_in_currencies(posting).unwrap();
+        let groups = group_and_fill_in_currencies(posting, &AccountBalances::new()).unwrap();
         assert_eq!(groups.len(), 1);
         let group = groups.into_iter().next().unwrap();
         assert_eq!(group.0, currency.into());
@@ -198,7 +220,7 @@ mod tests {
 
     fn check(posting_strings: &[&str]) -> GroupedPostings {
         let posting = &postings_from_strings(posting_strings);
-        group_and_fill_in_currencies(posting).unwrap()
+        group_and_fill_in_currencies(posting, &AccountBalances::new()).unwrap()
     }
 
     #[test]

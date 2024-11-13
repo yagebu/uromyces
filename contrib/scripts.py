@@ -104,9 +104,6 @@ def import_booking_tests() -> None:
             if booking_method not in excluded:
                 target_path = BOOKING_TEST_PATH / f"{test_id}.beancount"
                 contents = dedent(method.__doc__)
-                # workaround as uro does not infer categorisation based on
-                # account balances
-                contents = contents.replace("HOOL {}", "HOOL {USD}")
                 # uro-parser doesn't support txns without postings, add dummy
                 contents = re.sub(
                     r"error: \".*\"", r"\g<0>\n  Assets:Dummy", contents

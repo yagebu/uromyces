@@ -8,9 +8,9 @@
   Assets:Account           50 HOOL {114.00 USD, 2016-01-17}
 
 2016-05-02 * #apply
-  Assets:Account          -40 HOOL {USD}
-  Assets:Account          -35 HOOL {USD}
-  Assets:Account          -30 HOOL {USD}
+  Assets:Account          -40 HOOL {}
+  Assets:Account          -35 HOOL {}
+  Assets:Account          -30 HOOL {}
 
 2016-05-02 * #booked
   Assets:Account          -40 HOOL {116.00 USD, 2016-01-16}

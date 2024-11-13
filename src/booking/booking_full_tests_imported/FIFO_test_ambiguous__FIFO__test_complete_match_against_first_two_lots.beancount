@@ -8,7 +8,7 @@
   Assets:Account          6 HOOL {122.22 USD, 2015-10-03}
 
 2015-02-22 * #apply
-  Assets:Account         -9 HOOL {USD}
+  Assets:Account         -9 HOOL {}
 
 2015-02-22 * #booked
   Assets:Account         -4 HOOL {100.00 USD, 2015-10-01}

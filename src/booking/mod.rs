@@ -348,7 +348,7 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> (Ledger, AccountBalances) {
             let mut booked_postings = Vec::with_capacity(txn.postings.len());
             let tolerances = Tolerances::infer_from_raw(&txn.postings, &raw_ledger.options);
 
-            let groups = group_and_fill_in_currencies(&txn.postings)?;
+            let groups = group_and_fill_in_currencies(&txn.postings, balances)?;
             for (currency, mut postings) in groups {
                 close_positions(balances, &mut postings, &booking_methods)?;
                 booked_postings.append(&mut interpolate_and_fill_in_missing(

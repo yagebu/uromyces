@@ -7,7 +7,7 @@
   Assets:Account          10 HOOL {115.00 USD, 2016-04-15, "lot2"}
 
 2016-05-02 * #apply
-  Assets:Account          -5 HOOL {USD}
+  Assets:Account          -5 HOOL {}
 
 2016-05-02 * #apply
   Assets:Account          -5 HOOL {115.00 USD}
@@ -52,7 +52,7 @@
 ; ]
 ; -----------------------------------------------------------------------------
 ; errors=[
-;     "Unresolved cost currency",
+;     "Ambiguous matches",
 ; ]
 ; ex_balances=[
 ;     "units=10 HOOL, cost=115.00 USD, 2016-04-15, lot1",

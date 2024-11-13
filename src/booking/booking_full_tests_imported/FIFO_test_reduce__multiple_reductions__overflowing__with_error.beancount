@@ -7,8 +7,8 @@
   Assets:Account           50 HOOL {116.00 USD, 2016-01-16}
 
 2016-05-02 * #apply
-  Assets:Account          -40 HOOL {USD}
-  Assets:Account          -65 HOOL {USD}
+  Assets:Account          -40 HOOL {}
+  Assets:Account          -65 HOOL {}
 
 2016-05-02 * #booked
   error: "Not enough lots to reduce"

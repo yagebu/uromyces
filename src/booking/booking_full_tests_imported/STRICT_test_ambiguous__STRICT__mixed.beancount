@@ -41,7 +41,7 @@
 ; ]
 ; -----------------------------------------------------------------------------
 ; errors=[
-;     "Unresolved cost currency",
+;     "No matching lots in inventory to reduce position",
 ; ]
 ; ex_balances=[
 ;     "units=5 HOOL, cost=100.00 USD, 2015-10-01",
