@@ -37,4 +37,5 @@ regex = { version = "1" }
 
 [dev-dependencies]
 insta = { version = "1", features = ["glob", "json", "filters"] }
+itertools = { version = "0.13" }
 regex = { version = "1" }

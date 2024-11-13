@@ -18,12 +18,11 @@
 //! inventory.add_position(&Amount::from_str("10 USD").unwrap());
 //! inventory.add_position(&Amount::from_str("10 USD").unwrap());
 //! assert_eq!(inventory.len(), 1);
-//! assert_eq!(inventory.currencies(), vec![&Currency::from("USD")]);
 //! let sum = Amount::from_str("20 USD").unwrap();
 //! assert_eq!(inventory.get(sum.currency, None), Some(sum.number));
 //! ```
 //!
-use indexmap::IndexMap;
+use indexmap::{IndexMap, IndexSet};
 use rust_decimal::prelude::Signed;
 
 use crate::types::{Amount, Cost, Currency, Decimal, Posting};
@@ -137,6 +136,17 @@ impl Position for &Posting {
         self.cost.clone()
     }
 }
+impl Position for (Amount, Cost) {
+    fn number(&self) -> Decimal {
+        self.0.number
+    }
+    fn currency(&self) -> Currency {
+        self.0.currency.clone()
+    }
+    fn cost(&self) -> Option<Cost> {
+        Some(self.1.clone())
+    }
+}
 
 /// An inventory position of number, currency and optional cost.
 #[allow(clippy::module_name_repetitions)]
@@ -217,10 +227,19 @@ impl Inventory {
         self.map.get(&InventoryKey::new(currency, cost)).copied()
     }
 
-    /// Get the list of currencies contained in this inventory.
+    /// Get the currencies contained in this inventory.
     #[must_use]
-    pub fn currencies(&self) -> Vec<&Currency> {
+    pub fn currencies(&self) -> IndexSet<&Currency> {
         self.map.keys().map(|key| &key.currency).collect()
+    }
+
+    /// Get the cost currencies contained in this inventory.
+    #[must_use]
+    pub fn cost_currencies(&self) -> IndexSet<&Currency> {
+        self.map
+            .keys()
+            .filter_map(|key| key.cost.as_ref().map(|c| &c.currency))
+            .collect()
     }
 
     /// An iterator over all positions in this inventory.
@@ -323,7 +342,10 @@ where
 #[cfg(test)]
 mod tests {
 
-    use crate::test_utils::a;
+    use crate::{
+        test_utils::{a, d},
+        types::MIN_DATE,
+    };
 
     use super::*;
 
@@ -352,11 +374,16 @@ mod tests {
     fn test_inventory_get_currencies() {
         let mut inv = Inventory::new();
         inv.add_position(&a("2.0 EUR"));
-        assert_eq!(inv.currencies(), vec!["EUR"]);
+        inv.add_position(&(
+            a("2.0 EUR"),
+            Cost::new(d("3"), "USD".into(), MIN_DATE, None),
+        ));
+        itertools::assert_equal(inv.currencies(), vec!["EUR"]);
+        itertools::assert_equal(inv.cost_currencies(), vec!["USD"]);
         inv.add_position(&a("2.0 USD"));
         let mut currencies = inv.currencies();
         currencies.sort();
-        assert_eq!(currencies, vec!["EUR", "USD"]);
+        itertools::assert_equal(currencies, vec!["EUR", "USD"]);
     }
 
     #[test]
