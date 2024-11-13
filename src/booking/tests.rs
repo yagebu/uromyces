@@ -153,6 +153,9 @@ fn run_booking_test(path: &Path) {
 /// The test inputs can be imported from Beancount with `contrib/scripts.py`.
 #[test]
 fn booking_test() {
+    insta::glob!("booking_tests/*.beancount", |path| {
+        run_booking_test(path);
+    });
     insta::glob!("booking_full_tests_imported/*.beancount", |path| {
         run_booking_test(path);
     });
