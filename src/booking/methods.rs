@@ -184,15 +184,14 @@ pub(super) fn resolve_matches(
 
     match method {
         BookingMethod::Ordered(order) => {
-            resolve_ordered(units, matches, order).map_err(|kind| BookingError::new(posting, kind))
+            resolve_ordered(units, matches, order).map_err(|kind| kind.with_posting(posting))
         }
         BookingMethod::Strict => {
-            resolve_strict(units, &matches).map_err(|kind| BookingError::new(posting, kind))
+            resolve_strict(units, &matches).map_err(|kind| kind.with_posting(posting))
         }
-        BookingMethod::Average => Err(BookingError::new(
-            posting,
-            BookingErrorKind::UnsupportedAverageBooking,
-        )),
+        BookingMethod::Average => {
+            Err(BookingErrorKind::UnsupportedAverageBooking.with_posting(posting))
+        }
     }
 }
 

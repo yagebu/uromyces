@@ -8,16 +8,6 @@ pub struct BookingError {
     kind: BookingErrorKind,
 }
 
-impl BookingError {
-    pub(super) fn new(posting: &RawPosting, kind: BookingErrorKind) -> Self {
-        Self {
-            filename: posting.filename.clone(),
-            line: posting.line,
-            kind,
-        }
-    }
-}
-
 #[derive(Debug)]
 pub(super) enum BookingErrorKind {
     // Currency resolution and grouping
@@ -34,6 +24,16 @@ pub(super) enum BookingErrorKind {
     TooManyMissingNumbers,
     MissingAmountNumber,
     MissingCostNumber,
+}
+
+impl BookingErrorKind {
+    pub(super) fn with_posting(self, posting: &RawPosting) -> BookingError {
+        BookingError {
+            filename: posting.filename.clone(),
+            line: posting.line,
+            kind: self,
+        }
+    }
 }
 
 impl std::error::Error for BookingError {}

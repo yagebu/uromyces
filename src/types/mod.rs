@@ -282,6 +282,27 @@ pub struct RawPosting {
     pub cost: Option<CostSpec>,
 }
 
+impl RawPosting {
+    /// Complete the posting with the given units, cost, and price.
+    pub(crate) fn complete(
+        self,
+        units: Amount,
+        price: Option<Amount>,
+        cost: Option<Cost>,
+    ) -> Posting {
+        Posting {
+            filename: self.filename,
+            line: self.line,
+            meta: self.meta,
+            account: self.account,
+            flag: self.flag,
+            units,
+            cost,
+            price,
+        }
+    }
+}
+
 /// A fully booked posting.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]

@@ -36,20 +36,11 @@ type GroupedPostings = Vec<(Currency, Vec<RawPosting>)>;
 /// Check whether all currencies are set in the posting.
 fn check_posting_currencies(posting: &RawPosting) -> Result<(), BookingError> {
     if posting.units.currency.is_none() {
-        Err(BookingError::new(
-            posting,
-            BookingErrorKind::UnresolvedUnitsCurrency,
-        ))
+        Err(BookingErrorKind::UnresolvedUnitsCurrency.with_posting(posting))
     } else if posting.price.iter().any(|v| v.currency.is_none()) {
-        Err(BookingError::new(
-            posting,
-            BookingErrorKind::UnresolvedPriceCurrency,
-        ))
+        Err(BookingErrorKind::UnresolvedPriceCurrency.with_posting(posting))
     } else if posting.cost.iter().any(|v| v.currency.is_none()) {
-        Err(BookingError::new(
-            posting,
-            BookingErrorKind::UnresolvedCostCurrency,
-        ))
+        Err(BookingErrorKind::UnresolvedCostCurrency.with_posting(posting))
     } else {
         Ok(())
     }
@@ -64,7 +55,8 @@ fn check_posting_currencies(posting: &RawPosting) -> Result<(), BookingError> {
 /// - one posting is allowed to be an "auto posting" without units, of which we create one copy for each
 ///   currency group.
 ///
-/// Unlike Beancount, this does not try to fill in currencies from the account balances.
+/// Unlike Beancount, this does not try to fill in all currencies from the account balances, just
+/// cost currencies, if they are missing.
 pub(super) fn group_and_fill_in_currencies(
     postings: &[RawPosting],
     balances: &AccountBalances,
@@ -88,12 +80,12 @@ pub(super) fn group_and_fill_in_currencies(
             }
         }
 
-        if posting.units.number.is_none() && posting.units.currency.is_none() {
+        if posting.units.number.is_none()
+            && posting.units.currency.is_none()
+            && posting.price.is_none()
+        {
             if auto_posting.is_some() {
-                return Err(BookingError::new(
-                    &posting,
-                    BookingErrorKind::MultipleAutoPostings,
-                ));
+                return Err(BookingErrorKind::MultipleAutoPostings.with_posting(&posting));
             }
             auto_posting = Some(posting);
         } else {

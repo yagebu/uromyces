@@ -121,10 +121,7 @@ fn close_positions(
                 })
                 .collect::<Vec<_>>();
             if matches.is_empty() {
-                return Err(BookingError::new(
-                    posting,
-                    BookingErrorKind::NoMatchesForReduction,
-                ));
+                return Err(BookingErrorKind::NoMatchesForReduction.with_posting(posting));
             }
             let resolved_matches = resolve_matches(&booking_method, posting, matches, &units)?;
             let mut resolved = close_with_resolved_matches(posting, balance, resolved_matches);
@@ -217,10 +214,7 @@ fn find_missing_value(posting: &RawPosting, date: Date) -> Result<MissingNumber,
         (Err(..), Ok(p), Ok(c)) => Ok(MissingNumber::UnitsNumber(p, c)),
         (Ok(u), Err(..), Ok(c)) => Ok(MissingNumber::PriceNumber(u, c)),
         (Ok(u), Ok(p), Err(..)) => Ok(MissingNumber::CostPerUnit(u, p)),
-        _ => Err(BookingError::new(
-            posting,
-            BookingErrorKind::TooManyMissingNumbers,
-        )),
+        _ => Err(BookingErrorKind::TooManyMissingNumbers.with_posting(posting)),
     }
 }
 
@@ -242,22 +236,10 @@ fn interpolate_and_fill_in_missing(
     for posting in postings {
         let missing_type = find_missing_value(&posting, date)?;
         if let MissingNumber::None(units, price, cost) = missing_type {
-            complete_postings.push(Posting {
-                filename: posting.filename,
-                line: posting.line,
-                meta: posting.meta,
-                account: posting.account,
-                flag: posting.flag,
-                units,
-                price,
-                cost,
-            });
+            complete_postings.push(posting.complete(units, price, cost));
         } else {
             if incomplete.is_some() {
-                return Err(BookingError::new(
-                    &posting,
-                    BookingErrorKind::TooManyMissingNumbers,
-                ));
+                return Err(BookingErrorKind::TooManyMissingNumbers.with_posting(&posting));
             }
             incomplete = Some((posting, missing_type));
         }
@@ -315,16 +297,7 @@ fn interpolate_and_fill_in_missing(
             }
             MissingNumber::None(units, price, cost) => Some((units, price, cost)),
         } {
-            complete_postings.push(Posting {
-                filename: posting.filename,
-                line: posting.line,
-                meta: posting.meta,
-                account: posting.account,
-                flag: posting.flag,
-                units,
-                price,
-                cost,
-            });
+            complete_postings.push(posting.complete(units, price, cost));
         };
     }
 
