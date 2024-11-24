@@ -3,6 +3,8 @@
 //! Just like `beancount.ops.summarize`, this module provides functions to summarize entries, e.g.
 //! when filtering to a time frame to collect all entries before that time frame to a few entries.
 
+use std::ops::AddAssign;
+
 use hashbrown::{HashMap, HashSet};
 
 use crate::inventory::Position;
@@ -22,7 +24,7 @@ fn balances_by_account(entries: &[Entry]) -> AccountBalances {
                 balances
                     .entry(&pos.account)
                     .or_insert_with(Inventory::new)
-                    .add_position(&pos);
+                    .add_position(pos);
             }
         }
     }
@@ -102,13 +104,13 @@ pub fn clamp(
     for (account, inv) in &balances_before {
         if accounts.roots.is_income_statement_account(account) {
             transfered_income_statement_accounts.insert(*account);
-            previous_earnings_balance.add_inventory(inv);
+            previous_earnings_balance += inv;
         }
     }
     balances_before
         .entry(&accounts.previous_earnings)
         .or_default()
-        .add_inventory(&previous_earnings_balance);
+        .add_assign(&previous_earnings_balance);
 
     // Create summarisation entries
     let summarisation_entry_date = begin_date.previous_day().unwrap_or(begin_date);

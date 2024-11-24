@@ -46,10 +46,7 @@ impl<'ledger> AccountPadder<'ledger> {
     fn balance(&mut self, entry: &'ledger Balance) {
         let check_amount = &entry.amount;
         let currency = &check_amount.currency;
-        let current_balance = self
-            .balance
-            .get(currency.clone(), None)
-            .unwrap_or(Decimal::ZERO);
+        let current_balance = self.balance.get(currency, None).unwrap_or(Decimal::ZERO);
 
         let diff = current_balance - check_amount.number;
         let padded_already = !self.padded_currencies.insert(&check_amount.currency);

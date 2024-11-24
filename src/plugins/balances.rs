@@ -57,7 +57,7 @@ impl<'ledger> BalanceChecker<'ledger> {
         let expected_amount = &entry.amount;
         let current_balance = self
             .balance
-            .get(expected_amount.currency.clone(), None)
+            .get(&expected_amount.currency, None)
             .unwrap_or(Decimal::ZERO);
 
         let diff = current_balance - expected_amount.number;

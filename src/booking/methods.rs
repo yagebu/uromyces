@@ -1,6 +1,6 @@
 use std::cmp::Reverse;
 
-use crate::inventory::{Inventory, InventoryPosition, PositionWithCost};
+use crate::inventory::{Inventory, InventoryPosition, InventoryPositionWithCost};
 use crate::types::{Amount, Booking, Cost, Decimal, RawPosting};
 
 use super::errors::{BookingError, BookingErrorKind};
@@ -100,7 +100,7 @@ fn test_remainder() {
 /// - HIFO (highest-in-first-out)
 fn resolve_ordered(
     posting_units: &Amount,
-    mut matches: Vec<PositionWithCost>,
+    mut matches: Vec<InventoryPositionWithCost>,
     order: &ClosingOrder,
 ) -> Result<Vec<(Amount, Cost)>, BookingErrorKind> {
     let mut resolved = vec![];
@@ -139,7 +139,7 @@ fn resolve_ordered(
 
 fn resolve_strict(
     posting_units: &Amount,
-    matches: &[PositionWithCost],
+    matches: &[InventoryPositionWithCost],
 ) -> Result<Vec<(Amount, Cost)>, BookingErrorKind> {
     let mut remainder = Remainder::new(posting_units.number);
 
@@ -181,7 +181,7 @@ fn resolve_strict(
 pub(super) fn resolve_matches(
     method: &BookingMethod,
     posting: &mut RawPosting,
-    matches: Vec<PositionWithCost>,
+    matches: Vec<InventoryPositionWithCost>,
     units: &Amount,
 ) -> Result<Vec<(Amount, Cost)>, BookingError> {
     debug_assert!(posting.cost.is_some());

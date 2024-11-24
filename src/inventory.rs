@@ -17,12 +17,13 @@
 //!
 //! inventory.add_position(&Amount::from_str("10 USD").unwrap());
 //! inventory.add_position(&Amount::from_str("10 USD").unwrap());
-//! assert_eq!(inventory.len(), 1);
 //! let sum = Amount::from_str("20 USD").unwrap();
-//! assert_eq!(inventory.get(sum.currency, None), Some(sum.number));
+//! assert_eq!(inventory.get(&sum.currency, None), Some(sum.number));
 //! ```
 //!
-use indexmap::{IndexMap, IndexSet};
+use std::ops::AddAssign;
+
+use indexmap::{Equivalent, IndexMap, IndexSet};
 use rust_decimal::prelude::Signed;
 
 use crate::types::{Amount, Cost, Currency, Decimal, Posting};
@@ -37,6 +38,25 @@ struct InventoryKey {
 impl InventoryKey {
     fn new(currency: Currency, cost: Option<Cost>) -> Self {
         Self { currency, cost }
+    }
+}
+
+/// For getting values from the inventory with borrowed currency and cost, this key can be used.
+#[derive(Debug, Hash)]
+struct BorrowedInventoryKey<'a> {
+    currency: &'a Currency,
+    cost: Option<&'a Cost>,
+}
+
+impl<'a> BorrowedInventoryKey<'a> {
+    fn new(currency: &'a Currency, cost: Option<&'a Cost>) -> Self {
+        Self { currency, cost }
+    }
+}
+
+impl Equivalent<InventoryKey> for BorrowedInventoryKey<'_> {
+    fn equivalent(&self, key: &InventoryKey) -> bool {
+        return *self.currency == key.currency && self.cost == key.cost.as_ref();
     }
 }
 
@@ -59,17 +79,17 @@ pub trait Position {
     fn number(&self) -> Decimal;
     /// Get the currency of this position.
     #[must_use]
-    fn currency(&self) -> Currency;
+    fn currency(&self) -> &Currency;
     /// Get the units of this position.
     ///
     /// This default implementation uses the number and currency fns.
     #[must_use]
     fn units(&self) -> Amount {
-        Amount::new(self.number(), self.currency())
+        Amount::new(self.number(), self.currency().clone())
     }
     /// Get the cost of this position.
     #[must_use]
-    fn cost(&self) -> Option<Cost>;
+    fn cost(&self) -> Option<&Cost>;
     /// Get the total cost of this position.
     #[must_use]
     fn total_cost(&self) -> Amount {
@@ -87,69 +107,49 @@ pub trait Position {
             "units={number} {currency}, cost={cost}",
             number = self.number(),
             currency = self.currency(),
-            cost = self.cost().map_or("None".to_string(), |c| c.to_string())
+            cost = self.cost().map_or("None".to_string(), ToString::to_string)
         )
     }
 }
 
+// implementations of Position for some common types.
 impl Position for Amount {
     fn number(&self) -> Decimal {
         self.number
     }
-    fn currency(&self) -> Currency {
-        self.currency.clone()
+    fn currency(&self) -> &Currency {
+        &self.currency
     }
-    fn cost(&self) -> Option<Cost> {
+    fn cost(&self) -> Option<&Cost> {
         None
     }
 }
-impl Position for &Amount {
-    fn number(&self) -> Decimal {
-        self.number
-    }
-    fn currency(&self) -> Currency {
-        self.currency.clone()
-    }
-    fn cost(&self) -> Option<Cost> {
-        None
-    }
-}
+
 impl Position for Posting {
     fn number(&self) -> Decimal {
         self.units.number
     }
-    fn currency(&self) -> Currency {
-        self.units.currency.clone()
+    fn currency(&self) -> &Currency {
+        &self.units.currency
     }
-    fn cost(&self) -> Option<Cost> {
-        self.cost.clone()
-    }
-}
-impl Position for &Posting {
-    fn number(&self) -> Decimal {
-        self.units.number
-    }
-    fn currency(&self) -> Currency {
-        self.units.currency.clone()
-    }
-    fn cost(&self) -> Option<Cost> {
-        self.cost.clone()
+    fn cost(&self) -> Option<&Cost> {
+        self.cost.as_ref()
     }
 }
+
 impl Position for (Amount, Cost) {
     fn number(&self) -> Decimal {
         self.0.number
     }
-    fn currency(&self) -> Currency {
-        self.0.currency.clone()
+    fn currency(&self) -> &Currency {
+        &self.0.currency
     }
-    fn cost(&self) -> Option<Cost> {
-        Some(self.1.clone())
+    fn cost(&self) -> Option<&Cost> {
+        Some(&self.1)
     }
 }
 
 /// An inventory position of number, currency and optional cost.
-#[allow(clippy::module_name_repetitions)]
 pub struct InventoryPosition<'inv> {
     /// The number of units of this position.
     pub number: &'inv Decimal,
@@ -163,17 +163,17 @@ impl Position for InventoryPosition<'_> {
     fn number(&self) -> Decimal {
         *self.number
     }
-    fn currency(&self) -> Currency {
-        self.currency.clone()
+    fn currency(&self) -> &Currency {
+        self.currency
     }
-    fn cost(&self) -> Option<Cost> {
-        self.cost.clone()
+    fn cost(&self) -> Option<&Cost> {
+        self.cost.as_ref()
     }
 }
 
 /// An inventory position of number, currency and cost, when filtering on positions with cost.
 #[derive(Debug)]
-pub struct PositionWithCost<'inv> {
+pub struct InventoryPositionWithCost<'inv> {
     /// The number of units of this position.
     pub number: &'inv Decimal,
     /// The currency that this position is in.
@@ -182,15 +182,15 @@ pub struct PositionWithCost<'inv> {
     pub cost: &'inv Cost,
 }
 
-impl Position for PositionWithCost<'_> {
+impl Position for InventoryPositionWithCost<'_> {
     fn number(&self) -> Decimal {
         *self.number
     }
-    fn currency(&self) -> Currency {
-        self.currency.clone()
+    fn currency(&self) -> &Currency {
+        self.currency
     }
-    fn cost(&self) -> Option<Cost> {
-        Some(self.cost.clone())
+    fn cost(&self) -> Option<&Cost> {
+        Some(self.cost)
     }
 }
 
@@ -215,16 +215,12 @@ impl Inventory {
         self.map.is_empty()
     }
 
-    /// The number of positions in this inventory.
+    /// The value for the given position in this inventory.
     #[must_use]
-    pub fn len(&self) -> usize {
-        self.map.len()
-    }
-
-    /// The number of positions in this inventory.
-    #[must_use]
-    pub fn get(&self, currency: Currency, cost: Option<Cost>) -> Option<Decimal> {
-        self.map.get(&InventoryKey::new(currency, cost)).copied()
+    pub fn get(&self, currency: &Currency, cost: Option<&Cost>) -> Option<Decimal> {
+        self.map
+            .get(&BorrowedInventoryKey::new(currency, cost))
+            .copied()
     }
 
     /// Get the currencies contained in this inventory.
@@ -246,10 +242,10 @@ impl Inventory {
     ///
     /// Just like when iterating over the underlying [`IndexMap`], the items contain borrowed values.
     pub fn iter(&self) -> impl Iterator<Item = InventoryPosition> {
-        self.map.iter().map(|(k, v)| InventoryPosition {
-            number: v,
-            currency: &k.currency,
-            cost: &k.cost,
+        self.map.iter().map(|(key, number)| InventoryPosition {
+            number,
+            currency: &key.currency,
+            cost: &key.cost,
         })
     }
 
@@ -258,25 +254,18 @@ impl Inventory {
     /// This is just like the `.iter()` function above but skips all positions that do not have a cost
     /// and has a iterator item types that ensures this.
     /// Just like when iterating over the underlying [`IndexMap`], the items contain borrowed values.
-    pub fn iter_with_cost(&self) -> impl Iterator<Item = PositionWithCost> {
-        self.map.iter().filter_map(|(k, v)| {
-            k.cost.as_ref().map(|cost| PositionWithCost {
-                number: v,
-                currency: &k.currency,
+    pub fn iter_with_cost(&self) -> impl Iterator<Item = InventoryPositionWithCost> {
+        self.map.iter().filter_map(|(key, number)| {
+            key.cost.as_ref().map(|cost| InventoryPositionWithCost {
+                number,
+                currency: &key.currency,
                 cost,
             })
         })
     }
 
-    /// Add all positions from another inventory.
-    pub fn add_inventory(&mut self, inv: &Inventory) {
-        for pos in inv.iter() {
-            self.add_position(&pos);
-        }
-    }
-
-    fn add_to_key(&mut self, key: InventoryKey, number: Decimal) -> BookingResult {
-        let pos = self.map.get_mut(&key);
+    fn add_to_key(&mut self, key: &BorrowedInventoryKey<'_>, number: Decimal) -> BookingResult {
+        let pos = self.map.get_mut(key);
         if let Some(num) = pos {
             let result_type = if num.signum() == number.signum() {
                 BookingResult::AUGMENTED
@@ -284,8 +273,8 @@ impl Inventory {
                 BookingResult::REDUCED
             };
             *num += number;
-            if *num == Decimal::ZERO {
-                self.map.swap_remove(&key);
+            if num.is_zero() {
+                self.map.swap_remove(key);
             };
             result_type
         } else if number.is_zero() {
@@ -293,16 +282,19 @@ impl Inventory {
             // the ignored value in case the position did not yet exist in the inventory.
             BookingResult::IGNORED
         } else {
-            self.map.insert(key, number);
+            self.map.insert(
+                InventoryKey::new(key.currency.clone(), key.cost.cloned()),
+                number,
+            );
             BookingResult::CREATED
         }
     }
 
     /// Add a position to the inventory.
-    pub fn add_position(&mut self, pos: &impl Position) -> BookingResult {
-        let key = InventoryKey::new(pos.currency(), pos.cost());
-        let number = pos.number();
-        self.add_to_key(key, number)
+    pub fn add_position(&mut self, position: &impl Position) -> BookingResult {
+        let key = BorrowedInventoryKey::new(position.currency(), position.cost());
+        let number = position.number();
+        self.add_to_key(&key, number)
     }
 
     /// Check whether the given amount could reduce this inventory (without checking costs)
@@ -323,6 +315,15 @@ impl Inventory {
 impl Default for Inventory {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl AddAssign<&Inventory> for Inventory {
+    /// Add all positions from another inventory.
+    fn add_assign(&mut self, rhs: &Inventory) {
+        for pos in rhs.iter() {
+            self.add_position(&pos);
+        }
     }
 }
 
