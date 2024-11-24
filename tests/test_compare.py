@@ -37,10 +37,8 @@ def test_compare(test_ledgers_dir: Path, ledger_name: str) -> None:
     balances_uro = {
         n.name: n.balance.to_strings() for n in Tree(entries_uro).values()
     }
-    for account in balances_bc:
-        assert (
-            balances_bc[account] == balances_uro[account]
-        ), f"Balance for {account}"
+    for account, balance_bc in balances_bc.items():
+        assert balance_bc == balances_uro[account], f"Balance for {account}"
 
     for bc, uro in zip(entries_bc, entries_uro):
         clean_meta(bc.meta)

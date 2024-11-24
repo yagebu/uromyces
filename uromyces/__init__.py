@@ -28,7 +28,7 @@ from uromyces.uromyces import Query
 from uromyces.uromyces import summarize_clamp
 from uromyces.uromyces import Transaction
 
-__all__ = [
+__all__ = [  # noqa: RUF022
     # Entries
     "Balance",
     "Close",
