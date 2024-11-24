@@ -1,8 +1,9 @@
+use std::convert::Infallible;
 use std::fmt::{Debug, Display};
 
-use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::pybacked::PyBackedStr;
+use pyo3::{exceptions::PyValueError, types::PyString};
 use serde::{Deserialize, Serialize};
 
 /// An transaction or posting flag.
@@ -87,15 +88,13 @@ impl From<Flag> for char {
     }
 }
 
-impl ToPyObject for Flag {
-    fn to_object(&self, py: pyo3::Python<'_>) -> PyObject {
-        Into::<char>::into(*self).to_object(py)
-    }
-}
+impl<'py> IntoPyObject<'py> for Flag {
+    type Target = PyString;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
 
-impl IntoPy<PyObject> for Flag {
-    fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
-        self.to_object(py)
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        Into::<char>::into(self).into_pyobject(py)
     }
 }
 

@@ -5,7 +5,7 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::pybacked::PyBackedStr;
 use pyo3::sync::GILOnceCell;
-use pyo3::types::{PyAnyMethods, PyString};
+use pyo3::types::{PyAnyMethods, PyString, PyTuple};
 use pyo3::PyTypeInfo;
 
 use crate::types::{Amount, Date, Decimal};
@@ -41,21 +41,21 @@ pub fn get_python_types(py: Python) -> &PythonTypes {
 
 /// Import decimal.Decimal and datetime.date
 pub fn init_statics(py: Python) -> PyResult<()> {
-    let builtins = py.import_bound("builtins")?;
+    let builtins = py.import("builtins")?;
     let bool = builtins.getattr("bool")?;
     let str = builtins.getattr("str")?;
 
-    let decimal = py.import_bound("decimal")?.getattr("Decimal")?;
-    let date = py.import_bound("datetime")?.getattr("date")?;
+    let decimal = py.import("decimal")?.getattr("Decimal")?;
+    let date = py.import("datetime")?.getattr("date")?;
 
     PY_TYPES.get_or_init(py, || PythonTypes {
-        account_dummy: PyString::new_bound(py, "<AccountDummy>").into(),
+        account_dummy: PyString::new(py, "<AccountDummy>").into(),
         bool: bool.into(),
         date: date.into(),
         decimal: decimal.into(),
         str: str.into(),
 
-        amount: Amount::type_object_bound(py).into_any().into(),
+        amount: Amount::type_object(py).into_any().into(),
     });
 
     Ok(())
@@ -63,16 +63,17 @@ pub fn init_statics(py: Python) -> PyResult<()> {
 
 /// Convert a [`Date`] to a Python `datetime.date`.
 // pyo3 also provides this conversion but that uses the non-stable ABI
-pub fn date_to_py(py: Python, date: Date) -> PyResult<PyObject> {
+pub fn date_to_py(py: Python, date: Date) -> PyResult<Bound<'_, PyAny>> {
     get_python_types(py)
         .date
-        .call1(py, (date.year(), date.month(), date.day()))
+        .bind(py)
+        .call1((date.year(), date.month(), date.day()))
 }
 
 /// Convert a [`rust_decimal::Decimal`] to a Python decimal.Decimal.
 // pyo3 also has this conversion but does a string conversion
-pub fn decimal_to_py(py: Python, decimal: Decimal) -> PyObject {
-    fn py_decimal_args(decimal: Decimal) -> (i32, Vec<u8>, i64) {
+pub fn decimal_to_py(py: Python, decimal: Decimal) -> PyResult<Bound<'_, PyAny>> {
+    let (sign, digits, scale) = {
         let mut num = decimal.mantissa().abs();
         let mut digits: Vec<u8> = Vec::with_capacity(28);
 
@@ -89,12 +90,13 @@ pub fn decimal_to_py(py: Python, decimal: Decimal) -> PyObject {
             digits,
             -i64::from(decimal.scale()),
         )
-    }
+    };
+    let digits_tuple = PyTuple::new(py, digits)?;
 
     get_python_types(py)
         .decimal
-        .call1(py, (py_decimal_args(decimal),))
-        .expect("conversion to Python Decimal to succeed")
+        .bind(py)
+        .call1(((sign, digits_tuple, scale),))
 }
 
 /// Convert from a Python decimal.Decimal to a [`rust_decimal::Decimal`].
@@ -114,7 +116,7 @@ mod tests {
         fn roundtrip(py: Python, num: &str) {
             let d = Decimal::from_str(num).unwrap();
             let dec = decimal_to_py(py, d);
-            assert_eq!(dec.to_string(), num);
+            assert_eq!(dec.unwrap().to_string(), num);
         }
 
         pyo3::prepare_freethreaded_python();

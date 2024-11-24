@@ -50,7 +50,6 @@
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
-use pyo3::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 pub(crate) use rust_decimal::Decimal;
@@ -362,12 +361,11 @@ impl Posting {
     fn meta<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         self.meta.to_py_dict(py, &self.filename, self.line)
     }
-    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        match op {
-            CompareOp::Eq => (self == other).into_py(py),
-            CompareOp::Ne => (self != other).into_py(py),
-            _ => py.NotImplemented(),
-        }
+    fn __eq__(&self, other: &Self) -> bool {
+        self == other
+    }
+    fn __ne__(&self, other: &Self) -> bool {
+        self != other
     }
 }
 
@@ -499,8 +497,8 @@ impl Balance {
     }
 
     #[getter]
-    fn tolerance(&self, py: Python) -> Option<PyObject> {
-        self.tolerance.map(|t| decimal_to_py(py, t))
+    fn tolerance<'py>(&self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyAny>>> {
+        self.tolerance.map(|t| decimal_to_py(py, t)).transpose()
     }
 
     #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, amount=None))]
@@ -893,12 +891,11 @@ macro_rules! pymethods_for_entry {
             fn meta<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
                 self.header.to_py_dict(py)
             }
-            fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-                match op {
-                    CompareOp::Eq => (self == other).into_py(py),
-                    CompareOp::Ne => (self != other).into_py(py),
-                    _ => py.NotImplemented(),
-                }
+            fn __eq__(&self, other: &Self) -> bool {
+                self == other
+            }
+            fn __ne__(&self, other: &Self) -> bool {
+                self != other
             }
             fn __hash__(&self) -> u64 {
                 // use a fixed hash function here and not the Rust DefaultHasher to keep it stable
@@ -926,22 +923,26 @@ pymethods_for_entry!(Price);
 pymethods_for_entry!(Query);
 pymethods_for_entry!(Transaction);
 
-impl IntoPy<PyObject> for Entry {
-    fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
-        match self {
-            Self::Balance(e) => e.into_py(py),
-            Self::Close(e) => e.into_py(py),
-            Self::Commodity(e) => e.into_py(py),
-            Self::Custom(e) => e.into_py(py),
-            Self::Document(e) => e.into_py(py),
-            Self::Event(e) => e.into_py(py),
-            Self::Note(e) => e.into_py(py),
-            Self::Open(e) => e.into_py(py),
-            Self::Pad(e) => e.into_py(py),
-            Self::Price(e) => e.into_py(py),
-            Self::Query(e) => e.into_py(py),
-            Self::Transaction(e) => e.into_py(py),
-        }
+impl<'py> IntoPyObject<'py> for Entry {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        Ok(match self {
+            Self::Balance(e) => e.into_pyobject(py)?.into_any(),
+            Self::Close(e) => e.into_pyobject(py)?.into_any(),
+            Self::Commodity(e) => e.into_pyobject(py)?.into_any(),
+            Self::Custom(e) => e.into_pyobject(py)?.into_any(),
+            Self::Document(e) => e.into_pyobject(py)?.into_any(),
+            Self::Event(e) => e.into_pyobject(py)?.into_any(),
+            Self::Note(e) => e.into_pyobject(py)?.into_any(),
+            Self::Open(e) => e.into_pyobject(py)?.into_any(),
+            Self::Pad(e) => e.into_pyobject(py)?.into_any(),
+            Self::Price(e) => e.into_pyobject(py)?.into_any(),
+            Self::Query(e) => e.into_pyobject(py)?.into_any(),
+            Self::Transaction(e) => e.into_pyobject(py)?.into_any(),
+        })
     }
 }
 

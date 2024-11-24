@@ -1,4 +1,5 @@
 use pyo3::exceptions::PyKeyError;
+use pyo3::BoundObject;
 use pyo3::{prelude::*, pybacked::PyBackedStr, types::PyDict};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -32,23 +33,41 @@ impl From<String> for MetaValue {
     }
 }
 
-impl ToPyObject for MetaValue {
-    fn to_object(&self, py: Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for MetaValue {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        use MetaValue::{Account, Amount, Bool, Currency, Date, Number, String, Tag};
         match self {
-            Self::String(v) | Self::Tag(v) => v.to_object(py),
-            Self::Date(v) => v.to_object(py),
-            Self::Account(v) => v.to_object(py),
-            Self::Bool(v) => v.to_object(py),
-            Self::Amount(v) => v.clone().into_py(py),
-            Self::Number(v) => decimal_to_py(py, *v),
-            Self::Currency(v) => v.to_object(py),
+            String(v) | Tag(v) => Ok(v.into_pyobject(py)?.into_any()),
+            Date(v) => v.into_pyobject(py),
+            Account(v) => Ok(v.into_pyobject(py)?.into_any()),
+            Bool(v) => Ok(v.into_pyobject(py)?.into_any().to_owned()),
+            Amount(v) => Ok(v.clone().into_pyobject(py)?.into_any()),
+            Number(v) => decimal_to_py(py, v),
+            Currency(v) => Ok(v.into_pyobject(py)?.into_any()),
         }
     }
 }
 
-impl IntoPy<PyObject> for MetaValue {
-    fn into_py(self, py: Python<'_>) -> PyObject {
-        self.to_object(py)
+impl<'a, 'py> IntoPyObject<'py> for &'a MetaValue {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        use MetaValue::{Account, Amount, Bool, Currency, Date, Number, String, Tag};
+        match self {
+            String(v) | Tag(v) => Ok(v.into_pyobject(py)?.into_any()),
+            Date(v) => v.into_pyobject(py),
+            Account(v) => Ok(v.into_pyobject(py)?.into_any()),
+            Bool(v) => Ok(v.into_pyobject(py)?.into_any().to_owned()),
+            Amount(v) => Ok(v.clone().into_pyobject(py)?.into_any()),
+            Number(v) => decimal_to_py(py, *v),
+            Currency(v) => Ok(v.into_pyobject(py)?.into_any()),
+        }
     }
 }
 
@@ -102,11 +121,11 @@ impl Meta {
         filename: &Option<FilePath>,
         line: LineNumber,
     ) -> PyResult<Bound<'py, PyDict>> {
-        let meta = PyDict::new_bound(py);
+        let meta = PyDict::new(py);
         meta.set_item(pyo3::intern!(py, "filename"), filename)?;
         meta.set_item(pyo3::intern!(py, "lineno"), line)?;
         for kv in &self.0 {
-            meta.set_item(&kv.key, kv.value.to_object(py))?;
+            meta.set_item(&kv.key, &kv.value)?;
         }
         Ok(meta)
     }
@@ -252,17 +271,17 @@ impl EntryHeader {
         }
     }
 
-    fn __getitem__(&self, key: &str, py: Python) -> PyResult<PyObject> {
+    fn __getitem__<'py>(&self, key: &str, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         Ok(match key {
-            "filename" => self.filename.to_object(py),
-            "lineno" => self.line.to_object(py),
-            _ => self
-                .meta
-                .0
-                .iter()
-                .find(|m| m.key == key)
-                .map(|m| m.value.to_object(py))
-                .ok_or_else(|| PyKeyError::new_err(""))?,
+            "filename" => self.filename.as_ref().into_pyobject(py)?,
+            "lineno" => self.line.into_pyobject(py)?.into_any(),
+            _ => {
+                let element = self.meta.0.iter().find(|m| m.key == key);
+                match element {
+                    Some(element) => element.value.as_ref().into_pyobject(py)?,
+                    None => Err(PyKeyError::new_err(""))?,
+                }
+            }
         })
     }
 }

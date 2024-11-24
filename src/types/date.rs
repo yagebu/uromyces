@@ -77,15 +77,13 @@ impl Debug for Date {
     }
 }
 
-impl ToPyObject for Date {
-    fn to_object(&self, py: pyo3::Python<'_>) -> PyObject {
-        date_to_py(py, *self).expect("creation of a datetime.date to work.")
-    }
-}
+impl<'py> IntoPyObject<'py> for Date {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
 
-impl IntoPy<PyObject> for Date {
-    fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
-        self.to_object(py)
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        date_to_py(py, self)
     }
 }
 

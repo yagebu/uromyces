@@ -1,7 +1,10 @@
-use std::fmt::{Debug, Display};
+use std::{
+    convert::Infallible,
+    fmt::{Debug, Display},
+};
 
 use internment::ArcIntern;
-use pyo3::{prelude::*, pybacked::PyBackedStr};
+use pyo3::{prelude::*, pybacked::PyBackedStr, types::PyString};
 use serde::{Deserialize, Serialize};
 
 /// Components of the account are separated by colons.
@@ -79,15 +82,13 @@ impl From<&str> for Account {
     }
 }
 
-impl ToPyObject for Account {
-    fn to_object(&self, py: pyo3::Python<'_>) -> PyObject {
-        self.0.to_object(py)
-    }
-}
+impl<'a, 'py> IntoPyObject<'py> for &'a Account {
+    type Target = PyString;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
 
-impl IntoPy<PyObject> for Account {
-    fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
-        self.0.to_object(py)
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        self.0.as_str().into_pyobject(py)
     }
 }
 

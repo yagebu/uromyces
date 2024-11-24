@@ -1,3 +1,4 @@
+use std::convert::Infallible;
 use std::fmt::{Debug, Display};
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
@@ -6,6 +7,7 @@ use internment::ArcIntern;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::pybacked::PyBackedStr;
+use pyo3::types::PyString;
 use serde::{Deserialize, Serialize};
 
 use super::Account;
@@ -140,15 +142,13 @@ impl TryFrom<PathBuf> for FilePath {
     }
 }
 
-impl ToPyObject for FilePath {
-    fn to_object(&self, py: pyo3::Python<'_>) -> PyObject {
-        self.0.to_object(py)
-    }
-}
+impl<'a, 'py> IntoPyObject<'py> for &'a FilePath {
+    type Target = PyString;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
 
-impl IntoPy<PyObject> for FilePath {
-    fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
-        self.to_object(py)
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        self.0.as_str().into_pyobject(py)
     }
 }
 

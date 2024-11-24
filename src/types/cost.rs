@@ -3,7 +3,7 @@ use std::{
     hash::{DefaultHasher, Hash, Hasher},
 };
 
-use pyo3::{basic::CompareOp, prelude::*};
+use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::py_bindings::{decimal_to_py, py_to_decimal};
@@ -69,12 +69,11 @@ impl Cost {
             label,
         }
     }
-    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        match op {
-            CompareOp::Eq => (self == other).into_py(py),
-            CompareOp::Ne => (self != other).into_py(py),
-            _ => py.NotImplemented(),
-        }
+    fn __eq__(&self, other: &Self) -> bool {
+        self == other
+    }
+    fn __ne__(&self, other: &Self) -> bool {
+        self != other
     }
     fn __hash__(&self) -> u64 {
         let mut hasher = DefaultHasher::new();
@@ -82,7 +81,7 @@ impl Cost {
         hasher.finish()
     }
     #[getter]
-    fn number(&self, py: Python) -> PyObject {
+    fn number<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         decimal_to_py(py, self.number)
     }
 }

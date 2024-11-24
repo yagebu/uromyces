@@ -34,7 +34,7 @@ impl UroError {
     #[getter]
     /// Convert this to a Python dictionary like the `meta` attribute of Beancount entries.
     fn source<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
-        let meta = PyDict::new_bound(py);
+        let meta = PyDict::new(py);
         meta.set_item(
             pyo3::intern!(py, "filename"),
             match &self.filename {

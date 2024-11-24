@@ -52,21 +52,13 @@ impl Default for TagsLinks {
     }
 }
 
-impl IntoPy<PyObject> for TagsLinks {
-    fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
-        self.to_object(py)
-    }
-}
-impl IntoPy<PyObject> for &TagsLinks {
-    fn into_py(self, py: pyo3::Python<'_>) -> PyObject {
-        self.to_object(py)
-    }
-}
-impl ToPyObject for TagsLinks {
-    fn to_object(&self, py: pyo3::Python<'_>) -> PyObject {
-        PyFrozenSet::new_bound(py, &self.0)
-            .expect("creating a Python frozenset to work")
-            .into()
+impl<'a, 'py> IntoPyObject<'py> for &'a TagsLinks {
+    type Target = PyFrozenSet;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        PyFrozenSet::new(py, &self.0)
     }
 }
 
