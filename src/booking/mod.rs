@@ -1,6 +1,7 @@
 //! Booking - finding matching positions when reducing inventories
 use hashbrown::HashMap;
 
+use crate::conversions::get_weight;
 use crate::inventory::Inventory;
 use crate::ledgers::{Ledger, RawLedger};
 use crate::tolerances::Tolerances;
@@ -177,15 +178,6 @@ fn complete_cost_spec(
     })
 }
 
-/// Compute the residual of a list of postings.
-#[must_use]
-pub fn compute_residual(postings: &[Posting]) -> Inventory {
-    postings
-        .iter()
-        .map(crate::conversions::get_weight)
-        .collect::<Inventory>()
-}
-
 /// The variants of where a number might be missing in a posting.
 enum MissingNumber {
     /// Nothing missing, all values are present
@@ -246,17 +238,15 @@ fn interpolate_and_fill_in_missing(
     }
 
     if let Some((posting, missing)) = incomplete {
-        let residual = compute_residual(&complete_postings);
-        // this function is only called on posting of the same currency
-        debug_assert!(residual.len() <= 1);
-        let pos = residual.iter().next();
-        let weight = if let Some(pos) = pos {
-            debug_assert!(pos.cost.is_none());
-            debug_assert_eq!(pos.currency, group_currency);
-            -*pos.number
-        } else {
-            Decimal::ZERO
-        };
+        // Compute the residual of the complete postings, which must all have a weight in `group_currency`).
+        let weight = -complete_postings
+            .iter()
+            .map(get_weight)
+            .map(|weight| {
+                assert_eq!(&weight.currency, group_currency);
+                weight.number
+            })
+            .sum::<Decimal>();
 
         if let Some((units, price, cost)) = match missing {
             MissingNumber::UnitsNumber(price, cost) => {

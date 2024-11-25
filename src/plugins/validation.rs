@@ -1,7 +1,8 @@
 use hashbrown::{HashMap, HashSet};
 
-use crate::booking;
+use crate::conversions::get_weight;
 use crate::errors::UroError;
+use crate::inventory::Inventory;
 use crate::tolerances::Tolerances;
 use crate::types::{Account, Balance, Close, Commodity, Currency, Date, Entry, Open, Transaction};
 use crate::Ledger;
@@ -239,7 +240,7 @@ pub fn transaction_balances(ledger: &Ledger) -> Vec<UroError> {
 
     for entry in &ledger.entries {
         if let Entry::Transaction(e) = entry {
-            let residual = booking::compute_residual(&e.postings);
+            let residual = e.postings.iter().map(get_weight).collect::<Inventory>();
             let tolerances = Tolerances::infer_from_booked(&e.postings, &ledger.options);
             if !tolerances.is_small(&residual) {
                 errors.push(TransactionDoesNotBalance(e).into());
