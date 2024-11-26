@@ -1,10 +1,16 @@
 use std::fs;
 use std::path::PathBuf;
+use std::sync::LazyLock;
 use std::{path::Path, str::FromStr};
 
 use regex::Regex;
 
 use crate::types::{Amount, Currency, Decimal, RawEntry, RawPosting};
+
+/// Detect CI
+fn is_ci() -> bool {
+    std::env::var("CI").is_ok()
+}
 
 /// Test helper to create a Currence from a string like `EUR`
 pub fn c(cur: &str) -> Currency {
@@ -60,6 +66,7 @@ pub fn postings_from_strings(postings: &[&str]) -> Vec<RawPosting> {
 pub struct BeancountSnapshot {
     path: Option<PathBuf>,
     title: String,
+    contents: String,
     input: String,
     snapshot: String,
     new_snapshot: String,
@@ -69,7 +76,7 @@ impl BeancountSnapshot {
     /// Load from a path.
     pub fn load(path: &Path) -> Self {
         let input = fs::read_to_string(path).unwrap();
-        let mut res = Self::from_str(&input);
+        let mut res = Self::from_string(input);
         res.path = Some(path.to_owned());
         res
     }
@@ -107,10 +114,16 @@ impl BeancountSnapshot {
     }
 
     /// Write the updated snapshot.
-    /// TODO: on CI, this should probably fail on mismatch
     pub fn write(&self) {
         let path = self.path.as_ref().expect("snapshot to have a path");
-        fs::write(path, self.print_to_string()).unwrap();
+        let new_contents = self.print_to_string();
+        if new_contents != self.contents {
+            if is_ci() {
+                assert_eq!(new_contents, self.contents, "snapshot failed");
+            } else {
+                fs::write(path, self.print_to_string()).expect("write to work in test");
+            }
+        }
     }
 
     /// Print out a snapshot in the defined format.
@@ -130,9 +143,10 @@ impl BeancountSnapshot {
     }
 
     /// Load from string.
-    fn from_str(contents: &str) -> BeancountSnapshot {
-        let snapshot_regex = Regex::new(
-            r"^(?x)
+    fn from_string(contents: String) -> BeancountSnapshot {
+        static SNAPSHOT_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(
+                r"^(?x)
               ;={3,}\n
               ;\ (?<title>.*?)\n
               ;={3,}\n
@@ -142,23 +156,28 @@ impl BeancountSnapshot {
                   (?<snapshot>(;\ .*\n)+)
               )?
               $",
-        )
-        .expect("snapshot_regex to compile");
-        let capture = snapshot_regex
-            .captures(contents)
+            )
+            .expect("static regex to compile")
+        });
+        let capture = SNAPSHOT_REGEX
+            .captures(&contents)
             .expect("snapshot_regex to match provided input");
         let snapshot = capture
             .name("snapshot")
             .map_or("", |m| m.as_str())
             .split("; ")
             .collect::<String>();
+        let current_snapshot_len = snapshot.len();
+        let title = capture["title"].to_string();
+        let input = capture["input"].to_string();
 
         BeancountSnapshot {
+            contents,
             path: None,
-            title: capture["title"].to_string(),
-            input: capture["input"].to_string(),
+            title,
+            input,
             snapshot,
-            new_snapshot: String::new(),
+            new_snapshot: String::with_capacity(current_snapshot_len),
         }
     }
 }
@@ -176,7 +195,7 @@ INPUT
 
 LINES
 ";
-        let snapshot = BeancountSnapshot::from_str(contents);
+        let snapshot = BeancountSnapshot::from_string(contents.to_string());
         assert_eq!(snapshot.title, "TITLE");
         assert_eq!(snapshot.input, "INPUT\n\nLINES\n");
         assert_eq!(snapshot.snapshot, "");
@@ -194,7 +213,7 @@ LINES
 ; snapshot_line1
 ; snapshot_line2
 ";
-        let mut snapshot = BeancountSnapshot::from_str(contents);
+        let mut snapshot = BeancountSnapshot::from_string(contents.to_string());
         assert_eq!(snapshot.title, "TITLE");
         assert_eq!(snapshot.input, "INPUT\n\nLINES\n");
         assert_eq!(snapshot.snapshot, "snapshot_line1\nsnapshot_line2\n");
