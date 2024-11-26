@@ -64,7 +64,11 @@ order-by-type = false
 known-first-party = ["uromyces"]
 required-imports = ["from __future__ import annotations"]
 
+[tool.ruff.lint.pylint]
+max-args = 10
+
 [tool.ruff.lint.per-file-ignores]
 "contrib/scripts.py" = ["S101"]
+"uromyces/uromyces.pyi" = ["PYI034"]
 "tests/conftest.py" = ["S101"]
 "tests/test_*.py" = ["D", "S101"]

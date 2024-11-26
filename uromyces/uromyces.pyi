@@ -32,7 +32,7 @@ class Amount:
     number: Decimal
     currency: str
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         number: Decimal,
         currency: str,
@@ -44,7 +44,7 @@ class Cost:
     date: datetime.date | None
     label: str | None
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         number: Decimal,
         currency: str,
@@ -62,7 +62,7 @@ class EntryHeader:
     tags: frozenset[str]
     links: frozenset[str]
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         meta: Meta,
         date: datetime.date,
@@ -76,14 +76,14 @@ class Balance(_Directive, abc.Balance):
     tolerance: Decimal | None
     diff_amount: None
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         account: str,
         amount: Amount,
         tolerance: Decimal | None,
     ) -> Balance: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Balance,
         *,
         date: datetime.date | None = None,
@@ -97,7 +97,7 @@ class Balance(_Directive, abc.Balance):
 class Close(_Directive, abc.Close):
     account: str
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         account: str,
@@ -115,7 +115,7 @@ class Close(_Directive, abc.Close):
 class Commodity(_Directive, abc.Commodity):
     currency: str
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         currency: str,
@@ -134,13 +134,13 @@ class Custom(_Directive, abc.Custom):
     type: str
     values: list[CustomValue]
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         type: str,  # noqa: A002
         values: list[CustomValue],
     ) -> Custom: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Custom,
         *,
         date: datetime.date | None = None,
@@ -155,13 +155,13 @@ class Document(_Directive, abc.Document):
     account: str
     filename: str
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         account: str,
         filename: str,
     ) -> Document: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Document,
         *,
         date: datetime.date | None = None,
@@ -177,13 +177,13 @@ class Event(_Directive, abc.Event):
     type: str
     description: str
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         type: str,  # noqa: A002
         description: str,
     ) -> Event: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Event,
         *,
         date: datetime.date | None = None,
@@ -198,13 +198,13 @@ class Note(_Directive, abc.Note):
     account: str
     comment: str
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         account: str,
         comment: str,
     ) -> Note: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Note,
         *,
         date: datetime.date | None = None,
@@ -220,14 +220,14 @@ class Open(_Directive, abc.Open):
     currencies: list[str]
     booking: Booking | None
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         account: str,
         currencies: list[str] | None,
         booking: Booking | None,
     ) -> Open: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Open,
         *,
         date: datetime.date | None = None,
@@ -243,13 +243,13 @@ class Pad(_Directive, abc.Pad):
     account: str
     source_account: str
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         account: str,
         source_account: str,
     ) -> Pad: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Pad,
         *,
         date: datetime.date | None = None,
@@ -264,13 +264,13 @@ class Price(_Directive, abc.Price):
     currency: str
     amount: abc.Amount
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         currency: str,
         amount: Amount,
     ) -> Price: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Price,
         *,
         date: datetime.date | None = None,
@@ -286,13 +286,13 @@ class Query(_Directive, abc.Query):
     name: str
     query_string: str
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         name: str,
         query_string: str,
     ) -> Query: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Query,
         *,
         date: datetime.date | None = None,
@@ -311,7 +311,7 @@ class Posting(abc.Posting):
     flag: str | None
     meta: Meta | None
 
-    def __new__(  # noqa: PLR0913, PYI034
+    def __new__(
         cls: Any,
         account: str,
         units: Amount,
@@ -327,7 +327,7 @@ class Transaction(_Directive, abc.Transaction):
     narration: str
     postings: list[Posting]  # type: ignore[assignment]
 
-    def __new__(  # noqa: PYI034
+    def __new__(
         cls: Any,
         header: EntryHeader,
         flag: str,
@@ -335,7 +335,7 @@ class Transaction(_Directive, abc.Transaction):
         narration: str,
         postings: list[Posting],
     ) -> Transaction: ...
-    def _replace(  # noqa: PLR0913
+    def _replace(
         self: Transaction,
         *,
         date: datetime.date | None = None,
