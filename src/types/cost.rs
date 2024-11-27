@@ -55,16 +55,16 @@ impl Display for Cost {
 #[pymethods]
 impl Cost {
     #[new]
-    #[pyo3(signature = (number, curreny, date, label=None))]
+    #[pyo3(signature = (number, currency, date, label=None))]
     fn __new__(
         #[pyo3(from_py_with = "py_to_decimal")] number: Decimal,
-        curreny: Currency,
+        currency: Currency,
         date: Date,
         label: Option<String>,
     ) -> Self {
         Self {
             number,
-            currency: curreny,
+            currency,
             date,
             label,
         }
