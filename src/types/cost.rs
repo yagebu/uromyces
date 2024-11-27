@@ -1,7 +1,5 @@
-use std::{
-    fmt::Display,
-    hash::{DefaultHasher, Hash, Hasher},
-};
+use std::fmt::Display;
+use std::hash::{DefaultHasher, Hash, Hasher};
 
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};

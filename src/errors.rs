@@ -5,11 +5,9 @@
 //! Otherwise, all information that should be displayed to the user about an error
 //! should be contained in the error message.
 
-use pyo3::{
-    prelude::*,
-    pybacked::PyBackedStr,
-    types::{PyDict, PyMapping},
-};
+use pyo3::prelude::*;
+use pyo3::pybacked::PyBackedStr;
+use pyo3::types::{PyDict, PyMapping};
 use serde::{Deserialize, Serialize};
 
 use crate::types::{Entry, FilePath, LineNumber};

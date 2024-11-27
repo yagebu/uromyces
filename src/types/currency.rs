@@ -1,7 +1,5 @@
-use std::{
-    convert::Infallible,
-    fmt::{Debug, Display},
-};
+use std::convert::Infallible;
+use std::fmt::{Debug, Display};
 
 use internment::ArcIntern;
 use pyo3::pybacked::PyBackedStr;

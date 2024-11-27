@@ -7,10 +7,10 @@ use std::ops::AddAssign;
 
 use hashbrown::{HashMap, HashSet};
 
+use crate::inventory::Inventory;
 use crate::inventory::Position;
-use crate::{
-    inventory::Inventory,
-    types::{Account, Date, Entry, EntryHeader, Flag, Posting, SummarizationAccounts, Transaction},
+use crate::types::{
+    Account, Date, Entry, EntryHeader, Flag, Posting, SummarizationAccounts, Transaction,
 };
 
 type AccountBalances<'a> = HashMap<&'a Account, Inventory>;
