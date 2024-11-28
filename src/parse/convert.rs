@@ -33,7 +33,7 @@ pub(super) struct ConversionState<'source> {
     /// The source string.
     pub string: &'source str,
     /// The filename of the file being parsed.
-    pub filename: &'source Option<FilePath>,
+    pub filename: Option<&'source FilePath>,
     /// The currently pushed metadata.
     pub pushed_meta: Meta,
     /// The currently pushed tags.
@@ -41,7 +41,7 @@ pub(super) struct ConversionState<'source> {
 }
 
 impl<'source> ConversionState<'source> {
-    pub fn new(string: &'source str, filename: &'source Option<FilePath>) -> Self {
+    pub fn new(string: &'source str, filename: Option<&'source FilePath>) -> Self {
         Self {
             string,
             filename,
@@ -273,7 +273,7 @@ impl TryFromNode for RawPosting {
             None
         };
         Ok(Self {
-            filename: s.filename.clone(),
+            filename: s.filename.cloned(),
             line: node.line_number() + 1,
             meta: node
                 .child_by_field_id(node_fields::METADATA)
@@ -388,7 +388,7 @@ impl TryFromNode for EntryHeader {
                 .unwrap_or_default(),
             tags,
             links,
-            filename: s.filename.clone(),
+            filename: s.filename.cloned(),
             line: node.line_number(),
         })
     }

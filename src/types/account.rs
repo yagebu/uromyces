@@ -80,7 +80,7 @@ impl From<&str> for Account {
     }
 }
 
-impl<'a, 'py> IntoPyObject<'py> for &'a Account {
+impl<'py> IntoPyObject<'py> for &Account {
     type Target = PyString;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;

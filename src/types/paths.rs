@@ -142,7 +142,7 @@ impl TryFrom<PathBuf> for FilePath {
     }
 }
 
-impl<'a, 'py> IntoPyObject<'py> for &'a FilePath {
+impl<'py> IntoPyObject<'py> for &FilePath {
     type Target = PyString;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;

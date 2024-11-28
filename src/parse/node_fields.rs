@@ -1,4 +1,4 @@
-/// These are the numerical IDs for the fields in the tree-sitter grammar.
+//! These are the numerical IDs for the fields in the tree-sitter grammar.
 
 // They should match the corresponding enum in the grammars parser.c and are
 // automatically updated by the build script.

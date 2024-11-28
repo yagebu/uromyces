@@ -37,7 +37,7 @@ impl ConversionError {
         s: &ConversionState,
     ) -> Self {
         Self {
-            filename: s.filename.clone(),
+            filename: s.filename.cloned(),
             line: node.line_number(),
             kind,
         }
@@ -81,6 +81,6 @@ impl std::fmt::Display for ConversionError {
 
 impl From<ConversionError> for UroError {
     fn from(e: ConversionError) -> Self {
-        Self::new(e.to_string()).with_position(&e.filename, e.line)
+        Self::new(e.to_string()).with_position(e.filename.as_ref(), e.line)
     }
 }

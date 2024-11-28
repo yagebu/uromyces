@@ -53,7 +53,7 @@ impl<'py> IntoPyObject<'py> for MetaValue {
     }
 }
 
-impl<'a, 'py> IntoPyObject<'py> for &'a MetaValue {
+impl<'py> IntoPyObject<'py> for &MetaValue {
     type Target = PyAny;
     type Output = Bound<'py, Self::Target>;
     type Error = PyErr;

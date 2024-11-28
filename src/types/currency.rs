@@ -39,7 +39,7 @@ impl From<&str> for Currency {
     }
 }
 
-impl<'a, 'py> IntoPyObject<'py> for &'a Currency {
+impl<'py> IntoPyObject<'py> for &Currency {
     type Target = PyString;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;

@@ -150,7 +150,7 @@ pub fn parse_string(s: &str, filename: &Option<FilePath>) -> ParsedFile {
 #[must_use]
 #[allow(clippy::too_many_lines)]
 pub fn convert_syntax_tree(parsed_tree: &ParsedTree, filename: &Option<FilePath>) -> ParsedFile {
-    let state = &mut ConversionState::new(parsed_tree.string, filename);
+    let state = &mut ConversionState::new(parsed_tree.string, filename.as_ref());
     // this is the cursor we use to iterate over all entries.
     let root_node = parsed_tree.tree.root_node();
     let mut result = ParsedFile::with_entries_capacity(root_node.child_count());

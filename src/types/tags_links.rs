@@ -52,7 +52,7 @@ impl Default for TagsLinks {
     }
 }
 
-impl<'a, 'py> IntoPyObject<'py> for &'a TagsLinks {
+impl<'py> IntoPyObject<'py> for &TagsLinks {
     type Target = PyFrozenSet;
     type Output = Bound<'py, Self::Target>;
     type Error = PyErr;

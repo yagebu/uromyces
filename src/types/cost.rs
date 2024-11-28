@@ -33,7 +33,7 @@ impl From<String> for CostLabel {
     }
 }
 
-impl<'a, 'py> IntoPyObject<'py> for &'a CostLabel {
+impl<'py> IntoPyObject<'py> for &CostLabel {
     type Target = PyString;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;

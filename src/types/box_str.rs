@@ -33,7 +33,7 @@ impl From<String> for BoxStr {
     }
 }
 
-impl<'a, 'py> IntoPyObject<'py> for &'a BoxStr {
+impl<'py> IntoPyObject<'py> for &BoxStr {
     type Target = PyString;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;

@@ -72,7 +72,7 @@ pub(crate) fn error_from_py(error: &Bound<'_, PyAny>) -> PyResult<UroError> {
         .ok()
         .and_then(|v| -> Option<LineNumber> { v.extract().ok()? });
     let uro_error = match (&filename, lineno) {
-        (_, Some(l)) => UroError::new(msg).with_position(&filename, l),
+        (_, Some(l)) => UroError::new(msg).with_position(filename.as_ref(), l),
         (Some(f), None) => UroError::new(msg).with_filename(f),
         (None, None) => UroError::new(msg),
     };
@@ -105,8 +105,8 @@ impl UroError {
 
     /// Add a position for the file and line that this error occurs in.
     #[must_use]
-    pub(crate) fn with_position(mut self, filename: &Option<FilePath>, line: LineNumber) -> Self {
-        self.filename.clone_from(filename);
+    pub(crate) fn with_position(mut self, filename: Option<&FilePath>, line: LineNumber) -> Self {
+        self.filename = filename.cloned();
         self.line = Some(line);
         self
     }

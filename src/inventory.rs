@@ -56,7 +56,7 @@ impl<'a> BorrowedInventoryKey<'a> {
 
 impl Equivalent<InventoryKey> for BorrowedInventoryKey<'_> {
     fn equivalent(&self, key: &InventoryKey) -> bool {
-        return *self.currency == key.currency && self.cost == key.cost.as_ref();
+        *self.currency == key.currency && self.cost == key.cost.as_ref()
     }
 }
 

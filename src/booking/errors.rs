@@ -64,6 +64,6 @@ impl std::fmt::Display for BookingError {
 
 impl From<BookingError> for crate::errors::UroError {
     fn from(e: BookingError) -> Self {
-        Self::new(e.to_string()).with_position(&e.filename, e.line)
+        Self::new(e.to_string()).with_position(e.filename.as_ref(), e.line)
     }
 }
