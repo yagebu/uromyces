@@ -1,12 +1,54 @@
+use std::convert::Infallible;
 use std::fmt::Display;
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 use pyo3::prelude::*;
+use pyo3::pybacked::PyBackedStr;
+use pyo3::types::PyString;
 use serde::{Deserialize, Serialize};
 
 use crate::py_bindings::{decimal_to_py, py_to_decimal};
 
 use super::{Currency, Date, Decimal};
+
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct CostLabel(Box<str>);
+
+impl Display for CostLabel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl From<&str> for CostLabel {
+    fn from(value: &str) -> Self {
+        Self(value.into())
+    }
+}
+
+impl From<String> for CostLabel {
+    fn from(value: String) -> Self {
+        Self(value.into())
+    }
+}
+
+impl<'a, 'py> IntoPyObject<'py> for &'a CostLabel {
+    type Target = PyString;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        self.0.into_pyobject(py)
+    }
+}
+
+impl<'source> FromPyObject<'source> for CostLabel {
+    fn extract_bound(ob: &Bound<'source, PyAny>) -> PyResult<Self> {
+        let str = ob.extract::<PyBackedStr>()?;
+        Ok((&*str).into())
+    }
+}
 
 /// A cost (basically an Amount + date and label).
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
@@ -25,12 +67,12 @@ pub struct Cost {
     pub date: Date,
     /// An optional label to identify a position.
     #[pyo3(get)]
-    pub label: Option<String>,
+    pub label: Option<CostLabel>,
 }
 
 impl Cost {
     #[must_use]
-    pub fn new(number: Decimal, currency: Currency, date: Date, label: Option<String>) -> Self {
+    pub fn new(number: Decimal, currency: Currency, date: Date, label: Option<CostLabel>) -> Self {
         Self {
             number,
             currency,
@@ -58,14 +100,9 @@ impl Cost {
         #[pyo3(from_py_with = "py_to_decimal")] number: Decimal,
         currency: Currency,
         date: Date,
-        label: Option<String>,
+        label: Option<CostLabel>,
     ) -> Self {
-        Self {
-            number,
-            currency,
-            date,
-            label,
-        }
+        Self::new(number, currency, date, label)
     }
     fn __eq__(&self, other: &Self) -> bool {
         self == other
@@ -95,12 +132,12 @@ pub fn cost_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Cost> {
         let date = ob.getattr(pyo3::intern!(py, "date"))?;
         let label = ob.getattr(pyo3::intern!(py, "label"))?;
 
-        Ok(Cost {
-            number: py_to_decimal(&number)?,
-            currency: currency.extract()?,
-            date: date.extract()?,
-            label: label.extract()?,
-        })
+        Ok(Cost::new(
+            py_to_decimal(&number)?,
+            currency.extract()?,
+            date.extract()?,
+            label.extract()?,
+        ))
     }
 }
 
@@ -150,7 +187,7 @@ pub struct CostSpec {
     /// The date that this lot was created.
     pub date: Option<Date>,
     /// An optional label to identify a position.
-    pub label: Option<String>,
+    pub label: Option<CostLabel>,
     /// Unsupported, like in Beancount v2.
     pub merge: bool,
 }

@@ -331,13 +331,7 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> (Ledger, AccountBalances) {
             booked_postings.sort_by_key(|p| p.line);
             booked_postings
         };
-        Ok(Transaction {
-            flag: txn.flag,
-            header: txn.header,
-            payee: txn.payee,
-            narration: txn.narration,
-            postings: booked_postings,
-        })
+        Ok(txn.complete(booked_postings))
     };
 
     let mut entries = Vec::with_capacity(raw_ledger.entries.len());

@@ -58,6 +58,7 @@ use serde::{Deserialize, Serialize};
 mod account;
 mod amount;
 mod booking;
+mod box_str;
 mod cost;
 mod currency;
 mod date;
@@ -69,7 +70,8 @@ mod tags_links;
 pub use account::{Account, RootAccounts, SummarizationAccounts};
 pub use amount::{Amount, IncompleteAmount};
 pub use booking::Booking;
-pub use cost::{Cost, CostSpec};
+pub use box_str::BoxStr;
+pub use cost::{Cost, CostLabel, CostSpec};
 pub use currency::Currency;
 pub use date::{Date, MIN_DATE};
 pub use flag::Flag;
@@ -83,6 +85,8 @@ use cost::option_cost_from_py;
 
 /// The type to use for line numbers in file positions.
 pub type LineNumber = u32;
+pub type Payee = Option<BoxStr>;
+pub type Narration = BoxStr;
 
 /// A raw Beancount directive (option, plugin, or include).
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -410,11 +414,33 @@ pub struct Transaction {
     #[pyo3(get)]
     pub flag: Flag,
     #[pyo3(get)]
-    pub payee: Option<String>,
+    pub payee: Payee,
     #[pyo3(get)]
-    pub narration: Option<String>,
+    pub narration: Narration,
     #[pyo3(get)]
     pub postings: Vec<Posting>,
+}
+
+impl Transaction {
+    /// Create a transaction.
+    ///
+    /// Generic to allow &str, String, etc. to be used for narration.
+    #[must_use]
+    pub fn new<T: Into<Narration>>(
+        header: EntryHeader,
+        flag: Flag,
+        payee: Payee,
+        narration: T,
+        postings: Vec<Posting>,
+    ) -> Self {
+        Self {
+            header,
+            flag,
+            payee,
+            narration: narration.into(),
+            postings,
+        }
+    }
 }
 
 /// A raw transaction.
@@ -425,9 +451,16 @@ pub struct Transaction {
 pub struct RawTransaction {
     pub header: EntryHeader,
     pub flag: Flag,
-    pub payee: Option<String>,
-    pub narration: Option<String>,
+    pub payee: Payee,
+    pub narration: Narration,
     pub postings: Vec<RawPosting>,
+}
+
+impl RawTransaction {
+    /// Complete the transaction with the given booked postings.
+    pub(crate) fn complete(self, postings: Vec<Posting>) -> Transaction {
+        Transaction::new(self.header, self.flag, self.payee, self.narration, postings)
+    }
 }
 
 /// A query entry.
@@ -828,15 +861,15 @@ impl Transaction {
     fn __new__(
         header: EntryHeader,
         flag: Flag,
-        payee: String,
-        narration: String,
+        payee: Payee,
+        narration: Narration,
         postings: Vec<Posting>,
     ) -> Self {
         Self {
             header,
             flag,
-            payee: Some(payee),
-            narration: Some(narration),
+            payee,
+            narration,
             postings,
         }
     }
@@ -850,8 +883,8 @@ impl Transaction {
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         flag: Option<Flag>,
-        payee: Option<String>,
-        narration: Option<String>,
+        payee: Option<BoxStr>,
+        narration: Option<Narration>,
         postings: Option<Vec<Posting>>,
     ) -> PyResult<Self> {
         Ok(Self {
@@ -860,7 +893,7 @@ impl Transaction {
                 .replace_meta_tags_links(date, meta, tags, links)?,
             flag: flag.unwrap_or(self.flag),
             payee: payee.or_else(|| self.payee.clone()),
-            narration: narration.or_else(|| self.narration.clone()),
+            narration: narration.unwrap_or_else(|| self.narration.clone()),
             postings: postings.unwrap_or_else(|| self.postings.clone()),
         })
     }

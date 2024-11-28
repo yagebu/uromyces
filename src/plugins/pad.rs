@@ -55,18 +55,18 @@ impl<'ledger> AccountPadder<'ledger> {
 
         if diff.abs() > balance_tolerance(entry, &self.ledger.options) && !padded_already {
             let diff_units = Amount::new(-diff, currency.clone());
-            let txn = Transaction {
-                header: pad.header.clone(),
-                flag: Flag::PADDING,
-                payee: None,
-                narration: Some(format!(
+            let txn = Transaction::new(
+                pad.header.clone(),
+                Flag::PADDING,
+                None,
+                format!(
                     "(Padding inserted for Balance of {check_amount} for difference {diff_units})"
-                )),
-                postings: vec![
+                ),
+                vec![
                     Posting::new_simple(pad.account.clone(), diff_units.clone()),
                     Posting::new_simple(pad.source_account.clone(), -diff_units.clone()),
                 ],
-            };
+            );
             self.new_entries.push(Entry::Transaction(txn));
             self.balance.add_position(&diff_units);
         }

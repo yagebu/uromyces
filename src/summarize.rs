@@ -59,13 +59,13 @@ fn create_summarisation_entries(
                     None,
                 ));
             }
-            Transaction {
-                header: EntryHeader::new(date, None, 0),
-                flag: Flag::SUMMARIZE,
-                payee: None,
-                narration: Some(format!("Opening balance for '{account}' (Summarization)")),
+            Transaction::new(
+                EntryHeader::new(date, None, 0),
+                Flag::SUMMARIZE,
+                None,
+                format!("Opening balance for '{account}' (Summarization)"),
                 postings,
-            }
+            )
             .into()
         })
         .collect()

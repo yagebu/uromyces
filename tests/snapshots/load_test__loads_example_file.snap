@@ -1,6 +1,7 @@
 ---
 source: tests/load_test.rs
 expression: ledger
+snapshot_kind: text
 ---
 {
   "filename": "[REPO_DIR]/tests/ledgers/example.beancount",

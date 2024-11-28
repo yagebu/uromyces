@@ -3,6 +3,7 @@ use pyo3::BoundObject;
 use pyo3::{prelude::*, pybacked::PyBackedStr, types::PyDict};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use thin_vec::ThinVec;
 
 use crate::py_bindings::{decimal_to_py, py_to_decimal};
 
@@ -81,11 +82,11 @@ pub struct MetaKeyValuePair {
 /// Metadata, a list of key-value pairs.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
-pub struct Meta(Vec<MetaKeyValuePair>);
+pub struct Meta(ThinVec<MetaKeyValuePair>);
 
 impl FromIterator<MetaKeyValuePair> for Meta {
     fn from_iter<T: IntoIterator<Item = MetaKeyValuePair>>(iter: T) -> Self {
-        Meta(Vec::from_iter(iter))
+        Meta(ThinVec::from_iter(iter))
     }
 }
 
@@ -235,7 +236,7 @@ pub(super) fn extract_meta_dict(
             }
         })
         .filter_map(Result::transpose)
-        .collect::<PyResult<Vec<MetaKeyValuePair>>>()?;
+        .collect::<PyResult<ThinVec<MetaKeyValuePair>>>()?;
     Ok((filename, line, Meta(meta_vec)))
 }
 

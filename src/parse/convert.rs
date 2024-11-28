@@ -22,10 +22,10 @@ use super::node_ids;
 use super::ConversionResult;
 use super::NodeGetters;
 use crate::types::{
-    Account, Amount, Balance, Booking, Close, Commodity, CostSpec, Currency, Custom, CustomValue,
-    Date, Decimal, Document, EntryHeader, Event, FilePath, Flag, IncompleteAmount, Meta,
-    MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query, RawPosting, RawTransaction,
-    TagsLinks,
+    Account, Amount, Balance, Booking, BoxStr, Close, Commodity, CostLabel, CostSpec, Currency,
+    Custom, CustomValue, Date, Decimal, Document, EntryHeader, Event, FilePath, Flag,
+    IncompleteAmount, Meta, MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query, RawPosting,
+    RawTransaction, TagsLinks,
 };
 
 /// The state that all conversion node handlers have access to.
@@ -102,16 +102,30 @@ impl FromNode for String {
     }
 }
 
+impl FromNode for BoxStr {
+    fn from_node(node: Node, s: &ConversionState) -> Self {
+        debug_assert_eq!(node.kind(), "string");
+        s.get_string(node).into()
+    }
+}
+
+impl FromNode for CostLabel {
+    fn from_node(node: Node, s: &ConversionState) -> Self {
+        debug_assert_eq!(node.kind(), "string");
+        s.get_string(node).into()
+    }
+}
+
 impl FromNode for Account {
     fn from_node(node: Node, s: &ConversionState) -> Self {
-        debug_assert!(node.kind() == "account",);
+        debug_assert_eq!(node.kind(), "account",);
         s.get_str(node).into()
     }
 }
 
 impl FromNode for Currency {
     fn from_node(node: Node, s: &ConversionState) -> Self {
-        debug_assert!(node.kind() == "currency",);
+        debug_assert_eq!(node.kind(), "currency",);
         s.get_str(node).into()
     }
 }
@@ -197,7 +211,7 @@ impl TryFromNode for CostSpec {
             .transpose()?;
         let label = node
             .child_by_field_id(node_fields::STRING)
-            .map(|n| String::from_node(n, s));
+            .map(|n| CostLabel::from_node(n, s));
 
         let mut number_per = None;
         let mut number_total = None;
@@ -514,10 +528,11 @@ impl TryFromNode for RawTransaction {
             flag: s.get_flag(node.required_child_by_id(node_fields::FLAG)),
             payee: node
                 .child_by_field_id(node_fields::PAYEE)
-                .map(|n| String::from_node(n, s)),
+                .map(|n| BoxStr::from_node(n, s)),
             narration: node
                 .child_by_field_id(node_fields::NARRATION)
-                .map(|n| String::from_node(n, s)),
+                .map(|n| BoxStr::from_node(n, s))
+                .unwrap_or_default(),
             postings: node
                 .child_by_field_id(node_fields::POSTINGS)
                 .map(|n| {

@@ -2,6 +2,7 @@
 source: src/parse/tests.rs
 expression: "super::parse_string(&input, &None)"
 input_file: src/parse/test_inputs/errors.beancount
+snapshot_kind: text
 ---
 {
   "entries": [
