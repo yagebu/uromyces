@@ -111,7 +111,7 @@ def _(entry: Custom) -> data.Custom:
         entry.meta,
         entry.date,
         entry.type,
-        [ValueType(v.value, v.dtype) for v in entry.values],  # noqa: PD011
+        [ValueType(v.value, v.dtype) for v in entry.values],
     )
 
 
