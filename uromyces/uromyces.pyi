@@ -15,12 +15,12 @@ class UroError:
     message: str
 
 class Booking(Enum):
-    STRICT: str
-    NONE: str
-    AVERAGE: str
-    FIFO: str
-    LIFO: str
-    HIFO: str
+    STRICT = "STRICT"
+    NONE = "NONE"
+    AVERAGE = "AVERAGE"
+    FIFO = "FIFO"
+    LIFO = "LIFO"
+    HIFO = "HIFO"
 
 class _Directive:
     meta: Meta
