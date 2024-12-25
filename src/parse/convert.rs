@@ -61,8 +61,8 @@ impl<'source> ConversionState<'source> {
     }
 
     /// Get the contents of a string-like node.
-    fn get_string(&self, node: Node) -> &'source str {
-        &self.string[node.start_byte() + 1..node.end_byte() - 1]
+    fn get_string(&self, node: Node) -> String {
+        self.string[node.start_byte() + 1..node.end_byte() - 1].replace("\\\"", "\"")
     }
 
     /// Get the contents of a key-like node.
@@ -98,7 +98,7 @@ pub(super) trait FromNode {
 impl FromNode for String {
     fn from_node(node: Node, s: &ConversionState) -> Self {
         debug_assert_eq!(node.kind(), "string");
-        s.get_string(node).into()
+        s.get_string(node)
     }
 }
 
@@ -151,8 +151,8 @@ impl TryFromNode for Booking {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "string");
         let method = s.get_string(node);
-        Self::try_from(method)
-            .map_err(|()| ConversionError::new(InvalidBookingMethod(method.into()), &node, s))
+        Self::try_from(method.as_str())
+            .map_err(|()| ConversionError::new(InvalidBookingMethod(method), &node, s))
     }
 }
 

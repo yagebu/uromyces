@@ -2,6 +2,7 @@
 source: src/parse/tests.rs
 expression: "super::parse_string(&input, &None)"
 input_file: src/parse/test_inputs/misc_entries.beancount
+snapshot_kind: text
 ---
 {
   "entries": [
@@ -118,6 +119,18 @@ input_file: src/parse/test_inputs/misc_entries.beancount
             }
           }
         ]
+      }
+    },
+    {
+      "Note": {
+        "date": "2002-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": null,
+        "line": 14,
+        "account": "Assets:Cash",
+        "comment": "string with escape\""
       }
     }
   ],
