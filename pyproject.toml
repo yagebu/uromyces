@@ -39,6 +39,9 @@ uro = "uromyces._cli:cli"
 [tool.black]
 line-length = 79
 
+[tool.mypy]
+strict = true
+
 [tool.ruff]
 target-version = "py39"
 line-length = 79

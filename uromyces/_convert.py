@@ -6,11 +6,11 @@ import copy
 from functools import singledispatch
 from typing import TYPE_CHECKING
 
-from beancount.core import amount  # type: ignore[import-untyped]
-from beancount.core import data  # type: ignore[import-untyped]
-from beancount.core import position  # type: ignore[import-untyped]
-from beancount.parser.grammar import ValueType  # type: ignore[import]
-from beancount.parser.options import OPTIONS_DEFAULTS  # type: ignore[import]
+from beancount.core import amount
+from beancount.core import data
+from beancount.core import position
+from beancount.parser.grammar import ValueType
+from beancount.parser.options import OPTIONS_DEFAULTS
 
 from uromyces.uromyces import Balance
 from uromyces.uromyces import Booking
@@ -55,7 +55,7 @@ def convert_options(ledger: Ledger) -> BeancountOptions:
     opts["filename"] = ledger.filename
     for option_name in opts:
         if hasattr(ledger.options, option_name):
-            opts[option_name] = getattr(  # type:ignore[literal-required]
+            opts[option_name] = getattr(
                 ledger.options,
                 option_name,
             )
@@ -66,7 +66,7 @@ def convert_options(ledger: Ledger) -> BeancountOptions:
     opts["name_income"] = root_accounts.income
     opts["name_expenses"] = root_accounts.expenses
     opts["_uro_options"] = ledger.options
-    return opts
+    return opts  # type: ignore[return-value]
 
 
 @singledispatch
@@ -78,10 +78,10 @@ def uromyces_to_beancount(_: Entry) -> Any:
 @uromyces_to_beancount.register(Balance)
 def _(entry: Balance) -> data.Balance:
     return data.Balance(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.account,
-        entry.amount,
+        entry.amount,  # type: ignore[arg-type]
         entry.tolerance,
         None,
     )
@@ -90,7 +90,7 @@ def _(entry: Balance) -> data.Balance:
 @uromyces_to_beancount.register(Commodity)
 def _(entry: Commodity) -> data.Commodity:
     return data.Commodity(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.currency,
     )
@@ -99,7 +99,7 @@ def _(entry: Commodity) -> data.Commodity:
 @uromyces_to_beancount.register(Close)
 def _(entry: Close) -> data.Close:
     return data.Close(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.account,
     )
@@ -108,7 +108,7 @@ def _(entry: Close) -> data.Close:
 @uromyces_to_beancount.register(Custom)
 def _(entry: Custom) -> data.Custom:
     return data.Custom(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.type,
         [ValueType(v.value, v.dtype) for v in entry.values],
@@ -118,7 +118,7 @@ def _(entry: Custom) -> data.Custom:
 @uromyces_to_beancount.register(Document)
 def _(entry: Document) -> data.Document:
     return data.Document(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.account,
         entry.filename,
@@ -130,7 +130,7 @@ def _(entry: Document) -> data.Document:
 @uromyces_to_beancount.register(Event)
 def _(entry: Event) -> data.Event:
     return data.Event(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.type,
         entry.description,
@@ -140,7 +140,7 @@ def _(entry: Event) -> data.Event:
 @uromyces_to_beancount.register(Note)
 def _(entry: Note) -> data.Note:
     return data.Note(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.account,
         entry.comment,
@@ -152,10 +152,10 @@ def _(entry: Note) -> data.Note:
 @uromyces_to_beancount.register(Open)
 def _(entry: Open) -> data.Open:
     return data.Open(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.account,
-        entry.currencies or None,
+        entry.currencies or None,  # type: ignore[arg-type]
         None
         if entry.booking is None
         else getattr(data.Booking, entry.booking.value),
@@ -165,24 +165,27 @@ def _(entry: Open) -> data.Open:
 @uromyces_to_beancount.register(Pad)
 def _(entry: Pad) -> data.Pad:
     return data.Pad(
-        entry.meta, entry.date, entry.account, entry.source_account
+        entry.meta,  # type: ignore[arg-type]
+        entry.date,
+        entry.account,
+        entry.source_account,
     )
 
 
 @uromyces_to_beancount.register(Price)
 def _(entry: Price) -> data.Price:
     return data.Price(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.currency,
-        entry.amount,
+        entry.amount,  # type: ignore[arg-type]
     )
 
 
 @uromyces_to_beancount.register(Query)
 def _(entry: Query) -> data.Query:
     return data.Query(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.name,
         entry.query_string,
@@ -206,7 +209,7 @@ def _posting_to_beancount(pos: Posting) -> data.Posting:
         ),
         None if price is None else amount.Amount(price.number, price.currency),
         pos.flag,
-        pos.meta if pos.meta else None,
+        pos.meta if pos.meta else None,  # type: ignore[arg-type]
     )
 
 
@@ -214,7 +217,7 @@ def _posting_to_beancount(pos: Posting) -> data.Posting:
 def _(entry: Transaction) -> data.Transaction:
     postings = [_posting_to_beancount(p) for p in entry.postings]
     return data.Transaction(
-        entry.meta,
+        entry.meta,  # type: ignore[arg-type]
         entry.date,
         entry.flag,
         entry.payee,
@@ -242,7 +245,7 @@ _UroEntryTypes = (
 
 
 @singledispatch
-def beancount_to_uromyces(entry: abc.Directive) -> Entry:
+def beancount_to_uromyces(entry: abc.Directive | data.Directive) -> Entry:
     """Convert a Beancount Entry to a uromyces entry."""
     if isinstance(entry, _UroEntryTypes):
         return entry
@@ -254,7 +257,7 @@ def _(entry: data.Balance) -> Balance:
     return Balance(
         EntryHeader(entry.meta, entry.date),
         entry.account,
-        entry.amount,
+        entry.amount,  # type: ignore[arg-type]
         entry.tolerance,
     )
 
@@ -328,7 +331,7 @@ def _(entry: data.Price) -> Price:
     return Price(
         EntryHeader(entry.meta, entry.date),
         entry.currency,
-        entry.amount,
+        entry.amount,  # type: ignore[arg-type]
     )
 
 
@@ -347,9 +350,16 @@ def _(entry: data.Transaction) -> Transaction:
         EntryHeader(entry.meta, entry.date, entry.tags, entry.links),
         entry.flag,
         entry.payee or "",
-        entry.narration,
+        entry.narration,  # type: ignore[arg-type]
         [
-            Posting(p.account, p.units, p.cost, p.price, p.flag, p.meta)
+            Posting(
+                p.account,
+                p.units,  # type: ignore[arg-type]
+                p.cost,  # type: ignore[arg-type]
+                p.price,  # type: ignore[arg-type]
+                p.flag,
+                p.meta,
+            )
             for p in entry.postings
         ],
     )

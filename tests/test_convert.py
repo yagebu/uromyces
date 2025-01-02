@@ -4,8 +4,8 @@ from datetime import date
 from decimal import Decimal
 
 import pytest
-from beancount.core import amount  # type: ignore[import-untyped]
-from beancount.core import data  # type: ignore[import-untyped]
+from beancount.core import amount
+from beancount.core import data
 
 from uromyces._convert import beancount_to_uromyces
 from uromyces.uromyces import Amount

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from beancount import loader  # type: ignore[import]
+from beancount import loader
 
 
 def clean_meta(meta: dict[str, Any]) -> None:

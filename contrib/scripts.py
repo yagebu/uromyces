@@ -32,8 +32,8 @@ IGNORED_TESTS: frozenset[str] = frozenset()
 
 def _format_snapshot(title: str, contents: str, expected: str) -> str:
     """Format a Beancount snapshot."""
-    header_sep_line = f";{'='*78}\n"
-    sep_line = f";{'-'*78}\n"
+    header_sep_line = f";{'=' * 78}\n"
+    sep_line = f";{'-' * 78}\n"
     expected_escaped = "\n; ".join(expected.split("\n"))
     return (
         f"{header_sep_line}; {title}\n{header_sep_line}"

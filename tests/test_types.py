@@ -5,7 +5,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import pytest
-from beancount.core import amount  # type: ignore[import-untyped]
+from beancount.core import amount
 
 from uromyces import Amount
 from uromyces import Balance
@@ -132,7 +132,7 @@ def test_entry_types(entry: Entry) -> None:
     assert entry._replace(links={"another-link"}).links == {"another-link"}
 
     with pytest.raises(TypeError, match="takes 0 positional arguments"):
-        assert entry._replace("")  # type: ignore[arg-type,misc,union-attr]
+        assert entry._replace("")  # type: ignore[arg-type,misc]
 
 
 def test_document() -> None:
@@ -167,7 +167,8 @@ def test_transaction() -> None:
     postings = [posting]
     assert posting == Posting("Assets:A1", units)
     assert posting == Posting(
-        "Assets:A1", amount.Amount(Decimal("10.00"), "USD")
+        "Assets:A1",
+        amount.Amount(Decimal("10.00"), "USD"),  # type: ignore[arg-type]
     )
     t = transaction._replace(postings=postings)
     assert t.postings == postings

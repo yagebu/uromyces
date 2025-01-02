@@ -43,9 +43,12 @@ __all__ = [  # noqa: RUF022
     "Query",
     "Transaction",
     # Other classes
+    "Amount",
+    "Cost",
     "Entry",
     "EntryHeader",
     "Ledger",
+    "Posting",
     # Functions
     "convert_entries",
     "convert_options",
@@ -55,8 +58,6 @@ __all__ = [  # noqa: RUF022
 
 
 # Register
-abc.Amount.register(Amount)
-abc.Cost.register(Cost)
 abc.Posting.register(Posting)
 
 # Register entry types

@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Any
 
 from fava.beans import abc
+from fava.beans import protocols
 from fava.beans.abc import Meta
 from fava.beans.abc import MetaValue
 
@@ -66,13 +67,13 @@ class EntryHeader:
         cls: Any,
         meta: Meta,
         date: datetime.date,
-        tags: set | frozenset | None = None,
-        links: set | frozenset | None = None,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> EntryHeader: ...
 
 class Balance(_Directive, abc.Balance):
     account: str
-    amount: abc.Amount
+    amount: Amount
     tolerance: Decimal | None
     diff_amount: None
 
@@ -80,7 +81,7 @@ class Balance(_Directive, abc.Balance):
         cls: Any,
         header: EntryHeader,
         account: str,
-        amount: Amount,
+        amount: protocols.Amount,
         tolerance: Decimal | None,
     ) -> Balance: ...
     def _replace(
@@ -91,7 +92,7 @@ class Balance(_Directive, abc.Balance):
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         account: str | None = None,
-        amount: Amount | None = None,
+        amount: protocols.Amount | None = None,
     ) -> Balance: ...
 
 class Close(_Directive, abc.Close):
@@ -218,7 +219,7 @@ class Note(_Directive, abc.Note):
 class Open(_Directive, abc.Open):
     account: str
     currencies: list[str]
-    booking: Booking | None
+    booking: Booking | None  # type: ignore[assignment]
 
     def __new__(
         cls: Any,
@@ -262,7 +263,7 @@ class Pad(_Directive, abc.Pad):
 
 class Price(_Directive, abc.Price):
     currency: str
-    amount: abc.Amount
+    amount: protocols.Amount
 
     def __new__(
         cls: Any,
@@ -305,9 +306,9 @@ class Query(_Directive, abc.Query):
 
 class Posting(abc.Posting):
     account: str
-    units: abc.Amount
-    cost: abc.Cost | None
-    price: abc.Amount | None
+    units: protocols.Amount
+    cost: protocols.Cost | None
+    price: protocols.Amount | None
     flag: str | None
     meta: Meta | None
 
@@ -325,7 +326,7 @@ class Transaction(_Directive, abc.Transaction):
     flag: str
     payee: str
     narration: str
-    postings: list[Posting]  # type: ignore[assignment]
+    postings: list[Posting]
 
     def __new__(
         cls: Any,
