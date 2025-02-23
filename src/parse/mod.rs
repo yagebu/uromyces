@@ -22,7 +22,7 @@ mod node_ids;
 #[cfg(test)]
 mod tests;
 
-extern "C" {
+unsafe extern "C" {
     fn tree_sitter_beancount() -> Language;
 }
 
