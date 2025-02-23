@@ -23,13 +23,13 @@ hashbrown = { version = "0.15", features = ["serde"] }
 indexmap = { version = "2.2" }
 internment = { version = "0.8", features = ["arc", "serde"] }
 log = { version = "0.4" }
-pyo3 = { version = "0.23", features = ["abi3-py39", "multiple-pymethods"] }
+pyo3 = { version = "0.24", features = ["abi3-py39", "multiple-pymethods"] }
 pyo3-log = { version = "0.12" }
 rust_decimal = { version = "1" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
 thin-vec = { version = "0.2", features = ["serde"] }
-tree-sitter = { version = "0.24" }
+tree-sitter = { version = "0.25" }
 
 [build-dependencies]
 cc = { version = "1" }

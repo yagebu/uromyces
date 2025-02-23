@@ -340,9 +340,9 @@ impl Posting {
     #[pyo3(signature = (account, units, cost=None, price=None, flag=None, meta=None))]
     fn __new__(
         account: Account,
-        #[pyo3(from_py_with = "amount_from_py")] units: Amount,
-        #[pyo3(from_py_with = "option_cost_from_py")] cost: Option<Cost>,
-        #[pyo3(from_py_with = "option_amount_from_py")] price: Option<Amount>,
+        #[pyo3(from_py_with = amount_from_py)] units: Amount,
+        #[pyo3(from_py_with = option_cost_from_py)] cost: Option<Cost>,
+        #[pyo3(from_py_with = option_amount_from_py)] price: Option<Amount>,
         flag: Option<Flag>,
         meta: Option<&Bound<'_, PyDict>>,
     ) -> PyResult<Self> {
@@ -518,7 +518,7 @@ impl Balance {
     fn __new__(
         header: EntryHeader,
         account: Account,
-        #[pyo3(from_py_with = "amount_from_py")] amount: Amount,
+        #[pyo3(from_py_with = amount_from_py)] amount: Amount,
         tolerance: Option<&Bound<'_, PyAny>>,
     ) -> PyResult<Self> {
         Ok(Self {
@@ -797,7 +797,7 @@ impl Price {
     fn __new__(
         header: EntryHeader,
         currency: Currency,
-        #[pyo3(from_py_with = "amount_from_py")] amount: Amount,
+        #[pyo3(from_py_with = amount_from_py)] amount: Amount,
     ) -> Self {
         Self {
             header,

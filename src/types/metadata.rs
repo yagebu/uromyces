@@ -19,7 +19,7 @@ pub enum MetaValue {
     Bool(bool),
     Amount(Amount),
     Currency(Currency),
-    Number(#[pyo3(from_py_with = "py_to_decimal")] Decimal),
+    Number(#[pyo3(from_py_with = py_to_decimal)] Decimal),
 }
 
 impl From<&str> for MetaValue {

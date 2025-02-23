@@ -6,7 +6,7 @@ import sys
 import time
 from importlib import import_module
 from inspect import signature
-from logging import info
+from logging import getLogger
 from pathlib import Path
 from traceback import format_exc
 from typing import TYPE_CHECKING
@@ -24,6 +24,9 @@ if TYPE_CHECKING:
 
 
 CONVERT = False
+
+
+logger = getLogger(__name__)
 
 
 def import_plugin(
@@ -54,7 +57,7 @@ def run(ledger: Ledger) -> Ledger:  # noqa: C901
     """Run the Beancount plugins for the ledger."""
     plugin_errors = []
     if not ledger.plugins:
-        info("No plugins to run.")
+        logger.info("No plugins to run.")
         return ledger
     entries = None
     options_map = convert_options(ledger)
@@ -73,7 +76,7 @@ def run(ledger: Ledger) -> Ledger:  # noqa: C901
                 else ledger.entries
             )
             if CONVERT:
-                info(
+                logger.info(
                     "Converted all entries to Beancount in %s",
                     time.time() - before,
                 )
@@ -100,12 +103,12 @@ def run(ledger: Ledger) -> Ledger:  # noqa: C901
                     ),
                 )
                 continue
-        info("Ran plugin %s in %s", plugin.name, time.time() - before)
+        logger.info("Ran plugin %s in %s", plugin.name, time.time() - before)
 
     if entries is not None:
         before = time.time()
         entries = uromyces_entries(entries)
-        info(
+        logger.info(
             "Convert any potential Beancount entries to uromyces in %s",
             time.time() - before,
         )

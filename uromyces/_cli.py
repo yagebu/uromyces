@@ -6,7 +6,7 @@ import logging
 import os
 import time
 from decimal import getcontext
-from logging import info
+from logging import getLogger
 from sys import stderr
 
 import click
@@ -15,6 +15,8 @@ from uromyces import load_file
 from uromyces._compat import clean_meta
 from uromyces._compat import load_beancount
 from uromyces._convert import uromyces_to_beancount
+
+logger = getLogger(__name__)
 
 
 class NoFileGivenError(click.UsageError):
@@ -64,15 +66,15 @@ def cli(
     if not all_filenames:
         raise NoFileGivenError
 
-    info("Running uro for %s", all_filenames)
+    logger.info("Running uro for %s", all_filenames)
 
     for filename in all_filenames:
         before = time.time()
-        info("Load Beancount ledger: %s", filename)
+        logger.info("Load Beancount ledger: %s", filename)
 
         ledger = load_file(filename)
 
-        info(
+        logger.info(
             "Loaded Beancount ledger (%s entries; %s errors) in %s",
             len(ledger.entries),
             len(ledger.errors),

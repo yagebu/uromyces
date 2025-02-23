@@ -40,10 +40,7 @@ impl Amount {
 #[pymethods]
 impl Amount {
     #[new]
-    fn __new__(
-        #[pyo3(from_py_with = "py_to_decimal")] number: Decimal,
-        currency: Currency,
-    ) -> Self {
+    fn __new__(#[pyo3(from_py_with = py_to_decimal)] number: Decimal, currency: Currency) -> Self {
         Self { number, currency }
     }
     fn __str__(&self) -> String {

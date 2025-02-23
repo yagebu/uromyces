@@ -97,7 +97,7 @@ impl Cost {
     #[new]
     #[pyo3(signature = (number, currency, date, label=None))]
     fn __new__(
-        #[pyo3(from_py_with = "py_to_decimal")] number: Decimal,
+        #[pyo3(from_py_with = py_to_decimal)] number: Decimal,
         currency: Currency,
         date: Date,
         label: Option<CostLabel>,

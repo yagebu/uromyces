@@ -112,7 +112,7 @@ impl Ledger {
     }
 
     /// Append some error (from the Python side).
-    pub fn add_error(&mut self, #[pyo3(from_py_with = "error_from_py")] error: UroError) {
+    pub fn add_error(&mut self, #[pyo3(from_py_with = error_from_py)] error: UroError) {
         self.errors.push(error);
     }
 }
