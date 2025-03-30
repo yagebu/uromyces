@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Sequence
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -385,7 +386,7 @@ class Ledger:
 
 def load_file(filename: str) -> Ledger: ...
 def summarize_clamp(
-    entries: list[Entry],
+    entries: Sequence[Entry],
     begin_date: datetime.date,
     end_date: datetime.date,
     options: BeancountOptions,
