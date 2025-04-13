@@ -288,7 +288,7 @@ fn interpolate_and_fill_in_missing(
             MissingNumber::None(units, price, cost) => Some((units, price, cost)),
         } {
             complete_postings.push(posting.complete(units, price, cost));
-        };
+        }
     }
 
     Ok(complete_postings)
@@ -341,15 +341,13 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> (Ledger, AccountBalances) {
 
     for raw_entry in raw_ledger.entries {
         match raw_entry {
-            RawEntry::Transaction(i) => {
-                match handle_txn(&balances, i) {
-                    Ok(txn) => {
-                        update_running_balances(&mut balances, &txn);
-                        entries.push(Entry::Transaction(txn));
-                    }
-                    Err(err) => errors.push(err),
-                };
-            }
+            RawEntry::Transaction(i) => match handle_txn(&balances, i) {
+                Ok(txn) => {
+                    update_running_balances(&mut balances, &txn);
+                    entries.push(Entry::Transaction(txn));
+                }
+                Err(err) => errors.push(err),
+            },
             RawEntry::Balance(i) => entries.push(Entry::Balance(i)),
             RawEntry::Close(i) => entries.push(Entry::Close(i)),
             RawEntry::Commodity(i) => entries.push(Entry::Commodity(i)),
@@ -361,7 +359,7 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> (Ledger, AccountBalances) {
             RawEntry::Pad(i) => entries.push(Entry::Pad(i)),
             RawEntry::Price(i) => entries.push(Entry::Price(i)),
             RawEntry::Query(i) => entries.push(Entry::Query(i)),
-        };
+        }
     }
 
     ledger.entries = entries;

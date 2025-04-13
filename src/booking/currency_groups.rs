@@ -101,7 +101,7 @@ pub(super) fn group_and_fill_in_currencies(
                     }
                 }
                 None => unknown.push(posting),
-            };
+            }
         }
     }
 

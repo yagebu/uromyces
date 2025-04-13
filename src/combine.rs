@@ -78,7 +78,7 @@ fn load_beancount_file(main_path: &FilePath) -> Vec<PathAndResult> {
                             ))
                             .with_filename(&path),
                         ),
-                    };
+                    }
                 }
             }
             results.push(PathAndResult { path, result });

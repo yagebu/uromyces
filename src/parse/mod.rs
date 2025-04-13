@@ -260,12 +260,12 @@ pub fn convert_syntax_tree(parsed_tree: &ParsedTree, filename: &Option<FilePath>
                 _ => {
                     println!("Unknown node kind: {}", node.kind());
                 }
-            };
+            }
             Ok(())
         })();
         if let Err(err) = res {
             result.errors.push(err);
-        };
+        }
     }
 
     result

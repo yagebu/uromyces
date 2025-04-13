@@ -84,7 +84,7 @@ def cli(
         if compare:
             entries_uro = ledger.entries
             entries_bc = load_beancount(filename)
-            for bc, uro in zip(entries_bc, entries_uro):
+            for bc, uro in zip(entries_bc, entries_uro, strict=True):
                 clean_meta(bc.meta)
                 for posting in getattr(bc, "postings", ()):
                     clean_meta(posting.meta)

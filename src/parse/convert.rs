@@ -378,7 +378,7 @@ impl TryFromNode for EntryHeader {
                     links.insert(name);
                 }
             }
-        };
+        }
         Ok(Self {
             date: Date::try_from_node(node.required_child_by_id(node_fields::DATE), s)?,
             meta: node

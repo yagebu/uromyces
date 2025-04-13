@@ -95,7 +95,7 @@ pub fn open_close(ledger: &Ledger) -> Vec<UroError> {
                 } else {
                     if !open_accounts.contains(&e.account) {
                         errors.push(ClosingUnopenedAccount(e).into());
-                    };
+                    }
                     closed_accounts.insert(&e.account);
                 }
             }
@@ -131,7 +131,7 @@ pub fn duplicate_balances(ledger: &Ledger) -> Vec<UroError> {
                 None => {
                     balances.insert(key, e);
                 }
-            };
+            }
         }
     }
     errors

@@ -87,7 +87,7 @@ impl Display for Cost {
         write!(f, "{} {}, {}", self.number, self.currency, self.date)?;
         if let Some(label) = &self.label {
             write!(f, ", {label}")?;
-        };
+        }
         Ok(())
     }
 }

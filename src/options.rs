@@ -181,7 +181,7 @@ impl BeancountOptions {
             _ => {
                 return Err(BeancountOptionError::UnknownOption(key.to_owned()));
             }
-        };
+        }
         Ok(())
     }
 

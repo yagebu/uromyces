@@ -275,7 +275,7 @@ impl Inventory {
             *num += number;
             if num.is_zero() {
                 self.map.swap_remove(key);
-            };
+            }
             result_type
         } else if number.is_zero() {
             // this matches the Beancount logic but is a bit confusing since we only return

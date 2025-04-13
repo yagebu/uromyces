@@ -21,7 +21,7 @@ impl TagsLinks {
 
     /// Insert a tag or link. Returns whether it was newly inserted.
     pub fn insert(&mut self, value: String) -> bool {
-        if self.0.iter().any(|v| *v == value) {
+        if self.0.contains(&value) {
             false
         } else {
             self.0.push(value);

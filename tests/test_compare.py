@@ -40,7 +40,7 @@ def test_compare(test_ledgers_dir: Path, ledger_name: str) -> None:
     for account, balance_bc in balances_bc.items():
         assert balance_bc == balances_uro[account], f"Balance for {account}"
 
-    for bc, uro in zip(entries_bc, entries_uro):
+    for bc, uro in zip(entries_bc, entries_uro, strict=True):
         clean_meta(bc.meta)
         postings = getattr(bc, "postings", [])
         postings.sort(key=lambda p: p.meta.get("lineno", 0))

@@ -116,7 +116,7 @@ fn resolve_ordered(
         ClosingOrder::Lifo => {
             matches.sort_by_key(|position| Reverse(position.cost.date));
         }
-    };
+    }
     for position in matches {
         // We only need to continue if we have a positive non-zero amount remaining.
         if !remainder.is_strictly_positive() {

@@ -1,2 +1,8 @@
 allow-unwrap-in-tests = true
-allowed-duplicate-crates = ["ahash", "hashbrown", "syn", "zerocopy", "zerocopy-derive"]
+allowed-duplicate-crates = [
+    "ahash",
+    "getrandom",
+    "hashbrown",
+    "syn",
+    "wasi",
+]
