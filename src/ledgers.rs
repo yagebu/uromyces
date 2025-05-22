@@ -2,7 +2,7 @@
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::errors::{error_from_py, UroError};
+use crate::errors::{UroError, error_from_py};
 use crate::options::BeancountOptions;
 #[cfg(test)]
 use crate::parse::ParsedFile;

@@ -1,11 +1,11 @@
 use hashbrown::{HashMap, HashSet};
 
+use crate::Ledger;
 use crate::conversions::get_weight;
 use crate::errors::UroError;
 use crate::inventory::Inventory;
 use crate::tolerances::Tolerances;
 use crate::types::{Account, Balance, Close, Commodity, Currency, Date, Entry, Open, Transaction};
-use crate::Ledger;
 
 struct InvalidAccountNameRoot<'a>(&'a Account);
 impl From<InvalidAccountNameRoot<'_>> for UroError {

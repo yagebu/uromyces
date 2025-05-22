@@ -6,7 +6,7 @@ use crate::ledgers::RawLedger;
 use crate::parse::parse_string;
 use crate::test_utils;
 use crate::types::{
-    Account, Entry, FilePath, Posting, RawEntry, RawPosting, RawTransaction, MIN_DATE,
+    Account, Entry, FilePath, MIN_DATE, Posting, RawEntry, RawPosting, RawTransaction,
 };
 
 use super::book_entries;

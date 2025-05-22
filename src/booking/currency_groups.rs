@@ -1,7 +1,7 @@
 use crate::types::{CostSpec, Currency, IncompleteAmount, RawPosting};
 
-use super::errors::{BookingError, BookingErrorKind};
 use super::AccountBalances;
+use super::errors::{BookingError, BookingErrorKind};
 
 /// Get the currency group for this posting.
 ///

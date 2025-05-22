@@ -1,12 +1,12 @@
 //! Various helpers to interface with Python.
 use std::str::FromStr;
 
+use pyo3::PyTypeInfo;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::pybacked::PyBackedStr;
 use pyo3::sync::GILOnceCell;
 use pyo3::types::{PyAnyMethods, PyString, PyTuple};
-use pyo3::PyTypeInfo;
 
 use crate::types::{Amount, Date, Decimal};
 

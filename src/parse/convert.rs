@@ -12,6 +12,8 @@
 
 use tree_sitter::Node;
 
+use super::ConversionResult;
+use super::NodeGetters;
 use super::errors::ConversionError;
 use super::errors::ConversionErrorKind::{
     InvalidBookingMethod, InvalidDate, InvalidDecimal, InvalidDocumentFilename,
@@ -19,8 +21,6 @@ use super::errors::ConversionErrorKind::{
 };
 use super::node_fields;
 use super::node_ids;
-use super::ConversionResult;
-use super::NodeGetters;
 use crate::types::{
     Account, Amount, Balance, Booking, BoxStr, Close, Commodity, CostLabel, CostSpec, Currency,
     Custom, CustomValue, Date, Decimal, Document, EntryHeader, Event, FilePath, Flag,

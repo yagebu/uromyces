@@ -1,8 +1,8 @@
 use crate::errors::UroError;
 use crate::types::{FilePath, LineNumber};
 
-use super::convert::ConversionState;
 use super::NodeGetters;
+use super::convert::ConversionState;
 
 /// An error that might occur when trying to parse a string with tree-sitter.
 #[derive(Debug)]

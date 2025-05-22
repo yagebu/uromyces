@@ -12,7 +12,7 @@ use crate::types::{
 
 use currency_groups::group_and_fill_in_currencies;
 use errors::{BookingError, BookingErrorKind};
-use methods::{close_with_resolved_matches, resolve_matches, BookingMethod};
+use methods::{BookingMethod, close_with_resolved_matches, resolve_matches};
 
 mod currency_groups;
 mod errors;

@@ -1,5 +1,5 @@
-use pyo3::exceptions::PyKeyError;
 use pyo3::BoundObject;
+use pyo3::exceptions::PyKeyError;
 use pyo3::{prelude::*, pybacked::PyBackedStr, types::PyDict};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};

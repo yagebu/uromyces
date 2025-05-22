@@ -2,7 +2,7 @@
 name = "uromyces"
 description = "urom implements parts of Beancount's plain text accounting functionality in Rust"
 version = "0.0.1"
-edition = "2021"
+edition = "2024"
 license = "GPL-2.0-only"
 repository = "https://github.com/yagebu/uromyces/"
 keywords = ["accounting", "beancount", "finance"]

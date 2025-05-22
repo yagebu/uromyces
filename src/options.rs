@@ -231,9 +231,11 @@ mod tests {
         let mut options = BeancountOptions::default();
 
         assert!(options.set_single_option("booking_method", "NONE").is_ok());
-        assert!(options
-            .set_single_option("inferred_tolerance_default", "USD:1.00")
-            .is_ok());
+        assert!(
+            options
+                .set_single_option("inferred_tolerance_default", "USD:1.00")
+                .is_ok()
+        );
     }
 
     #[test]

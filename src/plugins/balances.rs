@@ -1,11 +1,11 @@
 use hashbrown::{HashMap, HashSet};
 use rust_decimal::Decimal;
 
+use crate::Ledger;
 use crate::errors::UroError;
 use crate::inventory::Inventory;
 use crate::tolerances::balance_tolerance;
 use crate::types::{Account, Balance, Entry, Posting};
-use crate::Ledger;
 
 /// A balance assertion failed.
 struct BalanceCheckError<'a>(&'a Account, &'a Balance, Decimal);
@@ -22,8 +22,8 @@ impl From<BalanceCheckError<'_>> for crate::errors::UroError {
         let currency = &expected_amount.currency;
         let balance = expected_amount.number + diff_amount;
         let msg = format!(
-                "Balance failed for '{account}': expected {expected_amount} != accumulated {balance} {currency} ({diff_msg})"
-            );
+            "Balance failed for '{account}': expected {expected_amount} != accumulated {balance} {currency} ({diff_msg})"
+        );
         Self::new(msg).with_entry(*balance_entry)
     }
 }

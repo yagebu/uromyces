@@ -1,9 +1,9 @@
 use hashbrown::{HashMap, HashSet};
 
+use crate::Ledger;
 use crate::errors::UroError;
 use crate::inventory::{BookingResult, Inventory};
 use crate::types::{Amount, Entry, EntryHeader, Price};
-use crate::Ledger;
 
 const META_KEY: &str = "__implicit_prices__";
 
