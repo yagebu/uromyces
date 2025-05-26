@@ -48,7 +48,6 @@ import-booking-tests:
 
 clean:
 	rm -rf .*cache
-	rm -rf .tox
 	rm -rf .venv
 	rm -rf target
 	find . -type f -name '*.py[c0]' -delete
