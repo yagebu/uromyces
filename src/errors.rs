@@ -61,7 +61,7 @@ pub(crate) fn error_from_py(error: &Bound<'_, PyAny>) -> PyResult<UroError> {
     if error_source.is_none() {
         return Ok(UroError::new(msg));
     }
-    let source = error_source.downcast::<PyMapping>()?;
+    let source = error_source.cast::<PyMapping>()?;
     let filename = source
         .get_item(pyo3::intern!(py, "filename"))
         .ok()

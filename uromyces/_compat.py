@@ -13,7 +13,7 @@ def clean_meta(meta: dict[str, Any]) -> None:
 
 def load_beancount(filename: str) -> Any:
     """Load the given file using Beancount."""
-    entries, _parse_errors, options_map = loader._load(  # noqa: SLF001
+    entries, _parse_errors, _options_map = loader._load(  # noqa: SLF001
         [(filename, True)],
         None,
         None,

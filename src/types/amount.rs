@@ -65,7 +65,7 @@ impl Amount {
 
 /// Convert from a Python object which has the correct attributes.
 pub fn amount_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Amount> {
-    if let Ok(a) = ob.downcast::<Amount>() {
+    if let Ok(a) = ob.cast::<Amount>() {
         Ok(a.get().clone())
     } else {
         let py = ob.py();

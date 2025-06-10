@@ -140,10 +140,10 @@ impl DisplayPrecisionsStats {
     }
 
     fn update_from_incomplete_amount(&mut self, a: &IncompleteAmount) {
-        if let Some(number) = a.number {
-            if let Some(currency) = &a.currency {
-                self.update(number, currency);
-            }
+        if let Some(number) = a.number
+            && let Some(currency) = &a.currency
+        {
+            self.update(number, currency);
         }
     }
 
@@ -173,15 +173,15 @@ impl DisplayPrecisionsStats {
                             res.update_from_incomplete_amount(price);
                         }
                         if let Some(cost) = &p.cost {
-                            if let Some(number) = cost.number_per {
-                                if let Some(currency) = &cost.currency {
-                                    res.update(number, currency);
-                                }
+                            if let Some(number) = cost.number_per
+                                && let Some(currency) = &cost.currency
+                            {
+                                res.update(number, currency);
                             }
-                            if let Some(number) = cost.number_total {
-                                if let Some(currency) = &cost.currency {
-                                    res.update(number, currency);
-                                }
+                            if let Some(number) = cost.number_total
+                                && let Some(currency) = &cost.currency
+                            {
+                                res.update(number, currency);
                             }
                         }
                     }

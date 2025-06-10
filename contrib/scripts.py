@@ -49,9 +49,7 @@ def import_booking_tests() -> None:
     Expects Beancount's repo to live next to uromyces.
     """
     sys.path.insert(0, str(BEANCOUNT_PATH))
-    from beancount.parser import (  # type: ignore[import-untyped]
-        booking_full_test,
-    )
+    from beancount.parser import booking_full_test  # noqa: PLC0415
 
     sys.path.pop(0)
 

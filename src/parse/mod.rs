@@ -62,7 +62,7 @@ pub struct ParsedTree<'source> {
 /// # Errors
 ///
 /// `ParsingError` if parsing times out.
-pub fn string_to_tree(string: &str) -> Result<ParsedTree, ParsingError> {
+pub fn string_to_tree(string: &str) -> Result<ParsedTree<'_>, ParsingError> {
     let mut parser = init_parser();
     parser
         .parse(string, None)
@@ -104,19 +104,19 @@ type ConversionResult<T> = Result<T, ConversionError>;
 
 trait NodeGetters {
     /// Obtain the child at the given index (or error if it does not exist).
-    fn required_child(&self, i: usize) -> Node;
+    fn required_child(&self, i: u32) -> Node<'_>;
     /// Obtain the child with the given field id (or error if it does not exist).
-    fn required_child_by_id(&self, id: u16) -> Node;
+    fn required_child_by_id(&self, id: u16) -> Node<'_>;
     /// Get the starting line number of the node.
     fn line_number(&self) -> LineNumber;
 }
 
 impl NodeGetters for Node<'_> {
-    fn required_child(&self, i: usize) -> Node {
+    fn required_child(&self, i: u32) -> Node<'_> {
         self.child(i)
             .expect("required node child at given to exist")
     }
-    fn required_child_by_id(&self, id: u16) -> Node {
+    fn required_child_by_id(&self, id: u16) -> Node<'_> {
         self.child_by_field_id(id)
             .expect("required node child for given field to exist")
     }

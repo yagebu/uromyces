@@ -7,8 +7,9 @@ use pyo3::{exceptions::PyValueError, types::PyString};
 use serde::{Deserialize, Serialize};
 
 /// An transaction or posting flag.
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum Flag {
+    #[default]
     OKAY,
     WARNING,
     PADDING,
@@ -98,15 +99,11 @@ impl<'py> IntoPyObject<'py> for Flag {
     }
 }
 
-impl<'py> FromPyObject<'py> for Flag {
-    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
-        let str = ob.extract::<PyBackedStr>()?;
-        Self::try_from(&*str).map_err(|_e| PyValueError::new_err("Invalid flag"))
-    }
-}
+impl<'py> FromPyObject<'_, 'py> for Flag {
+    type Error = PyErr;
 
-impl Default for Flag {
-    fn default() -> Self {
-        Self::OKAY
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        let str = obj.extract::<PyBackedStr>()?;
+        Self::try_from(&*str).map_err(|_e| PyValueError::new_err("Invalid flag"))
     }
 }

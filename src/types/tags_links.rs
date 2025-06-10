@@ -62,15 +62,17 @@ impl<'py> IntoPyObject<'py> for &TagsLinks {
     }
 }
 
-impl<'py> FromPyObject<'py> for TagsLinks {
-    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
-        let vec = if let Ok(set) = ob.downcast::<PySet>() {
-            set.into_iter()
+impl<'py> FromPyObject<'_, 'py> for TagsLinks {
+    type Error = PyErr;
+
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        let vec = if let Ok(set) = obj.cast::<PySet>() {
+            set.iter()
                 .filter_map(|e| e.extract::<String>().ok())
                 .collect()
         } else {
-            let set = ob.downcast::<PyFrozenSet>()?;
-            set.into_iter()
+            let set = obj.cast::<PyFrozenSet>()?;
+            set.iter()
                 .filter_map(|e| e.extract::<String>().ok())
                 .collect()
         };

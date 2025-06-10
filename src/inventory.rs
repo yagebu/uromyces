@@ -241,7 +241,7 @@ impl Inventory {
     /// An iterator over all positions in this inventory.
     ///
     /// Just like when iterating over the underlying [`IndexMap`], the items contain borrowed values.
-    pub fn iter(&self) -> impl Iterator<Item = InventoryPosition> {
+    pub fn iter(&self) -> impl Iterator<Item = InventoryPosition<'_>> {
         self.map.iter().map(|(key, number)| InventoryPosition {
             number,
             currency: &key.currency,
@@ -254,7 +254,7 @@ impl Inventory {
     /// This is just like the `.iter()` function above but skips all positions that do not have a cost
     /// and has a iterator item types that ensures this.
     /// Just like when iterating over the underlying [`IndexMap`], the items contain borrowed values.
-    pub fn iter_with_cost(&self) -> impl Iterator<Item = InventoryPositionWithCost> {
+    pub fn iter_with_cost(&self) -> impl Iterator<Item = InventoryPositionWithCost<'_>> {
         self.map.iter().filter_map(|(key, number)| {
             key.cost.as_ref().map(|cost| InventoryPositionWithCost {
                 number,

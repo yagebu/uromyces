@@ -71,16 +71,16 @@ impl Tolerances {
     /// Set from an option string like "USD:0.04".
     pub(crate) fn set_from_option(&mut self, value: &str) -> Result<(), ()> {
         let mut parts = value.split(':');
-        if let Some(currency) = parts.next() {
-            if let Some(tol) = parts.next() {
-                let tolerance = Decimal::from_str_exact(tol).map_err(|_| ())?;
-                if currency == "*" {
-                    self.default = tolerance;
-                } else {
-                    self.map.insert(currency.into(), tolerance);
-                }
-                return Ok(());
+        if let Some(currency) = parts.next()
+            && let Some(tol) = parts.next()
+        {
+            let tolerance = Decimal::from_str_exact(tol).map_err(|_| ())?;
+            if currency == "*" {
+                self.default = tolerance;
+            } else {
+                self.map.insert(currency.into(), tolerance);
             }
+            return Ok(());
         }
         Err(())
     }
@@ -108,14 +108,10 @@ impl Tolerances {
         let mut tolerances = options.inferred_tolerance_default.clone();
 
         for posting in postings {
-            if let Some(number) = &posting.units.number {
-                if let Some(currency) = &posting.units.currency {
-                    tolerances.add_inferred(
-                        number,
-                        currency,
-                        &options.inferred_tolerance_multiplier,
-                    );
-                }
+            if let Some(number) = &posting.units.number
+                && let Some(currency) = &posting.units.currency
+            {
+                tolerances.add_inferred(number, currency, &options.inferred_tolerance_multiplier);
             }
         }
 

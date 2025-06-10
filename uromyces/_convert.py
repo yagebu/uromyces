@@ -348,7 +348,7 @@ def _(entry: data.Query) -> Query:
 def _(entry: data.Transaction) -> Transaction:
     return Transaction(
         EntryHeader(entry.meta, entry.date, entry.tags, entry.links),
-        entry.flag,
+        entry.flag or "*",
         entry.payee or "",
         entry.narration,  # type: ignore[arg-type]
         [

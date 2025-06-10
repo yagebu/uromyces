@@ -231,7 +231,7 @@ pub(super) fn extract_meta_dict(
                 }
                 _ => Ok(Some(MetaKeyValuePair {
                     key,
-                    value: Some(MetaValue::extract_bound(&v)?),
+                    value: Some(MetaValue::extract(v.as_borrowed())?),
                 })),
             }
         })

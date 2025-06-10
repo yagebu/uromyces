@@ -16,7 +16,7 @@ use crate::types::{
 type AccountBalances<'a> = HashMap<&'a Account, Inventory>;
 
 /// Accumulate balances by account.
-fn balances_by_account(entries: &[Entry]) -> AccountBalances {
+fn balances_by_account(entries: &[Entry]) -> AccountBalances<'_> {
     let mut balances = HashMap::new();
     for e in entries {
         if let Entry::Transaction(txn) = e {

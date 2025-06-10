@@ -37,10 +37,10 @@ impl BookingMethods {
     fn from_ledger(raw_ledger: &RawLedger) -> Self {
         let mut map = HashMap::new();
         for e in &raw_ledger.entries {
-            if let RawEntry::Open(entry) = e {
-                if let Some(method) = entry.booking {
-                    map.insert(entry.account.clone(), method);
-                }
+            if let RawEntry::Open(entry) = e
+                && let Some(method) = entry.booking
+            {
+                map.insert(entry.account.clone(), method);
             }
         }
         Self {

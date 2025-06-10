@@ -49,9 +49,11 @@ impl<'py> IntoPyObject<'py> for &Currency {
     }
 }
 
-impl<'py> FromPyObject<'py> for Currency {
-    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
-        let str = ob.extract::<PyBackedStr>()?;
+impl<'py> FromPyObject<'_, 'py> for Currency {
+    type Error = PyErr;
+
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        let str = obj.extract::<PyBackedStr>()?;
         Ok(Self::from(&*str))
     }
 }

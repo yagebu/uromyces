@@ -106,41 +106,41 @@ pub(super) fn group_and_fill_in_currencies(
     }
 
     // Only support this simple case for now.
-    if unknown.len() < 2 && groups.len() == 1 {
-        if let Some(mut unknown_posting) = unknown.pop() {
-            let currency = &groups[0].0;
-            match (&mut unknown_posting.cost, &mut unknown_posting.price) {
-                (None, None) => {
-                    unknown_posting.units.currency = Some(currency.clone());
-                }
-                (Some(cost), None) => {
-                    cost.currency = Some(currency.clone());
-                }
-                (None, Some(price)) => {
-                    price.currency = Some(currency.clone());
-                }
-                (Some(cost), Some(price)) => {
-                    cost.currency = Some(currency.clone());
-                    price.currency = Some(currency.clone());
-                }
+    if unknown.len() < 2
+        && groups.len() == 1
+        && let Some(mut unknown_posting) = unknown.pop()
+    {
+        let currency = &groups[0].0;
+        match (&mut unknown_posting.cost, &mut unknown_posting.price) {
+            (None, None) => {
+                unknown_posting.units.currency = Some(currency.clone());
             }
-            check_posting_currencies(&unknown_posting)?;
-            groups[0].1.push(unknown_posting);
+            (Some(cost), None) => {
+                cost.currency = Some(currency.clone());
+            }
+            (None, Some(price)) => {
+                price.currency = Some(currency.clone());
+            }
+            (Some(cost), Some(price)) => {
+                cost.currency = Some(currency.clone());
+                price.currency = Some(currency.clone());
+            }
         }
+        check_posting_currencies(&unknown_posting)?;
+        groups[0].1.push(unknown_posting);
     }
 
     // If we had more than one unknown posting, we infer cost currencies from existing account
     // balances.
     // Otherwise, we will bubble up an error.
     for mut posting in unknown {
-        if let Some(balance) = balances.get(&posting.account) {
-            if let Some(ref mut cost) = posting.cost {
-                if cost.currency.is_none() {
-                    let cost_currencies = balance.cost_currencies();
-                    if cost_currencies.len() == 1 {
-                        cost.currency = cost_currencies.into_iter().next().cloned();
-                    }
-                }
+        if let Some(balance) = balances.get(&posting.account)
+            && let Some(ref mut cost) = posting.cost
+            && cost.currency.is_none()
+        {
+            let cost_currencies = balance.cost_currencies();
+            if cost_currencies.len() == 1 {
+                cost.currency = cost_currencies.into_iter().next().cloned();
             }
         }
         check_posting_currencies(&posting)?;

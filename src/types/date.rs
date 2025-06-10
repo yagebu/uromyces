@@ -87,12 +87,14 @@ impl<'py> IntoPyObject<'py> for Date {
     }
 }
 
-impl<'py> FromPyObject<'py> for Date {
-    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
-        let py = ob.py();
-        let year = ob.getattr(pyo3::intern!(py, "year"))?.extract()?;
-        let month = ob.getattr(pyo3::intern!(py, "month"))?.extract()?;
-        let day = ob.getattr(pyo3::intern!(py, "day"))?.extract()?;
+impl<'py> FromPyObject<'_, 'py> for Date {
+    type Error = PyErr;
+
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        let py = obj.py();
+        let year = obj.getattr(pyo3::intern!(py, "year"))?.extract()?;
+        let month = obj.getattr(pyo3::intern!(py, "month"))?.extract()?;
+        let day = obj.getattr(pyo3::intern!(py, "day"))?.extract()?;
         Ok(Self(
             NaiveDate::from_ymd_opt(year, month, day).expect("Python date to be a valid date."),
         ))

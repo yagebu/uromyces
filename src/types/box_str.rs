@@ -43,9 +43,11 @@ impl<'py> IntoPyObject<'py> for &BoxStr {
     }
 }
 
-impl<'source> FromPyObject<'source> for BoxStr {
-    fn extract_bound(ob: &Bound<'source, PyAny>) -> PyResult<Self> {
-        let str = ob.extract::<PyBackedStr>()?;
+impl<'py> FromPyObject<'_, 'py> for BoxStr {
+    type Error = PyErr;
+
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        let str = obj.extract::<PyBackedStr>()?;
         Ok((&*str).into())
     }
 }

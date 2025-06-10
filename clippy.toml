@@ -1,6 +1,7 @@
 allow-unwrap-in-tests = true
 allowed-duplicate-crates = [
     "ahash",
+    "foldhash",
     "getrandom",
     "hashbrown",
     "syn",

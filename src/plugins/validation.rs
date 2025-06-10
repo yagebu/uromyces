@@ -156,10 +156,10 @@ pub fn duplicate_commodities(ledger: &Ledger) -> Vec<UroError> {
     let mut commodities = HashSet::new();
 
     for entry in &ledger.entries {
-        if let Entry::Commodity(e) = entry {
-            if !commodities.insert(&e.currency) {
-                errors.push(DuplicateCommodityDirective(e).into());
-            }
+        if let Entry::Commodity(e) = entry
+            && !commodities.insert(&e.currency)
+        {
+            errors.push(DuplicateCommodityDirective(e).into());
         }
     }
     errors
@@ -282,10 +282,10 @@ pub fn currency_constraints(ledger: &Ledger) -> Vec<UroError> {
     let mut currency_constraints: HashMap<&Account, &Vec<Currency>> = HashMap::new();
 
     for entry in &ledger.entries {
-        if let Entry::Open(e) = entry {
-            if !e.currencies.is_empty() {
-                currency_constraints.insert(&e.account, &e.currencies);
-            }
+        if let Entry::Open(e) = entry
+            && !e.currencies.is_empty()
+        {
+            currency_constraints.insert(&e.account, &e.currencies);
         }
     }
 

@@ -29,7 +29,7 @@ fn update_consts(path: &Path, kind: &str) {
             if new_num != num {
                 changed = true;
             }
-            format!("const {}: u16 = {};", const_name, new_num)
+            format!("const {const_name}: u16 = {new_num};")
         })
         .to_string();
     if changed {

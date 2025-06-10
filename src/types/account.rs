@@ -90,9 +90,11 @@ impl<'py> IntoPyObject<'py> for &Account {
     }
 }
 
-impl<'source> FromPyObject<'source> for Account {
-    fn extract_bound(ob: &Bound<'source, PyAny>) -> PyResult<Self> {
-        let str = ob.extract::<PyBackedStr>()?;
+impl<'py> FromPyObject<'_, 'py> for Account {
+    type Error = PyErr;
+
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        let str = obj.extract::<PyBackedStr>()?;
         Ok((&*str).into())
     }
 }

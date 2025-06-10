@@ -42,6 +42,9 @@ line-length = 79
 [tool.mypy]
 strict = true
 
+[tool.uv]
+python-preference = "system"
+
 [tool.ruff]
 line-length = 79
 

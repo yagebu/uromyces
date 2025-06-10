@@ -17,7 +17,7 @@ lint: .venv
 	cargo fmt
 	cargo clippy
 	pre-commit run -a
-	uv run mypy uromyces tests
+	uv run mypy uromyces tests contrib
 
 # Run Rust and Python tests
 test: .venv
@@ -50,6 +50,7 @@ clean:
 	rm -rf .*cache
 	rm -rf .venv
 	rm -rf target
+	find . -type f -name '*.so' -delete
 	find . -type f -name '*.py[c0]' -delete
 	find . -type d -name "__pycache__" -delete
 

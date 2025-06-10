@@ -5,7 +5,7 @@ use pyo3::PyTypeInfo;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::pybacked::PyBackedStr;
-use pyo3::sync::GILOnceCell;
+use pyo3::sync::PyOnceLock;
 use pyo3::types::{PyAnyMethods, PyString, PyTuple};
 
 use crate::types::{Amount, Date, Decimal};
@@ -13,29 +13,29 @@ use crate::types::{Amount, Date, Decimal};
 /// Some Python classes/objects that we want to call/use from Rust.
 pub struct PythonTypes {
     /// The `<AccountDummy>` object.
-    pub account_dummy: PyObject,
+    pub account_dummy: Py<PyAny>,
     /// The `bool` object.
-    pub bool: PyObject,
+    pub bool: Py<PyAny>,
     /// The `datetime.date` object
-    pub date: PyObject,
+    pub date: Py<PyAny>,
     /// The `decimal.Decimal` object
-    pub decimal: PyObject,
+    pub decimal: Py<PyAny>,
     /// The `str` object
-    pub str: PyObject,
+    pub str: Py<PyAny>,
 
     // The `uromyces.Amount` object
     // This is included since we want to use this type as a `dtype` for custom values.
-    pub amount: PyObject,
+    pub amount: Py<PyAny>,
 }
 
-static PY_TYPES: GILOnceCell<PythonTypes> = GILOnceCell::new();
+static PY_TYPES: PyOnceLock<PythonTypes> = PyOnceLock::new();
 
 /// Get the [`PythonTypes`] struct with some commonly use Python classes.
 ///
 /// # Panics
 ///
 /// Panics if the static has not been initialised (by a call to [`init_statics`]) yet.
-pub fn get_python_types(py: Python) -> &PythonTypes {
+pub fn get_python_types(py: Python<'_>) -> &PythonTypes {
     PY_TYPES.get(py).expect("static to be initialised")
 }
 
@@ -63,7 +63,7 @@ pub fn init_statics(py: Python) -> PyResult<()> {
 
 /// Convert a [`Date`] to a Python `datetime.date`.
 // pyo3 also provides this conversion but that uses the non-stable ABI
-pub fn date_to_py(py: Python, date: Date) -> PyResult<Bound<'_, PyAny>> {
+pub fn date_to_py(py: Python<'_>, date: Date) -> PyResult<Bound<'_, PyAny>> {
     get_python_types(py)
         .date
         .bind(py)
@@ -72,7 +72,7 @@ pub fn date_to_py(py: Python, date: Date) -> PyResult<Bound<'_, PyAny>> {
 
 /// Convert a [`rust_decimal::Decimal`] to a Python decimal.Decimal.
 // pyo3 also has this conversion but does a string conversion
-pub fn decimal_to_py(py: Python, decimal: Decimal) -> PyResult<Bound<'_, PyAny>> {
+pub fn decimal_to_py(py: Python<'_>, decimal: Decimal) -> PyResult<Bound<'_, PyAny>> {
     let (sign, digits, scale) = {
         let mut num = decimal.mantissa().abs();
         let mut digits: Vec<u8> = Vec::with_capacity(28);
@@ -119,8 +119,8 @@ mod tests {
             assert_eq!(dec.unwrap().to_string(), num);
         }
 
-        pyo3::prepare_freethreaded_python();
-        Python::with_gil(|py| -> PyResult<()> {
+        Python::initialize();
+        Python::attach(|py| -> PyResult<()> {
             init_statics(py).unwrap();
 
             roundtrip(py, "1.00");

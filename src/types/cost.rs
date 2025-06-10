@@ -43,9 +43,11 @@ impl<'py> IntoPyObject<'py> for &CostLabel {
     }
 }
 
-impl<'source> FromPyObject<'source> for CostLabel {
-    fn extract_bound(ob: &Bound<'source, PyAny>) -> PyResult<Self> {
-        let str = ob.extract::<PyBackedStr>()?;
+impl<'py> FromPyObject<'_, 'py> for CostLabel {
+    type Error = PyErr;
+
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        let str = obj.extract::<PyBackedStr>()?;
         Ok((&*str).into())
     }
 }
@@ -123,7 +125,7 @@ impl Cost {
 
 /// Convert from a Python object which has the correct attributes.
 pub fn cost_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Cost> {
-    if let Ok(a) = ob.downcast::<Cost>() {
+    if let Ok(a) = ob.cast::<Cost>() {
         Ok(a.get().clone())
     } else {
         let py = ob.py();

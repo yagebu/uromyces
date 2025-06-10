@@ -30,9 +30,9 @@ if TYPE_CHECKING:
 
 def test_amount() -> None:
     amt = Amount(Decimal("10.00"), "USD")
-    amt2 = Amount(Decimal("10"), "USD")
+    amt2 = Amount(Decimal(10), "USD")
     assert amt == amt2
-    assert amt != Amount(Decimal("11"), "USD")
+    assert amt != Amount(Decimal(11), "USD")
     assert hash(amt) == hash(amt2)
 
 
@@ -45,7 +45,7 @@ def test_cost() -> None:
 
 
 def test_equals() -> None:
-    assert Amount(Decimal("10.00"), "USD") == Amount(Decimal("10"), "USD")
+    assert Amount(Decimal("10.00"), "USD") == Amount(Decimal(10), "USD")
     header = EntryHeader(
         {"filename": "asdf", "lineno": 0},
         date(2022, 12, 12),
@@ -59,7 +59,7 @@ def test_equals() -> None:
     ) == Balance(
         header,
         "Assets:Cash",
-        Amount(Decimal("10"), "USD"),
+        Amount(Decimal(10), "USD"),
         None,
     )
 
@@ -108,7 +108,7 @@ HEADER = EntryHeader(
 @pytest.mark.parametrize(
     "entry",
     [
-        Balance(HEADER, "A:C", Amount(Decimal("1"), "USD"), None),
+        Balance(HEADER, "A:C", Amount(Decimal(1), "USD"), None),
         Close(HEADER, "A:C"),
         Commodity(HEADER, "USD"),
         Custom(HEADER, "custom-type", []),
@@ -117,7 +117,7 @@ HEADER = EntryHeader(
         Note(HEADER, "A:C", "account note"),
         Open(HEADER, "A:C", ["USD"], None),
         Pad(HEADER, "A:C", "A:Source"),
-        Price(HEADER, "A:C", Amount(Decimal("1"), "USD")),
+        Price(HEADER, "A:C", Amount(Decimal(1), "USD")),
         Query(HEADER, "name", "query"),
         Transaction(HEADER, "*", "payee", "narration", []),
     ],
