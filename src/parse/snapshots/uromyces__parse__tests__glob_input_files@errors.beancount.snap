@@ -2,7 +2,6 @@
 source: src/parse/tests.rs
 expression: "super::parse_string(&input, &None)"
 input_file: src/parse/test_inputs/errors.beancount
-snapshot_kind: text
 ---
 {
   "entries": [
@@ -66,7 +65,7 @@ snapshot_kind: text
     {
       "filename": null,
       "line": 6,
-      "message": "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (unary_num_expr (number)) currency: (currency)))) (MISSING \"_skipped_lines_token3\"))"
+      "message": "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (unary_num_expr (number)) currency: (currency)))) (ERROR (currency) (currency)))"
     }
   ],
   "directives": []

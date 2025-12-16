@@ -274,7 +274,7 @@ impl TryFromNode for RawPosting {
         };
         Ok(Self {
             filename: s.filename.cloned(),
-            line: node.line_number() + 1,
+            line: node.line_number(),
             meta: node
                 .child_by_field_id(node_fields::METADATA)
                 .map(|n| Meta::try_from_node(n, s))

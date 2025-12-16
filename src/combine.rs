@@ -46,7 +46,7 @@ fn load_single_beancount_file(path: &FilePath) -> Result<ParsedFile, UroError> {
     let string = fs::read_to_string(path).map_err(|io_error| {
         UroError::new(format!("Could not read file due to IO error: {io_error}"))
             .with_filename(path)
-    })? + "\n";
+    })?;
     let mut t = SimpleTimer::new();
     let result = parse::parse_string(&string, &Some(path.clone()));
     t.log_elapsed(&format!("{path}: parsing"));

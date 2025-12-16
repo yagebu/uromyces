@@ -42,6 +42,7 @@ fn main() {
     println!("cargo:rerun-if-changed=src/parse/node_fields.rs");
     println!("cargo:rerun-if-changed=src/parse/node_ids.rs");
     println!("cargo:rerun-if-changed=tree-sitter-beancount/parser.c");
+    println!("cargo:rerun-if-changed=tree-sitter-beancount/scanner.c");
 
     // Update the constants for all node fields.
     let node_fields: PathBuf = ["src", "parse", "node_fields.rs"].iter().collect();
@@ -52,12 +53,13 @@ fn main() {
 
     let dir: PathBuf = ["tree-sitter-beancount"].iter().collect();
     let parser = &dir.join("parser.c");
+    let scanner = &dir.join("scanner.c");
 
     cc::Build::new()
         .include(&dir)
         .file(parser)
-        // Enable C99 mode - required for tree-sitter, does not seem to be default in
-        // e.g. the aarch64 maturin CI build
-        .flag("-std=c99")
+        .file(scanner)
+        // Enable C11 mode - for tree-sitter
+        .flag("-std=c11")
         .compile("tree-sitter-beancount");
 }

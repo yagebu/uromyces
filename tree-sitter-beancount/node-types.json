@@ -1,5 +1,27 @@
 [
   {
+    "type": "num_expr",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "binary_num_expr",
+        "named": true
+      },
+      {
+        "type": "number",
+        "named": true
+      },
+      {
+        "type": "paren_num_expr",
+        "named": true
+      },
+      {
+        "type": "unary_num_expr",
+        "named": true
+      }
+    ]
+  },
+  {
     "type": "amount",
     "named": true,
     "fields": {
@@ -18,19 +40,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_num_expr",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "paren_num_expr",
-            "named": true
-          },
-          {
-            "type": "unary_num_expr",
+            "type": "num_expr",
             "named": true
           }
         ]
@@ -56,19 +66,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_num_expr",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "paren_num_expr",
-            "named": true
-          },
-          {
-            "type": "unary_num_expr",
+            "type": "num_expr",
             "named": true
           }
         ]
@@ -78,19 +76,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_num_expr",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "paren_num_expr",
-            "named": true
-          },
-          {
-            "type": "unary_num_expr",
+            "type": "num_expr",
             "named": true
           }
         ]
@@ -244,19 +230,7 @@
       "required": true,
       "types": [
         {
-          "type": "binary_num_expr",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "paren_num_expr",
-          "named": true
-        },
-        {
-          "type": "unary_num_expr",
+          "type": "num_expr",
           "named": true
         }
       ]
@@ -353,19 +327,7 @@
         "required": false,
         "types": [
           {
-            "type": "binary_num_expr",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "paren_num_expr",
-            "named": true
-          },
-          {
-            "type": "unary_num_expr",
+            "type": "num_expr",
             "named": true
           }
         ]
@@ -375,19 +337,7 @@
         "required": false,
         "types": [
           {
-            "type": "binary_num_expr",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "paren_num_expr",
-            "named": true
-          },
-          {
-            "type": "unary_num_expr",
+            "type": "num_expr",
             "named": true
           }
         ]
@@ -529,10 +479,6 @@
           "named": true
         },
         {
-          "type": "binary_num_expr",
-          "named": true
-        },
-        {
           "type": "bool",
           "named": true
         },
@@ -541,19 +487,11 @@
           "named": true
         },
         {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "paren_num_expr",
+          "type": "num_expr",
           "named": true
         },
         {
           "type": "string",
-          "named": true
-        },
-        {
-          "type": "unary_num_expr",
           "named": true
         }
       ]
@@ -662,11 +600,6 @@
     }
   },
   {
-    "type": "flag",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "include",
     "named": true,
     "fields": {},
@@ -700,19 +633,7 @@
         "required": false,
         "types": [
           {
-            "type": "binary_num_expr",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "paren_num_expr",
-            "named": true
-          },
-          {
-            "type": "unary_num_expr",
+            "type": "num_expr",
             "named": true
           }
         ]
@@ -746,10 +667,6 @@
             "named": true
           },
           {
-            "type": "binary_num_expr",
-            "named": true
-          },
-          {
             "type": "bool",
             "named": true
           },
@@ -762,11 +679,7 @@
             "named": true
           },
           {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "paren_num_expr",
+            "type": "num_expr",
             "named": true
           },
           {
@@ -775,10 +688,6 @@
           },
           {
             "type": "tag",
-            "named": true
-          },
-          {
-            "type": "unary_num_expr",
             "named": true
           }
         ]
@@ -983,19 +892,7 @@
       "required": true,
       "types": [
         {
-          "type": "binary_num_expr",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "paren_num_expr",
-          "named": true
-        },
-        {
-          "type": "unary_num_expr",
+          "type": "num_expr",
           "named": true
         }
       ]
@@ -1490,19 +1387,7 @@
       "required": true,
       "types": [
         {
-          "type": "binary_num_expr",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "paren_num_expr",
-          "named": true
-        },
-        {
-          "type": "unary_num_expr",
+          "type": "num_expr",
           "named": true
         }
       ]
@@ -1538,10 +1423,6 @@
   },
   {
     "type": "/",
-    "named": false
-  },
-  {
-    "type": ":",
     "named": false
   },
   {
@@ -1638,6 +1519,10 @@
   },
   {
     "type": "date",
+    "named": true
+  },
+  {
+    "type": "flag",
     "named": true
   },
   {
