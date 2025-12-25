@@ -57,7 +57,7 @@ impl<'source> ConversionState<'source> {
 
     /// Get the single char of a flag node.
     fn get_flag(&self, node: Node) -> Flag {
-        Flag::try_from(&self.string[node.start_byte()..node.end_byte()]).unwrap_or_default()
+        Flag::try_from(self.string.as_bytes()[node.start_byte()]).unwrap_or_default()
     }
 
     /// Get the contents of a string-like node.
