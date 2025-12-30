@@ -11,7 +11,7 @@ use self::errors::ConversionErrorKind::SyntaxError;
 use self::errors::{ConversionError, ParsingError};
 use crate::errors::UroError;
 use crate::types::{
-    Balance, Close, Commodity, Custom, Document, Event, FilePath, LineNumber, MetaKeyValuePair,
+    Balance, Close, Commodity, Custom, Document, Event, Filename, LineNumber, MetaKeyValuePair,
     Note, Open, Pad, Price, Query, RawDirective, RawEntry, RawTransaction,
 };
 
@@ -130,15 +130,12 @@ impl NodeGetters for Node<'_> {
 /// Parse a string to Beancount entries.
 #[must_use]
 #[allow(clippy::module_name_repetitions)]
-pub fn parse_string(s: &str, filename: &Option<FilePath>) -> ParsedFile {
-    match string_to_tree(s) {
+pub fn parse_string(string: &str, filename: &Filename) -> ParsedFile {
+    match string_to_tree(string) {
         Ok(tree) => convert_syntax_tree(&tree, filename),
         Err(err) => {
             let e = UroError::new(format!("Parsing file failed with an error: {err}"));
-            ParsedFile::from_error(match filename {
-                Some(p) => e.with_filename(p),
-                None => e,
-            })
+            ParsedFile::from_error(e.with_filename(filename.clone()))
         }
     }
 }
@@ -149,8 +146,8 @@ pub fn parse_string(s: &str, filename: &Option<FilePath>) -> ParsedFile {
 /// can be combined in a subsequent step to obtain a single list of entries ready for booking.
 #[must_use]
 #[allow(clippy::too_many_lines)]
-pub fn convert_syntax_tree(parsed_tree: &ParsedTree, filename: &Option<FilePath>) -> ParsedFile {
-    let state = &mut ConversionState::new(parsed_tree.string, filename.as_ref());
+pub fn convert_syntax_tree(parsed_tree: &ParsedTree, filename: &Filename) -> ParsedFile {
+    let state = &mut ConversionState::new(parsed_tree.string, filename);
     // this is the cursor we use to iterate over all entries.
     let root_node = parsed_tree.tree.root_node();
     let mut result = ParsedFile::with_entries_capacity(root_node.child_count());

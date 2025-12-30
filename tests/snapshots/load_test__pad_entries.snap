@@ -53,8 +53,8 @@ expression: ledger
       "narration": "(Padding inserted for Balance of 987.34 USD for difference 987.34 USD)",
       "postings": [
         {
-          "filename": null,
-          "line": 0,
+          "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
+          "line": null,
           "meta": [],
           "account": "Assets:US:BofA:Checking",
           "units": {
@@ -66,8 +66,8 @@ expression: ledger
           "flag": null
         },
         {
-          "filename": null,
-          "line": 0,
+          "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
+          "line": null,
           "meta": [],
           "account": "Equity:Opening-Balances",
           "units": {

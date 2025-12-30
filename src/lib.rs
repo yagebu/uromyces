@@ -10,8 +10,6 @@
 // Warns on Deserialize on pyo3 structs which should be fine.
 #![allow(clippy::unsafe_derive_deserialize)]
 
-use std::path::Path;
-
 use options::BeancountOptions;
 use pyo3::prelude::*;
 
@@ -33,14 +31,22 @@ mod tolerances;
 pub mod types;
 mod util;
 
-pub use combine::load;
+pub use combine::{load, load_string};
 pub use ledgers::Ledger;
 use py_bindings::init_statics;
 
+use crate::types::{AbsoluteUTF8Path, Filename};
+
 /// [pyfunction] Load the Beancount ledger at the given file path.
-#[pyfunction]
-fn load_file(filename: &str) -> PyResult<Ledger> {
-    Ok(load(&Path::new(filename).try_into()?))
+#[pyfunction(name = "load_file")]
+fn py_load_file(filename: AbsoluteUTF8Path) -> Ledger {
+    load(filename)
+}
+
+/// [pyfunction] Load a Beancount ledger from the given string.
+#[pyfunction(name = "load_string")]
+fn py_load_string(string: &str, filename: Filename) -> Ledger {
+    load_string(string, filename)
 }
 
 /// [pyfunction] Clamp the entries to the given interval.
@@ -68,7 +74,8 @@ fn uromyces(py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Ensure that some basic types can be imported.
     init_statics(py)?;
 
-    m.add_function(wrap_pyfunction!(load_file, m)?)?;
+    m.add_function(wrap_pyfunction!(py_load_file, m)?)?;
+    m.add_function(wrap_pyfunction!(py_load_string, m)?)?;
     m.add_function(wrap_pyfunction!(summarize_clamp, m)?)?;
 
     // Base types

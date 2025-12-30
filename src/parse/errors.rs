@@ -1,5 +1,5 @@
 use crate::errors::UroError;
-use crate::types::{FilePath, LineNumber};
+use crate::types::{Filename, LineNumber};
 
 use super::NodeGetters;
 use super::convert::ConversionState;
@@ -25,7 +25,7 @@ impl std::fmt::Display for ParsingError {
 /// An error that occurs on converting a tree-sitter tree to Rust data structures.
 #[derive(Debug)]
 pub struct ConversionError {
-    filename: Option<FilePath>,
+    filename: Filename,
     line: LineNumber,
     kind: ConversionErrorKind,
 }
@@ -37,7 +37,7 @@ impl ConversionError {
         s: &ConversionState,
     ) -> Self {
         Self {
-            filename: s.filename.cloned(),
+            filename: s.filename.clone(),
             line: node.line_number(),
             kind,
         }
@@ -81,6 +81,6 @@ impl std::fmt::Display for ConversionError {
 
 impl From<ConversionError> for UroError {
     fn from(e: ConversionError) -> Self {
-        Self::new(e.to_string()).with_position(e.filename.as_ref(), e.line)
+        Self::new(e.to_string()).with_position(e.filename.clone(), e.line)
     }
 }

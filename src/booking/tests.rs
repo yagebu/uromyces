@@ -6,7 +6,7 @@ use crate::ledgers::RawLedger;
 use crate::parse::parse_string;
 use crate::test_utils;
 use crate::types::{
-    Account, Entry, FilePath, MIN_DATE, Posting, RawEntry, RawPosting, RawTransaction,
+    AbsoluteUTF8Path, Account, Entry, MIN_DATE, Posting, RawEntry, RawPosting, RawTransaction,
 };
 
 use super::book_entries;
@@ -56,10 +56,10 @@ fn compare_postings(expected: &[RawPosting], booked: &[Posting]) {
 fn run_booking_test(path: &Path) {
     let mut snapshot = test_utils::BeancountSnapshot::load(path);
 
-    let filename: FilePath = path.try_into().unwrap();
+    let filename: AbsoluteUTF8Path = path.try_into().unwrap();
     let raw_ledger = RawLedger::from_single_parsed_file(
-        filename.clone(),
-        parse_string(snapshot.input(), &Some(filename)),
+        filename.clone().into(),
+        parse_string(snapshot.input(), &filename.clone().into()),
     );
     let booking_method = snapshot
         .title()

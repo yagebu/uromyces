@@ -1,6 +1,6 @@
 ---
 source: src/parse/tests.rs
-expression: "super::parse_string(&input, &None)"
+expression: "super::parse_string(&input, &dummy_filename.clone())"
 input_file: src/parse/test_inputs/directives.beancount
 ---
 {
@@ -9,7 +9,7 @@ input_file: src/parse/test_inputs/directives.beancount
   "directives": [
     {
       "Option": {
-        "filename": null,
+        "filename": "<string>",
         "line": 1,
         "key": "name",
         "value": "file name"
@@ -17,7 +17,7 @@ input_file: src/parse/test_inputs/directives.beancount
     },
     {
       "Option": {
-        "filename": null,
+        "filename": "<string>",
         "line": 3,
         "key": "name_assets",
         "value": "AssetsRootAccount"

@@ -22,10 +22,10 @@ use super::errors::ConversionErrorKind::{
 use super::node_fields;
 use super::node_ids;
 use crate::types::{
-    Account, Amount, Balance, Booking, BoxStr, Close, Commodity, CostLabel, CostSpec, Currency,
-    Custom, CustomValue, Date, Decimal, Document, EntryHeader, Event, FilePath, Flag,
-    IncompleteAmount, Meta, MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query, RawPosting,
-    RawTransaction, TagsLinks,
+    AbsoluteUTF8Path, Account, Amount, Balance, Booking, BoxStr, Close, Commodity, CostLabel,
+    CostSpec, Currency, Custom, CustomValue, Date, Decimal, Document, EntryHeader, Event, Filename,
+    Flag, IncompleteAmount, Meta, MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query,
+    RawPosting, RawTransaction, TagsLinks,
 };
 
 /// The state that all conversion node handlers have access to.
@@ -33,7 +33,7 @@ pub(super) struct ConversionState<'source> {
     /// The source string.
     pub string: &'source str,
     /// The filename of the file being parsed.
-    pub filename: Option<&'source FilePath>,
+    pub filename: &'source Filename,
     /// The currently pushed metadata.
     pub pushed_meta: Meta,
     /// The currently pushed tags.
@@ -41,7 +41,7 @@ pub(super) struct ConversionState<'source> {
 }
 
 impl<'source> ConversionState<'source> {
-    pub fn new(string: &'source str, filename: Option<&'source FilePath>) -> Self {
+    pub fn new(string: &'source str, filename: &'source Filename) -> Self {
         Self {
             string,
             filename,
@@ -273,7 +273,7 @@ impl TryFromNode for RawPosting {
             None
         };
         Ok(Self {
-            filename: s.filename.cloned(),
+            filename: s.filename.clone(),
             line: node.line_number(),
             meta: node
                 .child_by_field_id(node_fields::METADATA)
@@ -388,7 +388,7 @@ impl TryFromNode for EntryHeader {
                 .unwrap_or_default(),
             tags,
             links,
-            filename: s.filename.cloned(),
+            filename: s.filename.clone(),
             line: node.line_number(),
         })
     }
@@ -449,9 +449,10 @@ impl TryFromNode for Document {
         Ok(Self {
             header: EntryHeader::try_from_node(node, s)?,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
-            filename: std::convert::TryInto::<FilePath>::try_into(raw_path.as_str()).map_err(
-                |e| ConversionError::new(InvalidDocumentFilename(e.to_string()), &node, s),
-            )?,
+            filename: std::convert::TryInto::<AbsoluteUTF8Path>::try_into(raw_path.as_str())
+                .map_err(|e| {
+                    ConversionError::new(InvalidDocumentFilename(e.to_string()), &node, s)
+                })?,
         })
     }
 }

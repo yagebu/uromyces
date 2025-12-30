@@ -2,7 +2,7 @@
 
 use crate::errors::UroError;
 use crate::ledgers::Ledger;
-use crate::types::{Account, Date, Document, Entry, EntryHeader, FilePath};
+use crate::types::{AbsoluteUTF8Path, Account, Date, Document, Entry, EntryHeader};
 
 /// Get a sorted list of all open accounts in the ledger.
 fn get_all_open_accounts(ledger: &Ledger) -> Vec<&Account> {
@@ -25,11 +25,11 @@ fn get_all_open_accounts(ledger: &Ledger) -> Vec<&Account> {
     all_accounts
 }
 
-struct DocumentsDirectoryReadError<'a>(&'a Ledger, &'a FilePath);
+struct DocumentsDirectoryReadError<'a>(&'a Ledger, &'a AbsoluteUTF8Path);
 impl From<DocumentsDirectoryReadError<'_>> for UroError {
-    fn from(val: DocumentsDirectoryReadError) -> Self {
-        UroError::new(format!("Could not read documents directory: '{}'", val.1))
-            .with_filename(&val.0.filename)
+    fn from(value: DocumentsDirectoryReadError) -> Self {
+        UroError::new(format!("Could not read documents directory: '{}'", value.1))
+            .with_filename(value.0.filename.clone())
     }
 }
 
@@ -39,6 +39,9 @@ pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
     if document_paths.is_empty() {
         return (Vec::new(), Vec::new());
     }
+    let Ok(base_path): Result<AbsoluteUTF8Path, _> = ledger.filename.clone().try_into() else {
+        return (Vec::new(), Vec::new());
+    };
 
     let mut new_documents = Vec::new();
     let mut new_errors = Vec::new();
@@ -46,7 +49,7 @@ pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
     let all_accounts = get_all_open_accounts(ledger);
 
     for document_path in document_paths {
-        let documents_dir = ledger.filename.join_relative_to_file(document_path);
+        let documents_dir = base_path.join_relative_to_file(document_path);
         if !documents_dir.as_ref().is_dir() {
             new_errors.push(DocumentsDirectoryReadError(ledger, &documents_dir).into());
             continue;
@@ -85,7 +88,7 @@ pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
             new_documents.extend(&mut account_files.iter().filter_map(|file_name| {
                 if let Ok(date) = Date::try_from_str(file_name) {
                     Some(Document {
-                        header: EntryHeader::new(date, Some(ledger.filename.clone()), 0),
+                        header: EntryHeader::new(date, ledger.filename.clone(), 0),
                         account: (*account).clone(),
                         filename: account_dir.join(file_name),
                     })

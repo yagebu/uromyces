@@ -40,7 +40,8 @@
 //! - [`Currency`] - a currency name
 //! - [`Date`] - a simple date
 //! - [`Decimal`] - all numbers that represent some financial value.
-//! - [`FilePath`] - a file path - ensured to be absolute and valid unicode
+//! - [`Filename`] - a file path - ensured to be absolute and valid unicode
+//!   (or a dummy like `<summarize>`)
 //! - [`Flag`] - an enumeration of the possible transaction or posting flags
 //!
 //! ## Base composite data types
@@ -76,7 +77,7 @@ pub use currency::Currency;
 pub use date::{Date, MIN_DATE};
 pub use flag::Flag;
 pub use metadata::{EntryHeader, Meta, MetaKeyValuePair, MetaValue};
-pub use paths::FilePath;
+pub use paths::{AbsoluteUTF8Path, Filename};
 pub use tags_links::TagsLinks;
 
 use crate::py_bindings::{decimal_to_py, get_python_types, py_to_decimal};
@@ -93,7 +94,7 @@ pub type Narration = BoxStr;
 pub enum RawDirective {
     /// A raw Beancount option.
     Option {
-        filename: Option<FilePath>,
+        filename: Filename,
         line: LineNumber,
         key: String,
         value: String,
@@ -201,7 +202,7 @@ pub struct Document {
     #[pyo3(get)]
     pub account: Account,
     #[pyo3(get)]
-    pub filename: FilePath,
+    pub filename: AbsoluteUTF8Path,
 }
 
 /// An event for an account.
@@ -273,7 +274,7 @@ pub struct Price {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RawPosting {
     /// The filename.
-    pub filename: Option<FilePath>,
+    pub filename: Filename,
     /// The 1-based line number.
     pub line: LineNumber,
     pub meta: Meta,
@@ -294,8 +295,8 @@ impl RawPosting {
         cost: Option<Cost>,
     ) -> Posting {
         Posting {
-            filename: self.filename,
-            line: self.line,
+            filename: Some(self.filename),
+            line: Some(self.line),
             meta: self.meta,
             account: self.account,
             flag: self.flag,
@@ -311,9 +312,9 @@ impl RawPosting {
 #[pyclass(frozen, module = "uromyces")]
 pub struct Posting {
     /// The filename.
-    pub filename: Option<FilePath>,
+    pub filename: Option<Filename>,
     /// The 1-based line number.
-    pub line: LineNumber,
+    pub line: Option<LineNumber>,
     /// Metadata for the posting.
     pub meta: Meta,
 
@@ -348,7 +349,7 @@ impl Posting {
     ) -> PyResult<Self> {
         let (filename, line, meta) = match meta {
             Some(meta) => metadata::extract_meta_dict(meta)?,
-            None => (None, 0, Meta::default()),
+            None => (None, None, Meta::default()),
         };
         Ok(Self {
             filename,
@@ -363,7 +364,7 @@ impl Posting {
     }
     #[getter]
     fn meta<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
-        self.meta.to_py_dict(py, &self.filename, self.line)
+        self.meta.to_py_dict(py, self.filename.as_ref(), self.line)
     }
     fn __eq__(&self, other: &Self) -> bool {
         self == other
@@ -376,11 +377,11 @@ impl Posting {
 impl Posting {
     /// Create a posting for an account with just some units.
     #[must_use]
-    pub(crate) fn new_simple(account: Account, units: Amount) -> Self {
+    pub(crate) fn new_simple(filename: Filename, account: Account, units: Amount) -> Self {
         Self {
             flag: None,
-            filename: None,
-            line: 0,
+            filename: Some(filename),
+            line: None,
             account,
             units,
             cost: None,
@@ -391,11 +392,16 @@ impl Posting {
 
     /// Create a posting for an account with just units and possibly a cost.
     #[must_use]
-    pub(crate) fn new_with_cost(account: Account, units: Amount, cost: Option<Cost>) -> Self {
+    pub(crate) fn new_with_cost(
+        filename: Filename,
+        account: Account,
+        units: Amount,
+        cost: Option<Cost>,
+    ) -> Self {
         Self {
             flag: None,
-            filename: None,
-            line: 0,
+            filename: Some(filename),
+            line: None,
             account,
             units,
             cost,
@@ -635,7 +641,7 @@ impl Custom {
 #[pymethods]
 impl Document {
     #[new]
-    fn __new__(header: EntryHeader, account: Account, filename: FilePath) -> Self {
+    fn __new__(header: EntryHeader, account: Account, filename: AbsoluteUTF8Path) -> Self {
         Self {
             header,
             account,
@@ -651,7 +657,7 @@ impl Document {
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         account: Option<Account>,
-        filename: Option<FilePath>,
+        filename: Option<AbsoluteUTF8Path>,
     ) -> PyResult<Self> {
         Ok(Self {
             header: self
@@ -923,6 +929,9 @@ macro_rules! pymethods_for_entry {
             #[getter]
             fn meta<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
                 self.header.to_py_dict(py)
+            }
+            fn __repr__(&self) -> String {
+                format!("<{:?}>", self)
             }
             fn __eq__(&self, other: &Self) -> bool {
                 self == other

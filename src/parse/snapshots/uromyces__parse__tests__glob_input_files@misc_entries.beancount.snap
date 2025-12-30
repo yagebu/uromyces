@@ -1,8 +1,7 @@
 ---
 source: src/parse/tests.rs
-expression: "super::parse_string(&input, &None)"
+expression: "super::parse_string(&input, &dummy_filename.clone())"
 input_file: src/parse/test_inputs/misc_entries.beancount
-snapshot_kind: text
 ---
 {
   "entries": [
@@ -12,7 +11,7 @@ snapshot_kind: text
         "meta": [],
         "tags": [],
         "links": [],
-        "filename": null,
+        "filename": "<string>",
         "line": 1,
         "account": "Assets:Cash",
         "currencies": [
@@ -34,7 +33,7 @@ snapshot_kind: text
         ],
         "tags": [],
         "links": [],
-        "filename": null,
+        "filename": "<string>",
         "line": 2,
         "account": "Equity:OpeningBalances",
         "currencies": [
@@ -56,7 +55,7 @@ snapshot_kind: text
         ],
         "tags": [],
         "links": [],
-        "filename": null,
+        "filename": "<string>",
         "line": 5,
         "account": "Assets:Cash",
         "source_account": "Equity:OpeningBalances"
@@ -68,7 +67,7 @@ snapshot_kind: text
         "meta": [],
         "tags": [],
         "links": [],
-        "filename": null,
+        "filename": "<string>",
         "line": 8,
         "account": "Assets:Cash",
         "amount": {
@@ -84,7 +83,7 @@ snapshot_kind: text
         "meta": [],
         "tags": [],
         "links": [],
-        "filename": null,
+        "filename": "<string>",
         "line": 10,
         "name": "query all entries",
         "query_string": "journal"
@@ -96,7 +95,7 @@ snapshot_kind: text
         "meta": [],
         "tags": [],
         "links": [],
-        "filename": null,
+        "filename": "<string>",
         "line": 12,
         "type": "string",
         "values": [
@@ -127,7 +126,7 @@ snapshot_kind: text
         "meta": [],
         "tags": [],
         "links": [],
-        "filename": null,
+        "filename": "<string>",
         "line": 14,
         "account": "Assets:Cash",
         "comment": "string with escape\""

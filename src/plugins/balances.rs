@@ -143,14 +143,12 @@ pub fn check_balance_assertions(ledger: &Ledger) -> Vec<UroError> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{booking, ledgers::RawLedger, parse};
+    use crate::{load_string, types::Filename};
 
     use super::*;
 
     fn check(s: &str) -> Vec<String> {
-        let res = parse::parse_string(s, &None);
-        let raw_ledger = RawLedger::from_single_parsed_file("/test/path".try_into().unwrap(), res);
-        let (ledger, _) = booking::book_entries(raw_ledger);
+        let ledger = load_string(s, Filename::new_dummy("string"));
         check_balance_assertions(&ledger)
             .into_iter()
             .map(|e| e.message().into())

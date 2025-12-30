@@ -85,7 +85,7 @@ def run(ledger: Ledger) -> Ledger:  # noqa: C901
         plugin_errors.extend(errors)
         for func in mod_plugins:
             sig = signature(func)
-            conf_arg = () if len(sig.parameters) == 2 else (plugin.config,)  # noqa: PLR2004
+            conf_arg = () if len(sig.parameters) == 2 else (plugin.config,)
             try:
                 entries, new_errors = func(
                     entries,

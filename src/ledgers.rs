@@ -7,13 +7,13 @@ use crate::options::BeancountOptions;
 #[cfg(test)]
 use crate::parse::ParsedFile;
 use crate::plugins::{run_named_plugin, run_validations};
-use crate::types::{Entry, FilePath, Plugin, RawEntry};
+use crate::types::{Entry, Filename, Plugin, RawEntry};
 
 /// The result of parsing a Beancount file and all its includes.
 #[derive(Debug, Clone)]
 pub struct RawLedger {
     /// The main filename.
-    pub filename: FilePath,
+    pub filename: Filename,
     /// The (raw) sorted entries of the ledger.
     pub entries: Vec<RawEntry>,
     /// Errors encountered on converting the parse tree to a `ParseResult`.
@@ -21,7 +21,7 @@ pub struct RawLedger {
     /// The options in the file.
     pub options: BeancountOptions,
     /// Included file paths.
-    pub includes: Vec<FilePath>,
+    pub includes: Vec<Filename>,
     /// Plugins (with optional config)
     pub plugins: Vec<Plugin>,
 }
@@ -29,8 +29,8 @@ pub struct RawLedger {
 impl RawLedger {
     /// New raw ledger for a given file, with the given includes and the expected entry count.
     pub(crate) fn from_filename_and_includes(
-        filename: FilePath,
-        includes: Vec<FilePath>,
+        filename: Filename,
+        includes: Vec<Filename>,
         entry_count: usize,
     ) -> Self {
         Self {
@@ -44,7 +44,7 @@ impl RawLedger {
     }
 
     #[cfg(test)]
-    pub(crate) fn from_single_parsed_file(filename: FilePath, parsed_file: ParsedFile) -> Self {
+    pub(crate) fn from_single_parsed_file(filename: Filename, parsed_file: ParsedFile) -> Self {
         Self {
             filename,
             entries: parsed_file.entries,
@@ -62,7 +62,7 @@ impl RawLedger {
 pub struct Ledger {
     /// The main filename.
     #[pyo3(get)]
-    pub filename: FilePath,
+    pub filename: Filename,
     /// The entries of the ledger (sorted).
     #[pyo3(get)]
     pub entries: Vec<Entry>,
@@ -74,7 +74,7 @@ pub struct Ledger {
     pub options: BeancountOptions,
     /// Included file paths.
     #[pyo3(get)]
-    pub includes: Vec<FilePath>,
+    pub includes: Vec<Filename>,
     /// Plugins (with optional config)
     #[pyo3(get)]
     pub plugins: Vec<Plugin>,

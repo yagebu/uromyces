@@ -5,7 +5,7 @@ use std::{path::Path, str::FromStr};
 
 use regex::Regex;
 
-use crate::types::{Amount, Currency, Decimal, RawEntry, RawPosting};
+use crate::types::{Amount, Currency, Decimal, Filename, RawEntry, RawPosting};
 
 /// Detect CI
 fn is_ci() -> bool {
@@ -30,7 +30,7 @@ pub fn a(amt: &str) -> Amount {
 /// Create postings from a slice of string slices.
 pub fn postings_from_strings(postings: &[&str]) -> Vec<RawPosting> {
     let string = "2000-01-01 *\n ".to_owned() + &postings.join("\n ") + "\n";
-    let mut res = crate::parse::parse_string(&string, &None);
+    let mut res = crate::parse::parse_string(&string, &Filename::new_dummy("string"));
     assert_eq!(res.entries.len(), 1);
     let entry = res.entries.pop().unwrap();
     match entry {

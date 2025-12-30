@@ -43,6 +43,9 @@ line-length = 79
 [tool.mypy]
 strict = true
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 [tool.uv]
 python-preference = "system"
 
@@ -56,6 +59,7 @@ extend-select = [
 extend-ignore = [
     "COM812",      # Handled by formatter
     "ANN401",      # Allow typing.Any
+    "PLR2004",     # allow magic constants in comparisons
     "TD",          # Allow TODOs
 ]
 

@@ -10,7 +10,7 @@ use pyo3::pybacked::PyBackedStr;
 use pyo3::types::{PyDict, PyMapping};
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Entry, FilePath, LineNumber};
+use crate::types::{Entry, Filename, LineNumber};
 
 /// This is a user-surfaceable error.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -18,7 +18,7 @@ use crate::types::{Entry, FilePath, LineNumber};
 pub struct UroError {
     /// The file that this error occured in (if it can be attributed).
     #[pyo3(get)]
-    filename: Option<FilePath>,
+    filename: Option<Filename>,
     /// The line that this error occured on (if it can be attributed).
     #[pyo3(get)]
     line: Option<LineNumber>,
@@ -66,15 +66,15 @@ pub(crate) fn error_from_py(error: &Bound<'_, PyAny>) -> PyResult<UroError> {
         .get_item(pyo3::intern!(py, "filename"))
         .ok()
         .and_then(|v| -> Option<PyBackedStr> { v.extract().ok()? })
-        .and_then(|f| -> Option<FilePath> { (&*f).try_into().ok() });
+        .and_then(|f| -> Option<Filename> { (&*f).try_into().ok() });
     let lineno = source
         .get_item(pyo3::intern!(py, "lineno"))
         .ok()
         .and_then(|v| -> Option<LineNumber> { v.extract().ok()? });
-    let uro_error = match (&filename, lineno) {
-        (_, Some(l)) => UroError::new(msg).with_position(filename.as_ref(), l),
-        (Some(f), None) => UroError::new(msg).with_filename(f),
-        (None, None) => UroError::new(msg),
+    let uro_error = match (filename, lineno) {
+        (Some(f), Some(l)) => UroError::new(msg).with_position(f, l),
+        (Some(f), None) => UroError::new(msg).with_filename(f.clone()),
+        (None, Some(_) | None) => UroError::new(msg),
     };
     Ok(uro_error)
 }
@@ -98,15 +98,15 @@ impl UroError {
 
     /// Add a filename for the file that this error occurs in.
     #[must_use]
-    pub(crate) fn with_filename(mut self, filename: &FilePath) -> Self {
-        self.filename = Some(filename.clone());
+    pub(crate) fn with_filename(mut self, filename: Filename) -> Self {
+        self.filename = Some(filename);
         self
     }
 
     /// Add a position for the file and line that this error occurs in.
     #[must_use]
-    pub(crate) fn with_position(mut self, filename: Option<&FilePath>, line: LineNumber) -> Self {
-        self.filename = filename.cloned();
+    pub(crate) fn with_position(mut self, filename: Filename, line: LineNumber) -> Self {
+        self.filename = Some(filename);
         self.line = Some(line);
         self
     }
@@ -116,7 +116,7 @@ impl UroError {
     pub(crate) fn with_entry<E: Clone + Into<Entry>>(mut self, entry: &E) -> Self {
         let e: Entry = (*entry).clone().into();
         let header = e.get_header();
-        self.filename.clone_from(&header.filename);
+        self.filename = Some(header.filename.clone());
         self.line = Some(header.line);
         self
     }

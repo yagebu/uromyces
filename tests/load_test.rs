@@ -1,13 +1,22 @@
+use uromyces::types::AbsoluteUTF8Path;
+
 fn snap_ledger(snap_name: &str, filename: &str) {
-    let mut settings = insta::Settings::clone_current();
-    let current_dir = std::env::current_dir().expect("this test to obtain its working dir");
-    let cwd = current_dir
-        .to_str()
-        .expect("this test to run in a Unicode path");
-    settings.add_filter(cwd, "[REPO_DIR]");
-    settings.remove_input_file();
+    let current_dir = std::env::current_dir().expect("test to obtain its working dir");
+    let settings = {
+        let mut settings = insta::Settings::clone_current();
+        let cwd = current_dir
+            .to_str()
+            .expect("this test to run in a Unicode path");
+        settings.add_filter(cwd, "[REPO_DIR]");
+        settings.remove_input_file();
+        settings
+    };
     let path = current_dir.join("tests").join("ledgers").join(filename);
-    let mut ledger = uromyces::load(&path.try_into().expect("FilePath creation to work"));
+    let file_path: AbsoluteUTF8Path = path
+        .as_path()
+        .try_into()
+        .expect("FilePath creation to work");
+    let mut ledger = uromyces::load(file_path);
     ledger.run_validations();
     settings.bind(|| {
         insta::assert_json_snapshot!(snap_name, ledger);

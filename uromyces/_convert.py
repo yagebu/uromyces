@@ -29,21 +29,22 @@ from uromyces.uromyces import Query
 from uromyces.uromyces import Transaction
 
 if TYPE_CHECKING:
-    from typing import Any
+    from collections.abc import Sequence
 
-    from fava.beans import abc
     from fava.beans.types import BeancountOptions
 
     from uromyces import Entry
     from uromyces import Ledger
 
 
-def beancount_entries(entries: list[Entry]) -> list[Any]:
+def beancount_entries(
+    entries: Sequence[Entry | data.Directive],
+) -> list[data.Directive]:
     """Convert entries of the ledger to Beancount entries."""
     return list(map(uromyces_to_beancount, entries))
 
 
-def uromyces_entries(entries: list[Any]) -> list[Entry]:
+def uromyces_entries(entries: Sequence[Entry | data.Directive]) -> list[Entry]:
     """Convert Beancount entries to uromyces."""
     return list(map(beancount_to_uromyces, entries))
 
@@ -70,7 +71,7 @@ def convert_options(ledger: Ledger) -> BeancountOptions:
 
 
 @singledispatch
-def uromyces_to_beancount(_: Entry) -> Any:
+def uromyces_to_beancount(_: Entry) -> data.Directive:
     """Convert a uromyces Entry to a Beancount entry."""
     raise NotImplementedError
 
@@ -245,7 +246,7 @@ _UroEntryTypes = (
 
 
 @singledispatch
-def beancount_to_uromyces(entry: abc.Directive | data.Directive) -> Entry:
+def beancount_to_uromyces(entry: Entry | data.Directive) -> Entry:
     """Convert a Beancount Entry to a uromyces entry."""
     if isinstance(entry, _UroEntryTypes):
         return entry

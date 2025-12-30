@@ -19,6 +19,12 @@ const ONE_DAY: Days = Days::new(1);
 pub const MIN_DATE: Date = Date(NaiveDate::MIN);
 
 impl Date {
+    #[must_use]
+    /// Construct a date from year, month, and day.
+    pub fn from_ymd_opt(year: i32, month: u32, day: u32) -> Option<Self> {
+        NaiveDate::from_ymd_opt(year, month, day).map(Self)
+    }
+
     /// Try to parse a date from a string like "2012-12-12".
     pub(crate) fn try_from_str(s: &str) -> Result<Self, ()> {
         if s.len() < 10 {

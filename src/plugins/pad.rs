@@ -63,8 +63,16 @@ impl<'ledger> AccountPadder<'ledger> {
                     "(Padding inserted for Balance of {check_amount} for difference {diff_units})"
                 ),
                 vec![
-                    Posting::new_simple(pad.account.clone(), diff_units.clone()),
-                    Posting::new_simple(pad.source_account.clone(), -diff_units.clone()),
+                    Posting::new_simple(
+                        pad.header.filename.clone(),
+                        pad.account.clone(),
+                        diff_units.clone(),
+                    ),
+                    Posting::new_simple(
+                        pad.header.filename.clone(),
+                        pad.source_account.clone(),
+                        -diff_units.clone(),
+                    ),
                 ],
             );
             self.new_entries.push(Entry::Transaction(txn));

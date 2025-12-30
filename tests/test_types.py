@@ -47,7 +47,7 @@ def test_cost() -> None:
 def test_equals() -> None:
     assert Amount(Decimal("10.00"), "USD") == Amount(Decimal(10), "USD")
     header = EntryHeader(
-        {"filename": "asdf", "lineno": 0},
+        {"filename": "<string>", "lineno": 0},
         date(2022, 12, 12),
         {"asdf"},
     )
@@ -66,7 +66,7 @@ def test_equals() -> None:
 
 def test_balance() -> None:
     header = EntryHeader(
-        {"filename": "asdf", "lineno": 0},
+        {"filename": "<string>", "lineno": 0},
         date(2022, 12, 12),
         {"asdf"},
     )
@@ -98,7 +98,7 @@ def test_balance() -> None:
 
 
 HEADER = EntryHeader(
-    {"filename": "asdf", "lineno": 0},
+    {"filename": "<string>", "lineno": 0},
     date(2022, 12, 12),
     {"a-tag"},
     {"a-link"},
@@ -137,7 +137,7 @@ def test_entry_types(entry: Entry) -> None:
 
 def test_document() -> None:
     header = EntryHeader(
-        {"filename": "asdf", "lineno": 0},
+        {"filename": "<string>", "lineno": 0},
         date(2022, 12, 12),
         {"asdf"},
     )
@@ -152,7 +152,7 @@ def test_document() -> None:
 
 def test_transaction() -> None:
     header = EntryHeader(
-        {"filename": "asdf", "lineno": 0},
+        {"filename": "<string>", "lineno": 0},
         date(2022, 12, 12),
         {"asdf"},
     )

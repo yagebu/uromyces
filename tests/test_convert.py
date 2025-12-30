@@ -25,15 +25,28 @@ def test_booking() -> None:
     assert Booking.STRICT.value == "STRICT"
 
 
+def test_entry_header() -> None:
+    date_ = date(2022, 12, 12)
+    with pytest.raises(ValueError, match="Missing filename"):
+        EntryHeader({}, date_, {"asdf"})
+    with pytest.raises(ValueError, match="Missing lineno"):
+        EntryHeader({"filename": "<string>"}, date_, {"asdf"})
+    with pytest.raises(ValueError, match="Invalid filename"):
+        EntryHeader({"filename": "not_a_path", "lineno": 0}, date_, {"asdf"})
+
+    EntryHeader({"filename": "<dummy>", "lineno": 0}, date_, {"asdf"})
+    EntryHeader({"filename": "/some/path", "lineno": 0}, date_, {"asdf"})
+
+
 def test_entry_header_constructor() -> None:
     header = EntryHeader(
-        {"filename": "asdf", "lineno": 0},
+        {"filename": "<string>", "lineno": 0},
         date(2022, 12, 12),
         {"asdf"},
     )
     assert header.tags == frozenset(("asdf",))
     # not an absolute path
-    assert header.filename is None
+    assert header.filename == "<string>"
     header = EntryHeader(
         {"filename": "/home", "lineno": 0, "key": "string"},
         date(2022, 12, 12),
@@ -43,7 +56,8 @@ def test_entry_header_constructor() -> None:
     assert header["filename"] == "/home"
     assert header["lineno"] == 0
     assert header["key"] == "string"
-    assert len(header) == 3  # noqa: PLR2004
+    assert "key" in header
+    assert len(header) == 3
     with pytest.raises(KeyError):
         header["asdf"]
 
@@ -55,7 +69,7 @@ def test_entry_header_constructor() -> None:
 
 
 def test_convert_beancount_to_uromyces() -> None:
-    meta = {"filename": "asdf", "lineno": 0}
+    meta = {"filename": "<string>", "lineno": 0}
     bal = data.Balance(
         meta,
         date(2022, 12, 12),

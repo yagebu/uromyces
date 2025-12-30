@@ -2,7 +2,7 @@ use std::path::{Component, Path};
 
 use glob;
 
-use crate::types::FilePath;
+use crate::types::AbsoluteUTF8Path;
 
 /// An error that might be encountered on reading a glob.
 #[derive(Debug)]
@@ -36,9 +36,9 @@ impl std::fmt::Display for GlobIncludeError {
 /// For the given include directive, find matching files.
 // TODO: consider restricting the allowed kinds of patterns.
 pub fn glob_include(
-    base_path: &FilePath,
+    base_path: &AbsoluteUTF8Path,
     include: &str,
-) -> Result<Vec<FilePath>, GlobIncludeError> {
+) -> Result<Vec<AbsoluteUTF8Path>, GlobIncludeError> {
     let has_root = matches!(
         Path::new(include).components().next(),
         Some(Component::Prefix(..) | Component::RootDir)
@@ -77,11 +77,15 @@ pub fn glob_include(
 mod tests {
     use super::*;
 
-    use crate::types::FilePath;
+    use crate::types::AbsoluteUTF8Path;
 
     #[test]
     fn test_invalid_glob() {
-        let path: FilePath = std::env::current_dir().unwrap().try_into().unwrap();
+        let path: AbsoluteUTF8Path = std::env::current_dir()
+            .unwrap()
+            .as_path()
+            .try_into()
+            .unwrap();
         let err = glob_include(&path, "****").unwrap_err();
         let GlobIncludeError::InvalidGlobPattern(msg) = err else {
             panic!();
@@ -92,7 +96,7 @@ mod tests {
     #[test]
     fn test_glob() {
         let src_lib = std::env::current_dir().unwrap().join("src/lib.rs");
-        let res = glob_include(&src_lib.try_into().unwrap(), "*.rs");
+        let res = glob_include(&src_lib.as_path().try_into().unwrap(), "*.rs");
         assert!(res.is_ok());
         assert!(res.unwrap().len() > 6);
     }

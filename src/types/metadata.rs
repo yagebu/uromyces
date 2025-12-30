@@ -1,13 +1,14 @@
 use pyo3::BoundObject;
-use pyo3::exceptions::PyKeyError;
-use pyo3::{prelude::*, pybacked::PyBackedStr, types::PyDict};
+use pyo3::exceptions::{PyKeyError, PyValueError};
+use pyo3::{prelude::*, types::PyDict};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use thin_vec::ThinVec;
 
 use crate::py_bindings::{decimal_to_py, py_to_decimal};
+use crate::types::Filename;
 
-use super::{Account, Amount, Currency, Date, FilePath, LineNumber, TagsLinks};
+use super::{Account, Amount, Currency, Date, LineNumber, TagsLinks};
 
 /// Possible metadata values (this is also used for custom entries).
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, FromPyObject)]
@@ -119,12 +120,16 @@ impl Meta {
     pub fn to_py_dict<'py>(
         &self,
         py: Python<'py>,
-        filename: &Option<FilePath>,
-        line: LineNumber,
+        filename: Option<&Filename>,
+        line: Option<LineNumber>,
     ) -> PyResult<Bound<'py, PyDict>> {
         let meta = PyDict::new(py);
-        meta.set_item(pyo3::intern!(py, "filename"), filename)?;
-        meta.set_item(pyo3::intern!(py, "lineno"), line)?;
+        if let Some(filename) = filename {
+            meta.set_item(pyo3::intern!(py, "filename"), filename)?;
+        }
+        if let Some(line) = line {
+            meta.set_item(pyo3::intern!(py, "lineno"), line)?;
+        }
         for kv in &self.0 {
             meta.set_item(&kv.key, &kv.value)?;
         }
@@ -148,7 +153,7 @@ pub struct EntryHeader {
     pub links: TagsLinks,
     /// The filename.
     #[pyo3(get)]
-    pub filename: Option<FilePath>,
+    pub filename: Filename,
     /// The 1-based line number.
     #[pyo3(get)]
     pub line: LineNumber,
@@ -157,7 +162,7 @@ pub struct EntryHeader {
 impl EntryHeader {
     /// Create a new entry header (with empty metadata, tags and links).
     #[must_use]
-    pub fn new(date: Date, filename: Option<FilePath>, line: LineNumber) -> Self {
+    pub fn new(date: Date, filename: Filename, line: LineNumber) -> Self {
         Self {
             date,
             meta: Meta::default(),
@@ -184,7 +189,8 @@ impl EntryHeader {
 
     /// Convert this to a Python dictionary like the `meta` attribute of Beancount entries.
     pub(super) fn to_py_dict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
-        self.meta.to_py_dict(py, &self.filename, self.line)
+        self.meta
+            .to_py_dict(py, Some(&self.filename), Some(self.line))
     }
 
     /// Create a copy, possibly replacing the metadata, tags and links.
@@ -196,7 +202,14 @@ impl EntryHeader {
         links: Option<TagsLinks>,
     ) -> PyResult<Self> {
         let (filename, line, meta) = match meta {
-            Some(meta) => extract_meta_dict(meta)?,
+            Some(meta) => {
+                let (filename, line, meta) = extract_meta_dict(meta)?;
+                (
+                    filename.unwrap_or_else(|| self.filename.clone()),
+                    line.unwrap_or(self.line),
+                    meta,
+                )
+            }
             None => (self.filename.clone(), self.line, self.meta.clone()),
         };
         Ok(Self {
@@ -210,23 +223,23 @@ impl EntryHeader {
     }
 }
 
+/// Extract metadata from Python dictionary.
 pub(super) fn extract_meta_dict(
     meta: &Bound<'_, PyDict>,
-) -> PyResult<(Option<FilePath>, LineNumber, Meta)> {
+) -> PyResult<(Option<Filename>, Option<LineNumber>, Meta)> {
     let mut filename = None;
-    let mut line = 0;
+    let mut lineno = None;
     let meta_vec = meta
         .iter()
         .map(|(k, v)| {
             let key = k.extract::<String>()?;
-            match &*key {
+            match key.as_str() {
                 "filename" => {
-                    let filename_str = v.extract::<PyBackedStr>()?;
-                    filename = (&*filename_str).try_into().ok();
+                    filename = Some(v.extract::<Filename>()?);
                     Ok(None)
                 }
                 "lineno" => {
-                    line = v.extract()?;
+                    lineno = Some(v.extract::<u32>()?);
                     Ok(None)
                 }
                 _ => Ok(Some(MetaKeyValuePair {
@@ -237,7 +250,7 @@ pub(super) fn extract_meta_dict(
         })
         .filter_map(Result::transpose)
         .collect::<PyResult<ThinVec<MetaKeyValuePair>>>()?;
-    Ok((filename, line, Meta(meta_vec)))
+    Ok((filename, lineno, Meta(meta_vec)))
 }
 
 #[pymethods]
@@ -256,8 +269,8 @@ impl EntryHeader {
             meta,
             tags: tags.unwrap_or_default(),
             links: links.unwrap_or_default(),
-            filename,
-            line,
+            filename: filename.ok_or_else(|| PyValueError::new_err("Missing filename"))?,
+            line: line.ok_or_else(|| PyValueError::new_err("Missing lineno"))?,
         })
     }
 
@@ -274,7 +287,7 @@ impl EntryHeader {
 
     fn __getitem__<'py>(&self, key: &str, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         Ok(match key {
-            "filename" => self.filename.as_ref().into_pyobject(py)?,
+            "filename" => self.filename.into_pyobject(py)?.into_any(),
             "lineno" => self.line.into_pyobject(py)?.into_any(),
             _ => {
                 let element = self.meta.0.iter().find(|m| m.key == key);

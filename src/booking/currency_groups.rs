@@ -218,10 +218,10 @@ mod tests {
     #[test]
     fn test_filling_in_complete() {
         let group = check_single_group("USD", &["Assets:Cash 20 USD"]);
-        insta::assert_json_snapshot!(group, @r###"
+        insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 2,
             "meta": [],
             "account": "Assets:Cash",
@@ -234,16 +234,16 @@ mod tests {
             "cost": null
           }
         ]
-        "###);
+        "#);
     }
 
     #[test]
     fn test_filling_in_one_auto_posting() {
         let group = check_single_group("USD", &["Assets:Cash 20 USD", "Assets:Cash2"]);
-        insta::assert_json_snapshot!(group, @r###"
+        insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 2,
             "meta": [],
             "account": "Assets:Cash",
@@ -256,7 +256,7 @@ mod tests {
             "cost": null
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 3,
             "meta": [],
             "account": "Assets:Cash2",
@@ -269,19 +269,19 @@ mod tests {
             "cost": null
           }
         ]
-        "###);
+        "#);
     }
 
     #[test]
     fn test_filling_in_multiple_auto_postings() {
         let groups = check(&["Assets:Cash 20 USD", "Assets:Cash 20 EUR", "Assets:Cash2"]);
-        insta::assert_json_snapshot!(groups, @r###"
+        insta::assert_json_snapshot!(groups, @r#"
         [
           [
             "USD",
             [
               {
-                "filename": null,
+                "filename": "<string>",
                 "line": 2,
                 "meta": [],
                 "account": "Assets:Cash",
@@ -294,7 +294,7 @@ mod tests {
                 "cost": null
               },
               {
-                "filename": null,
+                "filename": "<string>",
                 "line": 4,
                 "meta": [],
                 "account": "Assets:Cash2",
@@ -312,7 +312,7 @@ mod tests {
             "EUR",
             [
               {
-                "filename": null,
+                "filename": "<string>",
                 "line": 3,
                 "meta": [],
                 "account": "Assets:Cash",
@@ -325,7 +325,7 @@ mod tests {
                 "cost": null
               },
               {
-                "filename": null,
+                "filename": "<string>",
                 "line": 4,
                 "meta": [],
                 "account": "Assets:Cash2",
@@ -340,16 +340,16 @@ mod tests {
             ]
           ]
         ]
-        "###);
+        "#);
     }
 
     #[test]
     fn test_filling_cost() {
         let group = check_single_group("USD", &["Assets:Cash 20 USD", "Assets:Cash2 30 APL {}"]);
-        insta::assert_json_snapshot!(group, @r###"
+        insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 2,
             "meta": [],
             "account": "Assets:Cash",
@@ -362,7 +362,7 @@ mod tests {
             "cost": null
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 3,
             "meta": [],
             "account": "Assets:Cash2",
@@ -382,16 +382,16 @@ mod tests {
             }
           }
         ]
-        "###);
+        "#);
     }
 
     #[test]
     fn test_filling_price() {
         let group = check_single_group("USD", &["Assets:Cash 20 USD", "Assets:Cash2 30 APL @"]);
-        insta::assert_json_snapshot!(group, @r###"
+        insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 2,
             "meta": [],
             "account": "Assets:Cash",
@@ -404,7 +404,7 @@ mod tests {
             "cost": null
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 3,
             "meta": [],
             "account": "Assets:Cash2",
@@ -420,16 +420,16 @@ mod tests {
             "cost": null
           }
         ]
-        "###);
+        "#);
     }
 
     #[test]
     fn test_filling_price_and_cost() {
         let group = check_single_group("USD", &["Assets:Cash 20 USD", "Assets:Cash2 30 APL {} @"]);
-        insta::assert_json_snapshot!(group, @r###"
+        insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 2,
             "meta": [],
             "account": "Assets:Cash",
@@ -442,7 +442,7 @@ mod tests {
             "cost": null
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 3,
             "meta": [],
             "account": "Assets:Cash2",
@@ -465,6 +465,6 @@ mod tests {
             }
           }
         ]
-        "###);
+        "#);
     }
 }

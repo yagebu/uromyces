@@ -1,8 +1,7 @@
 ---
 source: src/parse/tests.rs
-expression: "super::parse_string(&input, &None)"
+expression: "super::parse_string(&input, &dummy_filename.clone())"
 input_file: src/parse/test_inputs/transactions.beancount
-snapshot_kind: text
 ---
 {
   "entries": [
@@ -13,7 +12,7 @@ snapshot_kind: text
           "meta": [],
           "tags": [],
           "links": [],
-          "filename": null,
+          "filename": "<string>",
           "line": 1
         },
         "flag": "*",
@@ -21,7 +20,7 @@ snapshot_kind: text
         "narration": "Investing 60% of cash in RGAGX",
         "postings": [
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 2,
             "meta": [],
             "account": "Assets:US:Vanguard:RGAGX",
@@ -41,7 +40,7 @@ snapshot_kind: text
             }
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 3,
             "meta": [],
             "account": "Assets:US:Vanguard:RGAGX",
@@ -61,7 +60,7 @@ snapshot_kind: text
             }
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 4,
             "meta": [],
             "account": "Assets:US:Vanguard:RGAGX",
@@ -81,7 +80,7 @@ snapshot_kind: text
             }
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 5,
             "meta": [],
             "account": "Assets:US:Vanguard:RGAGX",
@@ -101,7 +100,7 @@ snapshot_kind: text
             }
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 6,
             "meta": [],
             "account": "Assets:US:Vanguard:RGAGX",
@@ -121,7 +120,7 @@ snapshot_kind: text
             }
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 7,
             "meta": [],
             "account": "Assets:US:Vanguard:RGAGX",
@@ -141,7 +140,7 @@ snapshot_kind: text
             }
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 8,
             "meta": [],
             "account": "Assets:US:Vanguard:RGAGX",
@@ -164,7 +163,7 @@ snapshot_kind: text
             }
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 9,
             "meta": [],
             "account": "Assets:US:Vanguard:RGAGX",
@@ -187,7 +186,7 @@ snapshot_kind: text
             }
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 10,
             "meta": [],
             "account": "Assets:US:Vanguard:Cash",
@@ -221,7 +220,7 @@ snapshot_kind: text
           "links": [
             "link"
           ],
-          "filename": null,
+          "filename": "<string>",
           "line": 12
         },
         "flag": "*",
@@ -229,7 +228,7 @@ snapshot_kind: text
         "narration": "narration",
         "postings": [
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 14,
             "meta": [
               {
@@ -249,7 +248,7 @@ snapshot_kind: text
             "cost": null
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 16,
             "meta": [],
             "account": "Income:US:Hooli:Match401k",
@@ -286,7 +285,7 @@ snapshot_kind: text
             "tag"
           ],
           "links": [],
-          "filename": null,
+          "filename": "<string>",
           "line": 21
         },
         "flag": "*",
@@ -294,7 +293,7 @@ snapshot_kind: text
         "narration": "narration",
         "postings": [
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 23,
             "meta": [],
             "account": "Assets:US:Vanguard:Cash",
@@ -310,7 +309,7 @@ snapshot_kind: text
             "cost": null
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 24,
             "meta": [],
             "account": "Income:US:Hooli:Match401k",
@@ -339,7 +338,7 @@ snapshot_kind: text
           ],
           "tags": [],
           "links": [],
-          "filename": null,
+          "filename": "<string>",
           "line": 29
         },
         "flag": "*",
@@ -347,7 +346,7 @@ snapshot_kind: text
         "narration": "narration",
         "postings": [
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 31,
             "meta": [],
             "account": "Assets:US:Vanguard:Cash",
@@ -363,7 +362,7 @@ snapshot_kind: text
             "cost": null
           },
           {
-            "filename": null,
+            "filename": "<string>",
             "line": 32,
             "meta": [],
             "account": "Income:US:Hooli:Match401k",

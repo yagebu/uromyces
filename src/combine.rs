@@ -11,24 +11,24 @@ use crate::errors::UroError;
 use crate::ledgers::{Ledger, RawLedger};
 use crate::parse;
 use crate::parse::ParsedFile;
-use crate::types::{FilePath, Plugin, RawDirective};
+use crate::types::{AbsoluteUTF8Path, Filename, Plugin, RawDirective};
 use crate::util::paths;
 use crate::util::timer::SimpleTimer;
 
 struct PathAndResult {
-    path: FilePath,
+    path: Filename,
     result: ParsedFile,
 }
 
 /// Load a Beancount file.
 ///
-/// Takes a reference to a path and tries to load the given Beancount file, producing
-/// a completely booked list of entries.
+/// Takes a path and tries to load the given Beancount file, producing a completely
+/// booked list of entries.
 ///
 /// This does not run any user-specified plugins or the built-in validations, those
 /// should be orchestrated from the calling Python code.
 #[must_use]
-pub fn load(main_path: &FilePath) -> Ledger {
+pub fn load(main_path: AbsoluteUTF8Path) -> Ledger {
     let paths_and_results = load_beancount_file(main_path);
     let raw_ledger = combine_files(paths_and_results);
 
@@ -40,23 +40,47 @@ pub fn load(main_path: &FilePath) -> Ledger {
     ledger
 }
 
+/// Load a Beancount string.
+///
+/// Takes a string and tries parse it as a Beancount file, producing a completely
+/// booked list of entries.
+///
+/// This does not run any user-specified plugins or the built-in validations, those
+/// should be orchestrated from the calling Python code.
+#[must_use]
+pub fn load_string(string: &str, filename: Filename) -> Ledger {
+    let result = parse::parse_string(string, &filename);
+    let paths_and_results = vec![PathAndResult {
+        result,
+        path: filename,
+    }];
+    let raw_ledger = combine_files(paths_and_results);
+
+    let mut t = SimpleTimer::new();
+    let (mut ledger, _) = booking::book_entries(raw_ledger);
+    t.log_elapsed("booking");
+
+    crate::plugins::run_pre(&mut ledger);
+    ledger
+}
+
 /// Load and parse a single Beancount file.
-fn load_single_beancount_file(path: &FilePath) -> Result<ParsedFile, UroError> {
+fn load_single_beancount_file(path: &AbsoluteUTF8Path) -> Result<ParsedFile, UroError> {
     // Always append a newline at the end, to avoid errors on a last missing end-of-line.
     let string = fs::read_to_string(path).map_err(|io_error| {
         UroError::new(format!("Could not read file due to IO error: {io_error}"))
-            .with_filename(path)
+            .with_filename(path.clone().into())
     })?;
     let mut t = SimpleTimer::new();
-    let result = parse::parse_string(&string, &Some(path.clone()));
+    let result = parse::parse_string(&string, &path.clone().into());
     t.log_elapsed(&format!("{path}: parsing"));
     Ok(result)
 }
 
 /// Load and parse a Beancount file and all includes.
-fn load_beancount_file(main_path: &FilePath) -> Vec<PathAndResult> {
+fn load_beancount_file(main_path: AbsoluteUTF8Path) -> Vec<PathAndResult> {
     let mut path_queue = VecDeque::new();
-    path_queue.push_back(main_path.clone());
+    path_queue.push_back(main_path);
     // keep track of loaded files to avoid doing them twice
     let mut loaded = HashSet::new();
     let mut results = Vec::new();
@@ -76,12 +100,15 @@ fn load_beancount_file(main_path: &FilePath) -> Vec<PathAndResult> {
                             UroError::new(format!(
                                 "Include pattern '{pattern}' failed: {glob_include_error}"
                             ))
-                            .with_filename(&path),
+                            .with_filename(path.clone().into()),
                         ),
                     }
                 }
             }
-            results.push(PathAndResult { path, result });
+            results.push(PathAndResult {
+                path: path.into(),
+                result,
+            });
         }
     }
     results
@@ -99,7 +126,7 @@ fn combine_files(result: Vec<PathAndResult>) -> RawLedger {
         RawLedger::from_filename_and_includes(result[0].path.clone(), all_includes, entry_count);
     let mut t = SimpleTimer::new();
 
-    // Merge all options
+    // Merge all ledgers
     for PathAndResult {
         path: _,
         mut result,

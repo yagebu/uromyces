@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from fava.beans import abc
 
 from uromyces import uromyces
@@ -28,6 +30,9 @@ from uromyces.uromyces import Query
 from uromyces.uromyces import summarize_clamp
 from uromyces.uromyces import Transaction
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 __all__ = [  # noqa: RUF022
     # Entries
     "Balance",
@@ -53,6 +58,7 @@ __all__ = [  # noqa: RUF022
     "convert_entries",
     "convert_options",
     "load_file",
+    "load_string",
     "summarize_clamp",
 ]
 
@@ -75,7 +81,7 @@ abc.Query.register(Query)
 abc.Transaction.register(Transaction)
 
 
-def load_file(filename: str) -> Ledger:
+def load_file(filename: Path | str) -> Ledger:
     """Load a Beancount file.
 
     Args:
@@ -84,7 +90,25 @@ def load_file(filename: str) -> Ledger:
     Returns:
         The ledger.
     """
-    ledger = uromyces.load_file(filename)
+    ledger = uromyces.load_file(str(filename))
+    ledger = run(ledger)
+    ledger.run_validations()
+    return ledger
+
+
+def load_string(string: str, filename: Path | str | None = None) -> Ledger:
+    """Load a Beancount file.
+
+    Args:
+        string: The string to load.
+        filename: The filename to use for the ledger.
+
+    Returns:
+        The ledger.
+    """
+    ledger = uromyces.load_string(
+        string, str(filename) if filename else "<string>"
+    )
     ledger = run(ledger)
     ledger.run_validations()
     return ledger
