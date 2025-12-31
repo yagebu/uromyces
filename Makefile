@@ -18,6 +18,7 @@ lint: .venv
 	cargo clippy
 	pre-commit run -a
 	uv run mypy uromyces tests contrib
+	uv run ty check uromyces tests contrib
 
 # Run Rust and Python tests
 test: .venv

@@ -31,6 +31,7 @@ dev = [
     "mypy>=1.11",
     "pip>=24",
     "pytest>=8",
+    "ty>=0.0.8",
 ]
 
 [project.scripts]
