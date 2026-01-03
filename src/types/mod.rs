@@ -51,9 +51,8 @@
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
-use pyo3::prelude::*;
-use pyo3::types::PyDict;
-pub(crate) use rust_decimal::Decimal;
+use pyo3::types::{PyBool, PyDate, PyDict, PyString};
+use pyo3::{PyTypeInfo, prelude::*};
 use serde::{Deserialize, Serialize};
 
 mod account;
@@ -63,6 +62,7 @@ mod box_str;
 mod cost;
 mod currency;
 mod date;
+mod decimal;
 mod flag;
 mod metadata;
 mod paths;
@@ -75,14 +75,13 @@ pub use box_str::BoxStr;
 pub use cost::{Cost, CostLabel, CostSpec};
 pub use currency::Currency;
 pub use date::{Date, MIN_DATE};
+pub use decimal::Decimal;
 pub use flag::Flag;
 pub use metadata::{EntryHeader, Meta, MetaKeyValuePair, MetaValue};
 pub use paths::{AbsoluteUTF8Path, Filename};
 pub use tags_links::TagsLinks;
 
-use crate::py_bindings::{decimal_to_py, get_python_types, py_to_decimal};
-use amount::{amount_from_py, option_amount_from_py};
-use cost::option_cost_from_py;
+use decimal::{decimal_to_py, get_decimal_decimal, py_to_decimal};
 
 /// The type to use for line numbers in file positions.
 pub type LineNumber = u32;
@@ -133,25 +132,26 @@ impl CustomValue {
         self.0.clone()
     }
     #[getter]
-    fn dtype<'py>(&self, py: Python<'py>) -> &Bound<'py, PyAny> {
-        match self.0 {
+    fn dtype<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        Ok(match self.0 {
             MetaValue::Currency(_) | MetaValue::String(_) | MetaValue::Tag(_) => {
-                get_python_types(py).str.bind(py)
+                PyString::type_object(py).into_any()
             }
-            MetaValue::Date(_) => get_python_types(py).date.bind(py),
-            MetaValue::Account(_) => get_python_types(py).account_dummy.bind(py),
-            MetaValue::Bool(_) => get_python_types(py).bool.bind(py),
-            MetaValue::Amount(_) => get_python_types(py).amount.bind(py),
-            MetaValue::Number(_) => get_python_types(py).decimal.bind(py),
-        }
+            MetaValue::Date(_) => PyDate::type_object(py).into_any(),
+            MetaValue::Account(_) => pyo3::intern!(py, "<AccountDummy>").clone().into_any(),
+            MetaValue::Bool(_) => PyBool::type_object(py).into_any(),
+            MetaValue::Amount(_) => Amount::type_object(py).into_any(),
+            MetaValue::Number(_) => get_decimal_decimal(py)?.clone().into_any(),
+        })
     }
 }
 
 /// A balance entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Balance {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -163,9 +163,10 @@ pub struct Balance {
 
 /// An account close entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Close {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -173,9 +174,10 @@ pub struct Close {
 
 /// A commodity entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Commodity {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub currency: Currency,
@@ -183,9 +185,10 @@ pub struct Commodity {
 
 /// A custom entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Custom {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub r#type: String,
@@ -195,9 +198,10 @@ pub struct Custom {
 
 /// An document entry for an account.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Document {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -207,9 +211,10 @@ pub struct Document {
 
 /// An event for an account.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Event {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub r#type: String,
@@ -219,9 +224,10 @@ pub struct Event {
 
 /// An account open entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Open {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -233,9 +239,10 @@ pub struct Open {
 
 /// A note entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Note {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -245,9 +252,10 @@ pub struct Note {
 
 /// A pad entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Pad {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub account: Account,
@@ -257,9 +265,10 @@ pub struct Pad {
 
 /// A price entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Price {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub currency: Currency,
@@ -309,7 +318,7 @@ impl RawPosting {
 
 /// A fully booked posting.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Posting {
     /// The filename.
     pub filename: Option<Filename>,
@@ -341,9 +350,9 @@ impl Posting {
     #[pyo3(signature = (account, units, cost=None, price=None, flag=None, meta=None))]
     fn __new__(
         account: Account,
-        #[pyo3(from_py_with = amount_from_py)] units: Amount,
-        #[pyo3(from_py_with = option_cost_from_py)] cost: Option<Cost>,
-        #[pyo3(from_py_with = option_amount_from_py)] price: Option<Amount>,
+        units: Amount,
+        cost: Option<Cost>,
+        price: Option<Amount>,
         flag: Option<Flag>,
         meta: Option<&Bound<'_, PyDict>>,
     ) -> PyResult<Self> {
@@ -365,12 +374,6 @@ impl Posting {
     #[getter]
     fn meta<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         self.meta.to_py_dict(py, self.filename.as_ref(), self.line)
-    }
-    fn __eq__(&self, other: &Self) -> bool {
-        self == other
-    }
-    fn __ne__(&self, other: &Self) -> bool {
-        self != other
     }
 }
 
@@ -413,9 +416,10 @@ impl Posting {
 
 /// A transaction.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Transaction {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub flag: Flag,
@@ -471,9 +475,10 @@ impl RawTransaction {
 
 /// A query entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces")]
 pub struct Query {
     #[serde(flatten)]
+    #[pyo3(get, name = "meta")]
     pub header: EntryHeader,
     #[pyo3(get)]
     pub name: String,
@@ -501,7 +506,7 @@ pub enum RawEntry {
 /// The Beancount entries.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(tag = "t")]
-#[derive(FromPyObject)]
+#[derive(FromPyObject, IntoPyObject)]
 pub enum Entry {
     Balance(Balance),
     Close(Close),
@@ -524,7 +529,7 @@ impl Balance {
     fn __new__(
         header: EntryHeader,
         account: Account,
-        #[pyo3(from_py_with = amount_from_py)] amount: Amount,
+        amount: Amount,
         tolerance: Option<&Bound<'_, PyAny>>,
     ) -> PyResult<Self> {
         Ok(Self {
@@ -800,11 +805,7 @@ impl Pad {
 #[pymethods]
 impl Price {
     #[new]
-    fn __new__(
-        header: EntryHeader,
-        currency: Currency,
-        #[pyo3(from_py_with = amount_from_py)] amount: Amount,
-    ) -> Self {
+    fn __new__(header: EntryHeader, currency: Currency, amount: Amount) -> Self {
         Self {
             header,
             currency,
@@ -922,22 +923,8 @@ macro_rules! pymethods_for_entry {
             fn tags(&self) -> &TagsLinks {
                 &self.header.tags
             }
-            #[getter]
-            fn header(&self) -> EntryHeader {
-                self.header.clone()
-            }
-            #[getter]
-            fn meta<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
-                self.header.to_py_dict(py)
-            }
             fn __repr__(&self) -> String {
                 format!("<{:?}>", self)
-            }
-            fn __eq__(&self, other: &Self) -> bool {
-                self == other
-            }
-            fn __ne__(&self, other: &Self) -> bool {
-                self != other
             }
             fn __hash__(&self) -> u64 {
                 // use a fixed hash function here and not the Rust DefaultHasher to keep it stable
@@ -964,29 +951,6 @@ pymethods_for_entry!(Pad);
 pymethods_for_entry!(Price);
 pymethods_for_entry!(Query);
 pymethods_for_entry!(Transaction);
-
-impl<'py> IntoPyObject<'py> for Entry {
-    type Target = PyAny;
-    type Output = Bound<'py, Self::Target>;
-    type Error = PyErr;
-
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        Ok(match self {
-            Self::Balance(e) => e.into_pyobject(py)?.into_any(),
-            Self::Close(e) => e.into_pyobject(py)?.into_any(),
-            Self::Commodity(e) => e.into_pyobject(py)?.into_any(),
-            Self::Custom(e) => e.into_pyobject(py)?.into_any(),
-            Self::Document(e) => e.into_pyobject(py)?.into_any(),
-            Self::Event(e) => e.into_pyobject(py)?.into_any(),
-            Self::Note(e) => e.into_pyobject(py)?.into_any(),
-            Self::Open(e) => e.into_pyobject(py)?.into_any(),
-            Self::Pad(e) => e.into_pyobject(py)?.into_any(),
-            Self::Price(e) => e.into_pyobject(py)?.into_any(),
-            Self::Query(e) => e.into_pyobject(py)?.into_any(),
-            Self::Transaction(e) => e.into_pyobject(py)?.into_any(),
-        })
-    }
-}
 
 impl Entry {
     /// Get the entry header.

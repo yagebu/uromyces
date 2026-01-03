@@ -1,19 +1,25 @@
-use std::convert::Infallible;
 use std::fmt::Display;
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 use pyo3::prelude::*;
-use pyo3::pybacked::PyBackedStr;
-use pyo3::types::PyString;
 use serde::{Deserialize, Serialize};
 
-use crate::py_bindings::{decimal_to_py, py_to_decimal};
+use crate::types::{BoxStr, Currency, Date, Decimal, decimal_to_py, py_to_decimal};
 
-use super::{Currency, Date, Decimal};
-
-#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(
+    Clone,
+    Debug,
+    Hash,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    IntoPyObject,
+    IntoPyObjectRef,
+    FromPyObject,
+)]
 #[serde(transparent)]
-pub struct CostLabel(Box<str>);
+pub struct CostLabel(BoxStr);
 
 impl Display for CostLabel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -33,28 +39,9 @@ impl From<String> for CostLabel {
     }
 }
 
-impl<'py> IntoPyObject<'py> for &CostLabel {
-    type Target = PyString;
-    type Output = Bound<'py, Self::Target>;
-    type Error = Infallible;
-
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        self.0.into_pyobject(py)
-    }
-}
-
-impl<'py> FromPyObject<'_, 'py> for CostLabel {
-    type Error = PyErr;
-
-    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
-        let str = obj.extract::<PyBackedStr>()?;
-        Ok((&*str).into())
-    }
-}
-
 /// A cost (basically an Amount + date and label).
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, module = "uromyces", skip_from_py_object)]
 pub struct Cost {
     /// The per-unit cost.
     pub number: Decimal,
@@ -106,12 +93,6 @@ impl Cost {
     ) -> Self {
         Self::new(number, currency, date, label)
     }
-    fn __eq__(&self, other: &Self) -> bool {
-        self == other
-    }
-    fn __ne__(&self, other: &Self) -> bool {
-        self != other
-    }
     fn __hash__(&self) -> u64 {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
@@ -123,32 +104,27 @@ impl Cost {
     }
 }
 
-/// Convert from a Python object which has the correct attributes.
-pub fn cost_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Cost> {
-    if let Ok(a) = ob.cast::<Cost>() {
-        Ok(a.get().clone())
-    } else {
-        let py = ob.py();
-        let number = ob.getattr(pyo3::intern!(py, "number"))?;
-        let currency = ob.getattr(pyo3::intern!(py, "currency"))?;
-        let date = ob.getattr(pyo3::intern!(py, "date"))?;
-        let label = ob.getattr(pyo3::intern!(py, "label"))?;
+impl<'py> FromPyObject<'_, 'py> for Cost {
+    type Error = PyErr;
 
-        Ok(Cost::new(
-            py_to_decimal(&number)?,
-            currency.extract()?,
-            date.extract()?,
-            label.extract()?,
-        ))
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        if let Ok(a) = obj.cast::<Cost>() {
+            Ok(a.get().clone())
+        } else {
+            let py = obj.py();
+            let number = obj.getattr(pyo3::intern!(py, "number"))?;
+            let currency = obj.getattr(pyo3::intern!(py, "currency"))?;
+            let date = obj.getattr(pyo3::intern!(py, "date"))?;
+            let label = obj.getattr(pyo3::intern!(py, "label"))?;
+
+            Ok(Cost::new(
+                py_to_decimal(&number)?,
+                currency.extract()?,
+                date.extract()?,
+                label.extract()?,
+            ))
+        }
     }
-}
-
-pub fn option_cost_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Option<Cost>> {
-    Ok(if ob.is_none() {
-        None
-    } else {
-        Some(cost_from_py(ob)?)
-    })
 }
 
 #[cfg(test)]

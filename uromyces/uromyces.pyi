@@ -1,5 +1,10 @@
 import datetime
+from collections.abc import ItemsView
+from collections.abc import Iterator
+from collections.abc import KeysView
+from collections.abc import Mapping
 from collections.abc import Sequence
+from collections.abc import ValuesView
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -25,7 +30,7 @@ class Booking(Enum):
     HIFO = "HIFO"
 
 class _Directive:
-    meta: Meta
+    meta: EntryHeader
     date: datetime.date
     links: frozenset[str]
     tags: frozenset[str]
@@ -58,7 +63,7 @@ class CustomValue:
     value: MetaValue
     dtype: Any
 
-class EntryHeader:
+class EntryHeader(Mapping[str, MetaValue]):
     date: datetime.date
     filename: str
     tags: frozenset[str]
@@ -73,7 +78,12 @@ class EntryHeader:
     ) -> EntryHeader: ...
     def __contains__(self, key: object) -> bool: ...
     def __getitem__(self, key: str) -> MetaValue: ...
+    def __iter__(self) -> Iterator[str]: ...
     def __len__(self) -> int: ...
+    def _asdict(self) -> dict[str, MetaValue]: ...
+    def items(self) -> ItemsView[str, MetaValue]: ...
+    def keys(self) -> KeysView[str]: ...
+    def values(self) -> ValuesView[MetaValue]: ...
 
 class Balance(_Directive, abc.Balance):
     account: str

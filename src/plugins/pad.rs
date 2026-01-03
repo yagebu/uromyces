@@ -1,11 +1,10 @@
 use hashbrown::{HashMap, HashSet};
-use rust_decimal::Decimal;
 
 use crate::Ledger;
 use crate::errors::UroError;
 use crate::inventory::Inventory;
 use crate::tolerances::balance_tolerance;
-use crate::types::{Amount, Balance, Currency, Entry, Flag, Pad, Posting, Transaction};
+use crate::types::{Amount, Balance, Currency, Decimal, Entry, Flag, Pad, Posting, Transaction};
 
 /// This is the state that we need to carry along for each account that we want to pad.
 ///

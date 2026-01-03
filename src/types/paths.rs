@@ -10,7 +10,7 @@ use pyo3::pybacked::PyBackedStr;
 use pyo3::types::PyString;
 use serde::{Deserialize, Serialize};
 
-use super::Account;
+use crate::types::Account;
 
 /// Type for file paths in uromyces.
 ///

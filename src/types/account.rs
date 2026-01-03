@@ -90,6 +90,16 @@ impl<'py> IntoPyObject<'py> for &Account {
     }
 }
 
+impl<'py> IntoPyObject<'py> for Account {
+    type Target = PyString;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        self.0.as_str().into_pyobject(py)
+    }
+}
+
 impl<'py> FromPyObject<'_, 'py> for Account {
     type Error = PyErr;
 

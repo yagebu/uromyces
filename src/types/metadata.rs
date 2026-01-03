@@ -1,14 +1,15 @@
 use pyo3::BoundObject;
 use pyo3::exceptions::{PyKeyError, PyValueError};
+use pyo3::sync::PyOnceLock;
+use pyo3::types::{PyNone, PyType};
 use pyo3::{prelude::*, types::PyDict};
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use thin_vec::ThinVec;
 
-use crate::py_bindings::{decimal_to_py, py_to_decimal};
-use crate::types::Filename;
-
-use super::{Account, Amount, Currency, Date, LineNumber, TagsLinks};
+use crate::types::{
+    Account, Amount, Currency, Date, Decimal, Filename, LineNumber, TagsLinks, decimal_to_py,
+    py_to_decimal,
+};
 
 /// Possible metadata values (this is also used for custom entries).
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, FromPyObject)]
@@ -29,12 +30,6 @@ impl From<&str> for MetaValue {
     }
 }
 
-impl From<String> for MetaValue {
-    fn from(value: String) -> Self {
-        Self::String(value)
-    }
-}
-
 impl<'py> IntoPyObject<'py> for MetaValue {
     type Target = PyAny;
     type Output = Bound<'py, Self::Target>;
@@ -44,7 +39,7 @@ impl<'py> IntoPyObject<'py> for MetaValue {
         use MetaValue::{Account, Amount, Bool, Currency, Date, Number, String, Tag};
         match self {
             String(v) | Tag(v) => Ok(v.into_pyobject(py)?.into_any()),
-            Date(v) => v.into_pyobject(py),
+            Date(v) => Ok(v.into_pyobject(py)?.into_any()),
             Account(v) => Ok(v.into_pyobject(py)?.into_any()),
             Bool(v) => Ok(v.into_pyobject(py)?.into_any().to_owned()),
             Amount(v) => Ok(v.clone().into_pyobject(py)?.into_any()),
@@ -63,7 +58,7 @@ impl<'py> IntoPyObject<'py> for &MetaValue {
         use MetaValue::{Account, Amount, Bool, Currency, Date, Number, String, Tag};
         match self {
             String(v) | Tag(v) => Ok(v.into_pyobject(py)?.into_any()),
-            Date(v) => v.into_pyobject(py),
+            Date(v) => Ok(v.into_pyobject(py)?.into_any()),
             Account(v) => Ok(v.into_pyobject(py)?.into_any()),
             Bool(v) => Ok(v.into_pyobject(py)?.into_any().to_owned()),
             Amount(v) => Ok(v.clone().into_pyobject(py)?.into_any()),
@@ -139,7 +134,7 @@ impl Meta {
 
 /// The "entry header", the data which all entries carry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, mapping, module = "uromyces")]
 pub struct EntryHeader {
     /// Entry date.
     pub date: Date,
@@ -185,12 +180,6 @@ impl EntryHeader {
             key: key.to_owned(),
             value: Some(value.into()),
         });
-    }
-
-    /// Convert this to a Python dictionary like the `meta` attribute of Beancount entries.
-    pub(super) fn to_py_dict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
-        self.meta
-            .to_py_dict(py, Some(&self.filename), Some(self.line))
     }
 
     /// Create a copy, possibly replacing the metadata, tags and links.
@@ -253,6 +242,20 @@ pub(super) fn extract_meta_dict(
     Ok((filename, lineno, Meta(meta_vec)))
 }
 
+#[pyclass]
+struct EntryHeaderKeysIter(std::vec::IntoIter<String>);
+
+#[pymethods]
+impl EntryHeaderKeysIter {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<String> {
+        slf.0.next()
+    }
+}
+
 #[pymethods]
 impl EntryHeader {
     #[new]
@@ -274,15 +277,66 @@ impl EntryHeader {
         })
     }
 
+    #[pyo3(signature = (key, default=None))]
+    fn get<'py>(
+        &self,
+        key: &str,
+        default: Option<Bound<'py, PyAny>>,
+        py: Python<'py>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let res = self.__getitem__(key, py);
+        match res {
+            Ok(e) => Ok(e),
+            Err(error) if error.is_instance_of::<PyKeyError>(py) => {
+                Ok(default.unwrap_or(PyNone::get(py).into_bound().into_any()))
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    fn items<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        static ITEMS_VIEW: PyOnceLock<Py<PyType>> = PyOnceLock::new();
+        ITEMS_VIEW
+            .import(py, "collections.abc", "ItemsView")?
+            .call1((self.clone(),))
+    }
+
+    fn keys<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        static KEYS_VIEW: PyOnceLock<Py<PyType>> = PyOnceLock::new();
+        KEYS_VIEW
+            .import(py, "collections.abc", "KeysView")?
+            .call1((self.clone(),))
+    }
+
+    fn values<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        static VALUES_VIEW: PyOnceLock<Py<PyType>> = PyOnceLock::new();
+        VALUES_VIEW
+            .import(py, "collections.abc", "ValuesView")?
+            .call1((self.clone(),))
+    }
+
+    fn _asdict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
+        self.meta
+            .to_py_dict(py, Some(&self.filename), Some(self.line))
+    }
+
     fn __len__(&self) -> usize {
         self.meta.0.len() + 2
     }
 
     fn __contains__(&self, key: &str) -> bool {
         match key {
-            "lineno" | "filename" => true,
+            "filename" | "lineno" => true,
             _ => self.meta.0.iter().any(|m| m.key == key),
         }
+    }
+
+    fn __iter__(&self) -> EntryHeaderKeysIter {
+        let keys = ["filename".to_string(), "lineno".to_string()]
+            .into_iter()
+            .chain(self.meta.0.iter().map(|m| &m.key).cloned())
+            .collect::<Vec<_>>();
+        EntryHeaderKeysIter(keys.into_iter())
     }
 
     fn __getitem__<'py>(&self, key: &str, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -293,7 +347,7 @@ impl EntryHeader {
                 let element = self.meta.0.iter().find(|m| m.key == key);
                 match element {
                     Some(element) => element.value.as_ref().into_pyobject(py)?,
-                    None => Err(PyKeyError::new_err(""))?,
+                    None => Err(PyKeyError::new_err(key.to_owned()))?,
                 }
             }
         })
