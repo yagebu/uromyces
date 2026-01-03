@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING
@@ -26,12 +27,16 @@ from uromyces import Transaction
 
 if TYPE_CHECKING:
     from uromyces import Entry
+    from uromyces import Ledger
 
 
 def test_amount() -> None:
     amt = Amount(Decimal("10.00"), "USD")
     amt2 = Amount(Decimal(10), "USD")
     assert amt == amt2
+    assert repr(amt) == "10.00 USD"
+    assert str(amt) == "10.00 USD"
+    assert repr(amt2) == "10 USD"
     assert amt != Amount(Decimal(11), "USD")
     assert hash(amt) == hash(amt2)
 
@@ -124,6 +129,8 @@ HEADER = EntryHeader(
 )
 def test_entry_types(entry: Entry) -> None:
     assert hash(entry)
+    assert entry == entry._replace(tags={"a-tag"})
+    assert entry != entry._replace(tags={"a-different-tag"})
     assert entry.date == date(2022, 12, 12)
     assert entry.links == {"a-link"}
     assert entry.links == {"a-link"}
@@ -131,8 +138,43 @@ def test_entry_types(entry: Entry) -> None:
     assert entry._replace(tags={"another-tag"}).tags == {"another-tag"}
     assert entry._replace(links={"another-link"}).links == {"another-link"}
 
+    assert isinstance(entry.meta, EntryHeader)
+    assert isinstance(entry.meta, Mapping)
+
     with pytest.raises(TypeError, match="takes 0 positional arguments"):
         assert entry._replace("")  # type: ignore[arg-type,misc]
+
+
+def test_custom_value(load_doc: Ledger) -> None:
+    """
+    2010-11-11 open Assets:Cash
+    2010-11-12 custom "account-name" Assets:Cash
+    2010-11-12 custom "multiple-values" "stringy" 2.00 FALSE 2012-10-11
+    """
+    assert not load_doc.errors
+    assert len(load_doc.entries) == 3
+    _open, custom_account, custom_multiple = load_doc.entries
+    assert isinstance(custom_account, Custom)
+    assert custom_account.type == "account-name"
+    account_custom_value = custom_account.values[0]
+    assert account_custom_value.value == "Assets:Cash"
+    assert account_custom_value.dtype == "<AccountDummy>"
+
+    assert isinstance(custom_multiple, Custom)
+    (
+        string_custom_value,
+        decimal_custom_value,
+        bool_custom_value,
+        date_custom_value,
+    ) = custom_multiple.values
+    assert string_custom_value.value == "stringy"
+    assert string_custom_value.dtype == str
+    assert decimal_custom_value.value == Decimal("2.00")
+    assert decimal_custom_value.dtype == Decimal
+    assert bool_custom_value.value is False
+    assert bool_custom_value.dtype == bool
+    assert date_custom_value.value == date(2012, 10, 11)
+    assert date_custom_value.dtype == date
 
 
 def test_document() -> None:

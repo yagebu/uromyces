@@ -1,18 +1,16 @@
 use std::fmt::{Debug, Display};
-use std::hash::{DefaultHasher, Hash, Hasher};
+use std::hash::Hash;
 use std::ops::Neg;
 use std::str::FromStr;
 
 use pyo3::{intern, prelude::*};
 use serde::{Deserialize, Serialize};
 
-use crate::py_bindings::{decimal_to_py, py_to_decimal};
-
-use super::{Cost, Currency, Decimal};
+use crate::types::{Cost, Currency, Decimal, decimal_to_py, py_to_decimal};
 
 /// An amount.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, str, hash, module = "uromyces", skip_from_py_object)]
 pub struct Amount {
     /// The number of units in this amount.
     pub number: Decimal,
@@ -43,19 +41,8 @@ impl Amount {
     fn __new__(#[pyo3(from_py_with = py_to_decimal)] number: Decimal, currency: Currency) -> Self {
         Self { number, currency }
     }
-    fn __str__(&self) -> String {
+    fn __repr__(&self) -> String {
         format!("{} {}", self.number, self.currency)
-    }
-    fn __eq__(&self, other: &Self) -> bool {
-        self == other
-    }
-    fn __ne__(&self, other: &Self) -> bool {
-        self != other
-    }
-    fn __hash__(&self) -> u64 {
-        let mut hasher = DefaultHasher::new();
-        self.hash(&mut hasher);
-        hasher.finish()
     }
     #[getter]
     fn number<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -63,28 +50,22 @@ impl Amount {
     }
 }
 
-/// Convert from a Python object which has the correct attributes.
-pub fn amount_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Amount> {
-    if let Ok(a) = ob.cast::<Amount>() {
-        Ok(a.get().clone())
-    } else {
-        let py = ob.py();
-        let number = ob.getattr(intern!(py, "number"))?;
-        let currency = ob.getattr(intern!(py, "currency"))?;
+impl<'py> FromPyObject<'_, 'py> for Amount {
+    type Error = PyErr;
 
-        Ok(Amount {
-            number: py_to_decimal(&number)?,
-            currency: currency.extract()?,
-        })
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        if let Ok(amount) = obj.cast::<Amount>() {
+            Ok(amount.get().clone())
+        } else {
+            let number = obj.getattr(intern!(obj.py(), "number"))?;
+            let currency = obj.getattr(intern!(obj.py(), "currency"))?;
+
+            Ok(Amount {
+                number: py_to_decimal(&number)?,
+                currency: currency.extract()?,
+            })
+        }
     }
-}
-
-pub fn option_amount_from_py(ob: &Bound<'_, PyAny>) -> PyResult<Option<Amount>> {
-    Ok(if ob.is_none() {
-        None
-    } else {
-        Some(amount_from_py(ob)?)
-    })
 }
 
 impl Neg for Amount {

@@ -1,11 +1,10 @@
 use hashbrown::{HashMap, HashSet};
-use rust_decimal::Decimal;
 
 use crate::Ledger;
 use crate::errors::UroError;
 use crate::inventory::Inventory;
 use crate::tolerances::balance_tolerance;
-use crate::types::{Account, Balance, Entry, Posting};
+use crate::types::{Account, Balance, Decimal, Entry, Posting};
 
 /// A balance assertion failed.
 struct BalanceCheckError<'a>(&'a Account, &'a Balance, Decimal);

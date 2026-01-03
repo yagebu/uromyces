@@ -1,23 +1,21 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
 
 from beancount import loader
 
-
-def clean_meta(meta: dict[str, Any]) -> None:
-    """Clean entry or posting metadata."""
-    meta.pop("__tolerances__", None)
-    meta.pop("__automatic__", None)
+if TYPE_CHECKING:
+    from beancount.core import data
 
 
-def load_beancount(filename: str) -> Any:
+def load_beancount(
+    filename: str,
+) -> tuple[list[data.Directive], list[data.BeancountError]]:
     """Load the given file using Beancount."""
-    entries, _parse_errors, _options_map = loader._load(  # noqa: SLF001
+    entries, errors, _options_map = loader._load(  # noqa: SLF001
         [(filename, True)],
         None,
         None,
         None,
     )
-    assert not _parse_errors  # noqa: S101
-    return entries
+    return entries, errors

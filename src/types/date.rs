@@ -1,15 +1,12 @@
 use std::fmt::{Debug, Display};
 
 use chrono::{Datelike, Days, NaiveDate};
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyDate};
 use serde::{Deserialize, Serialize};
-
-use crate::py_bindings::date_to_py;
 
 /// A simple date.
 ///
-/// Dates are currently stored as simple structs.
-/// Once more date-related functionality is needed, `chrono::NaiveDate` should probably be used.
+/// Dates are stored as [`chrono::NaiveDate`].
 #[derive(Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Date(NaiveDate);
@@ -83,13 +80,25 @@ impl Debug for Date {
     }
 }
 
-impl<'py> IntoPyObject<'py> for Date {
-    type Target = PyAny;
+impl<'py> IntoPyObject<'py> for &Date {
+    type Target = PyDate;
     type Output = Bound<'py, Self::Target>;
     type Error = PyErr;
 
+    #[allow(clippy::cast_possible_truncation)]
     fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        date_to_py(py, self)
+        PyDate::new(py, self.year(), self.month() as u8, self.day() as u8)
+    }
+}
+
+impl<'py> IntoPyObject<'py> for Date {
+    type Target = PyDate;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    #[allow(clippy::cast_possible_truncation)]
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        PyDate::new(py, self.year(), self.month() as u8, self.day() as u8)
     }
 }
 

@@ -79,7 +79,7 @@ def uromyces_to_beancount(_: Entry) -> data.Directive:
 @uromyces_to_beancount.register(Balance)
 def _(entry: Balance) -> data.Balance:
     return data.Balance(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.account,
         entry.amount,  # type: ignore[arg-type]
@@ -91,7 +91,7 @@ def _(entry: Balance) -> data.Balance:
 @uromyces_to_beancount.register(Commodity)
 def _(entry: Commodity) -> data.Commodity:
     return data.Commodity(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.currency,
     )
@@ -100,7 +100,7 @@ def _(entry: Commodity) -> data.Commodity:
 @uromyces_to_beancount.register(Close)
 def _(entry: Close) -> data.Close:
     return data.Close(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.account,
     )
@@ -109,7 +109,7 @@ def _(entry: Close) -> data.Close:
 @uromyces_to_beancount.register(Custom)
 def _(entry: Custom) -> data.Custom:
     return data.Custom(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.type,
         [ValueType(v.value, v.dtype) for v in entry.values],
@@ -119,7 +119,7 @@ def _(entry: Custom) -> data.Custom:
 @uromyces_to_beancount.register(Document)
 def _(entry: Document) -> data.Document:
     return data.Document(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.account,
         entry.filename,
@@ -131,7 +131,7 @@ def _(entry: Document) -> data.Document:
 @uromyces_to_beancount.register(Event)
 def _(entry: Event) -> data.Event:
     return data.Event(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.type,
         entry.description,
@@ -141,7 +141,7 @@ def _(entry: Event) -> data.Event:
 @uromyces_to_beancount.register(Note)
 def _(entry: Note) -> data.Note:
     return data.Note(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.account,
         entry.comment,
@@ -153,7 +153,7 @@ def _(entry: Note) -> data.Note:
 @uromyces_to_beancount.register(Open)
 def _(entry: Open) -> data.Open:
     return data.Open(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.account,
         entry.currencies or None,  # type: ignore[arg-type]
@@ -166,7 +166,7 @@ def _(entry: Open) -> data.Open:
 @uromyces_to_beancount.register(Pad)
 def _(entry: Pad) -> data.Pad:
     return data.Pad(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.account,
         entry.source_account,
@@ -176,17 +176,17 @@ def _(entry: Pad) -> data.Pad:
 @uromyces_to_beancount.register(Price)
 def _(entry: Price) -> data.Price:
     return data.Price(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.currency,
-        entry.amount,  # type: ignore[arg-type]
+        amount.Amount(entry.amount.number, entry.amount.currency),
     )
 
 
 @uromyces_to_beancount.register(Query)
 def _(entry: Query) -> data.Query:
     return data.Query(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.name,
         entry.query_string,
@@ -218,7 +218,7 @@ def _posting_to_beancount(pos: Posting) -> data.Posting:
 def _(entry: Transaction) -> data.Transaction:
     postings = [_posting_to_beancount(p) for p in entry.postings]
     return data.Transaction(
-        entry.meta,  # type: ignore[arg-type]
+        entry.meta._asdict(),
         entry.date,
         entry.flag,
         entry.payee,

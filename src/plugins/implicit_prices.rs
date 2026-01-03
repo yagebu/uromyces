@@ -24,7 +24,7 @@ pub fn add(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
 
                 let price_entry = if let Some(price) = &posting.price {
                     let mut header = EntryHeader::from_existing(&txn.header);
-                    header.add_meta(META_KEY, "from_prices");
+                    header.add_meta(META_KEY, "from_price");
                     Some(Price {
                         header,
                         currency: posting.units.currency.clone(),
