@@ -54,7 +54,7 @@ impl Remainder {
     /// Reduce by a number from a matching position.
     fn reduce(&mut self, number: &Decimal) -> Decimal {
         // assert here that we're not reducing by mixed amounts
-        assert_eq!(self.sign_positive, number.is_sign_negative());
+        assert_eq!(self.sign_positive, !number.is_sign_positive());
         let mut reduced = std::cmp::min(number.abs(), self.remaining_number);
         self.remaining_number -= reduced;
         // we never go below zero due to the min above

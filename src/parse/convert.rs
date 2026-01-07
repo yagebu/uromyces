@@ -161,13 +161,7 @@ impl TryFromNode for Decimal {
         match node.kind_id() {
             node_ids::NUMBER => {
                 let contents = s.get_str(node);
-                let dec = if contents.contains(',') {
-                    // FIXME(perf): this currently creates an intermediate String
-                    Self::from_str_exact(&contents.replace(',', ""))
-                } else {
-                    Self::from_str_exact(contents)
-                };
-                dec.map_err(|e| {
+                Decimal::from_str_with_commas(contents).map_err(|e| {
                     ConversionError::new(InvalidDecimal(contents.into(), e.to_string()), &node, s)
                 })
             }

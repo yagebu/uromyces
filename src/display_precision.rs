@@ -55,7 +55,7 @@ impl PrecisionStats {
 
     /// Update stats with the given number.
     fn update(&mut self, dec: Decimal) {
-        self.has_sign = self.has_sign || dec.is_sign_negative();
+        self.has_sign = self.has_sign || !dec.is_sign_positive();
         self.precisions[dec.scale() as usize] += 1;
     }
 }

@@ -33,16 +33,6 @@ impl From<String> for BoxStr {
     }
 }
 
-impl<'py> IntoPyObject<'py> for BoxStr {
-    type Target = PyString;
-    type Output = Bound<'py, Self::Target>;
-    type Error = Infallible;
-
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        self.0.into_pyobject(py)
-    }
-}
-
 impl<'py> IntoPyObject<'py> for &BoxStr {
     type Target = PyString;
     type Output = Bound<'py, Self::Target>;

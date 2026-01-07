@@ -21,9 +21,12 @@ lint: .venv
 	uv run ty check uromyces tests contrib
 
 # Run Rust and Python tests
-test: .venv
+.PHONY: test test-py test-rust
+test: test-rust test-py
+test-py: .venv
+	uv run pytest --cov=uromyces --cov-report=term-missing:skip-covered --cov-report=html
+test-rust:
 	cargo test
-	uv run pytest
 
 # Generate Rust documentation
 doc: .venv

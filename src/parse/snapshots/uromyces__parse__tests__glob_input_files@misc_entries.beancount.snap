@@ -6,131 +6,124 @@ input_file: src/parse/test_inputs/misc_entries.beancount
 {
   "entries": [
     {
-      "Open": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "<string>",
-        "line": 1,
-        "account": "Assets:Cash",
-        "currencies": [
-          "EUR"
-        ],
-        "booking": null
-      }
+      "t": "Open",
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "<string>",
+      "line": 1,
+      "account": "Assets:Cash",
+      "currencies": [
+        "EUR"
+      ],
+      "booking": null
     },
     {
-      "Open": {
-        "date": "2000-01-01",
-        "meta": [
-          {
-            "key": "name",
-            "value": {
-              "String": "Some account name"
-            }
+      "t": "Open",
+      "date": "2000-01-01",
+      "meta": [
+        {
+          "key": "name",
+          "value": {
+            "String": "Some account name"
           }
-        ],
-        "tags": [],
-        "links": [],
-        "filename": "<string>",
-        "line": 2,
-        "account": "Equity:OpeningBalances",
-        "currencies": [
-          "EUR"
-        ],
-        "booking": null
-      }
+        }
+      ],
+      "tags": [],
+      "links": [],
+      "filename": "<string>",
+      "line": 2,
+      "account": "Equity:OpeningBalances",
+      "currencies": [
+        "EUR"
+      ],
+      "booking": null
     },
     {
-      "Pad": {
-        "date": "2001-01-01",
-        "meta": [
-          {
-            "key": "number",
-            "value": {
-              "Number": "20.00"
-            }
-          }
-        ],
-        "tags": [],
-        "links": [],
-        "filename": "<string>",
-        "line": 5,
-        "account": "Assets:Cash",
-        "source_account": "Equity:OpeningBalances"
-      }
-    },
-    {
-      "Balance": {
-        "date": "2001-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "<string>",
-        "line": 8,
-        "account": "Assets:Cash",
-        "amount": {
-          "number": "1.00",
-          "currency": "EUR"
-        },
-        "tolerance": null
-      }
-    },
-    {
-      "Query": {
-        "date": "2002-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "<string>",
-        "line": 10,
-        "name": "query all entries",
-        "query_string": "journal"
-      }
-    },
-    {
-      "Custom": {
-        "date": "2000-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "<string>",
-        "line": 12,
-        "type": "string",
-        "values": [
-          {
-            "Account": "Assets:Cash"
-          },
-          {
-            "Bool": false
-          },
-          {
-            "Bool": true
-          },
-          {
+      "t": "Pad",
+      "date": "2001-01-01",
+      "meta": [
+        {
+          "key": "number",
+          "value": {
             "Number": "20.00"
-          },
-          {
-            "Amount": {
-              "number": "200.00",
-              "currency": "EUR"
-            }
           }
-        ]
-      }
+        }
+      ],
+      "tags": [],
+      "links": [],
+      "filename": "<string>",
+      "line": 5,
+      "account": "Assets:Cash",
+      "source_account": "Equity:OpeningBalances"
     },
     {
-      "Note": {
-        "date": "2002-01-01",
-        "meta": [],
-        "tags": [],
-        "links": [],
-        "filename": "<string>",
-        "line": 14,
-        "account": "Assets:Cash",
-        "comment": "string with escape\""
-      }
+      "t": "Balance",
+      "date": "2001-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "<string>",
+      "line": 8,
+      "account": "Assets:Cash",
+      "amount": {
+        "number": "1.00",
+        "currency": "EUR"
+      },
+      "tolerance": null
+    },
+    {
+      "t": "Query",
+      "date": "2002-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "<string>",
+      "line": 10,
+      "name": "query all entries",
+      "query_string": "journal"
+    },
+    {
+      "t": "Custom",
+      "date": "2000-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "<string>",
+      "line": 12,
+      "type": "string",
+      "values": [
+        {
+          "Account": "Assets:Cash"
+        },
+        {
+          "Bool": false
+        },
+        {
+          "Bool": true
+        },
+        {
+          "Number": "20.00"
+        },
+        {
+          "Amount": {
+            "number": "200.00",
+            "currency": "EUR"
+          }
+        }
+      ]
+    },
+    {
+      "t": "Note",
+      "date": "2002-01-01",
+      "meta": [],
+      "tags": [],
+      "links": [],
+      "filename": "<string>",
+      "line": 14,
+      "account": "Assets:Cash",
+      "comment": "string with escape\""
     }
   ],
   "errors": [],

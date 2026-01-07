@@ -19,7 +19,7 @@ pub fn c(cur: &str) -> Currency {
 
 /// Test helper to create a Decimal from a string like `4.00`
 pub fn d(dec: &str) -> Decimal {
-    Decimal::from_str_exact(dec).unwrap()
+    Decimal::d(dec)
 }
 
 /// Test helper to create an Amount from a string like `4.00 USD`

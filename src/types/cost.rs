@@ -4,19 +4,10 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::types::{BoxStr, Currency, Date, Decimal, decimal_to_py, py_to_decimal};
+use crate::types::{BoxStr, Currency, Date, Decimal};
 
 #[derive(
-    Clone,
-    Debug,
-    Hash,
-    PartialEq,
-    Eq,
-    Serialize,
-    Deserialize,
-    IntoPyObject,
-    IntoPyObjectRef,
-    FromPyObject,
+    Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, FromPyObject, IntoPyObjectRef,
 )]
 #[serde(transparent)]
 pub struct CostLabel(BoxStr);
@@ -44,6 +35,7 @@ impl From<String> for CostLabel {
 #[pyclass(frozen, eq, module = "uromyces", skip_from_py_object)]
 pub struct Cost {
     /// The per-unit cost.
+    #[pyo3(get)]
     pub number: Decimal,
     /// The currency.
     #[pyo3(get)]
@@ -85,22 +77,13 @@ impl Display for Cost {
 impl Cost {
     #[new]
     #[pyo3(signature = (number, currency, date, label=None))]
-    fn __new__(
-        #[pyo3(from_py_with = py_to_decimal)] number: Decimal,
-        currency: Currency,
-        date: Date,
-        label: Option<CostLabel>,
-    ) -> Self {
+    fn __new__(number: Decimal, currency: Currency, date: Date, label: Option<CostLabel>) -> Self {
         Self::new(number, currency, date, label)
     }
     fn __hash__(&self) -> u64 {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
         hasher.finish()
-    }
-    #[getter]
-    fn number<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        decimal_to_py(py, self.number)
     }
 }
 
@@ -118,7 +101,7 @@ impl<'py> FromPyObject<'_, 'py> for Cost {
             let label = obj.getattr(pyo3::intern!(py, "label"))?;
 
             Ok(Cost::new(
-                py_to_decimal(&number)?,
+                number.extract()?,
                 currency.extract()?,
                 date.extract()?,
                 label.extract()?,

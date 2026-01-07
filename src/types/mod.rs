@@ -81,7 +81,7 @@ pub use metadata::{EntryHeader, Meta, MetaKeyValuePair, MetaValue};
 pub use paths::{AbsoluteUTF8Path, Filename};
 pub use tags_links::TagsLinks;
 
-use decimal::{decimal_to_py, get_decimal_decimal, py_to_decimal};
+use decimal::get_decimal_decimal;
 
 /// The type to use for line numbers in file positions.
 pub type LineNumber = u32;
@@ -128,9 +128,10 @@ pub struct CustomValue(pub(crate) MetaValue);
 #[pymethods]
 impl CustomValue {
     #[getter]
-    fn value(&self) -> MetaValue {
-        self.0.clone()
+    fn value(&self) -> &MetaValue {
+        &self.0
     }
+
     #[getter]
     fn dtype<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         Ok(match self.0 {
@@ -157,7 +158,7 @@ pub struct Balance {
     pub account: Account,
     #[pyo3(get)]
     pub amount: Amount,
-    // getter is implemented below
+    #[pyo3(get)]
     pub tolerance: Option<Decimal>,
 }
 
@@ -488,6 +489,7 @@ pub struct Query {
 
 /// The Beancount entries (raw, after parsing).
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "t")]
 pub enum RawEntry {
     Balance(Balance),
     Close(Close),
@@ -530,19 +532,14 @@ impl Balance {
         header: EntryHeader,
         account: Account,
         amount: Amount,
-        tolerance: Option<&Bound<'_, PyAny>>,
-    ) -> PyResult<Self> {
-        Ok(Self {
+        tolerance: Option<Decimal>,
+    ) -> Self {
+        Self {
             header,
             account,
             amount,
-            tolerance: tolerance.map(py_to_decimal).transpose()?,
-        })
-    }
-
-    #[getter]
-    fn tolerance<'py>(&self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyAny>>> {
-        self.tolerance.map(|t| decimal_to_py(py, t)).transpose()
+            tolerance,
+        }
     }
 
     #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, amount=None))]
@@ -912,8 +909,8 @@ macro_rules! pymethods_for_entry {
         #[pymethods]
         impl $a {
             #[getter]
-            fn date(&self) -> Date {
-                self.header.date
+            fn date(&self) -> &Date {
+                &self.header.date
             }
             #[getter]
             fn links(&self) -> &TagsLinks {

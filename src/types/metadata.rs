@@ -1,18 +1,17 @@
-use pyo3::BoundObject;
 use pyo3::exceptions::{PyKeyError, PyValueError};
 use pyo3::sync::PyOnceLock;
 use pyo3::types::{PyNone, PyType};
+use pyo3::{BoundObject, IntoPyObjectExt};
 use pyo3::{prelude::*, types::PyDict};
 use serde::{Deserialize, Serialize};
 use thin_vec::ThinVec;
 
-use crate::types::{
-    Account, Amount, Currency, Date, Decimal, Filename, LineNumber, TagsLinks, decimal_to_py,
-    py_to_decimal,
-};
+use crate::types::{Account, Amount, Currency, Date, Decimal, Filename, LineNumber, TagsLinks};
 
 /// Possible metadata values (this is also used for custom entries).
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, FromPyObject)]
+#[derive(
+    Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, FromPyObject, IntoPyObjectRef,
+)]
 pub enum MetaValue {
     Account(Account),
     String(String),
@@ -21,50 +20,12 @@ pub enum MetaValue {
     Bool(bool),
     Amount(Amount),
     Currency(Currency),
-    Number(#[pyo3(from_py_with = py_to_decimal)] Decimal),
+    Number(Decimal),
 }
 
 impl From<&str> for MetaValue {
     fn from(value: &str) -> Self {
         Self::String(value.to_owned())
-    }
-}
-
-impl<'py> IntoPyObject<'py> for MetaValue {
-    type Target = PyAny;
-    type Output = Bound<'py, Self::Target>;
-    type Error = PyErr;
-
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        use MetaValue::{Account, Amount, Bool, Currency, Date, Number, String, Tag};
-        match self {
-            String(v) | Tag(v) => Ok(v.into_pyobject(py)?.into_any()),
-            Date(v) => Ok(v.into_pyobject(py)?.into_any()),
-            Account(v) => Ok(v.into_pyobject(py)?.into_any()),
-            Bool(v) => Ok(v.into_pyobject(py)?.into_any().to_owned()),
-            Amount(v) => Ok(v.clone().into_pyobject(py)?.into_any()),
-            Number(v) => decimal_to_py(py, v),
-            Currency(v) => Ok(v.into_pyobject(py)?.into_any()),
-        }
-    }
-}
-
-impl<'py> IntoPyObject<'py> for &MetaValue {
-    type Target = PyAny;
-    type Output = Bound<'py, Self::Target>;
-    type Error = PyErr;
-
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        use MetaValue::{Account, Amount, Bool, Currency, Date, Number, String, Tag};
-        match self {
-            String(v) | Tag(v) => Ok(v.into_pyobject(py)?.into_any()),
-            Date(v) => Ok(v.into_pyobject(py)?.into_any()),
-            Account(v) => Ok(v.into_pyobject(py)?.into_any()),
-            Bool(v) => Ok(v.into_pyobject(py)?.into_any().to_owned()),
-            Amount(v) => Ok(v.clone().into_pyobject(py)?.into_any()),
-            Number(v) => decimal_to_py(py, *v),
-            Currency(v) => Ok(v.into_pyobject(py)?.into_any()),
-        }
     }
 }
 
@@ -340,16 +301,16 @@ impl EntryHeader {
     }
 
     fn __getitem__<'py>(&self, key: &str, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        Ok(match key {
-            "filename" => self.filename.into_pyobject(py)?.into_any(),
-            "lineno" => self.line.into_pyobject(py)?.into_any(),
+        match key {
+            "filename" => self.filename.into_bound_py_any(py),
+            "lineno" => self.line.into_bound_py_any(py),
             _ => {
                 let element = self.meta.0.iter().find(|m| m.key == key);
                 match element {
-                    Some(element) => element.value.as_ref().into_pyobject(py)?,
-                    None => Err(PyKeyError::new_err(key.to_owned()))?,
+                    Some(element) => element.value.into_bound_py_any(py),
+                    None => Err(PyKeyError::new_err(key.to_owned())),
                 }
             }
-        })
+        }
     }
 }

@@ -6,13 +6,14 @@ use std::str::FromStr;
 use pyo3::{intern, prelude::*};
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Cost, Currency, Decimal, decimal_to_py, py_to_decimal};
+use crate::types::{Cost, Currency, Decimal};
 
 /// An amount.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, eq, str, hash, module = "uromyces", skip_from_py_object)]
 pub struct Amount {
     /// The number of units in this amount.
+    #[pyo3(get)]
     pub number: Decimal,
     /// The currency of the units in this amount.
     #[pyo3(get)]
@@ -38,15 +39,21 @@ impl Amount {
 #[pymethods]
 impl Amount {
     #[new]
-    fn __new__(#[pyo3(from_py_with = py_to_decimal)] number: Decimal, currency: Currency) -> Self {
+    fn __new__(number: Decimal, currency: Currency) -> Self {
         Self { number, currency }
     }
     fn __repr__(&self) -> String {
         format!("{} {}", self.number, self.currency)
     }
-    #[getter]
-    fn number<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        decimal_to_py(py, self.number)
+}
+
+impl<'py> IntoPyObject<'py> for &Amount {
+    type Target = Amount;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        self.clone().into_pyobject(py)
     }
 }
 
@@ -61,7 +68,7 @@ impl<'py> FromPyObject<'_, 'py> for Amount {
             let currency = obj.getattr(intern!(obj.py(), "currency"))?;
 
             Ok(Amount {
-                number: py_to_decimal(&number)?,
+                number: number.extract()?,
                 currency: currency.extract()?,
             })
         }

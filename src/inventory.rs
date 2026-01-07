@@ -24,7 +24,6 @@
 use std::ops::AddAssign;
 
 use indexmap::{Equivalent, IndexMap, IndexSet};
-use rust_decimal::prelude::Signed;
 
 use crate::types::{Amount, Cost, Currency, Decimal, Posting};
 
@@ -267,7 +266,7 @@ impl Inventory {
     fn add_to_key(&mut self, key: &BorrowedInventoryKey<'_>, number: Decimal) -> BookingResult {
         let pos = self.map.get_mut(key);
         if let Some(num) = pos {
-            let result_type = if num.signum() == number.signum() {
+            let result_type = if num.eq_signum(&number) {
                 BookingResult::AUGMENTED
             } else {
                 BookingResult::REDUCED

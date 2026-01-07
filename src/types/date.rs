@@ -91,17 +91,6 @@ impl<'py> IntoPyObject<'py> for &Date {
     }
 }
 
-impl<'py> IntoPyObject<'py> for Date {
-    type Target = PyDate;
-    type Output = Bound<'py, Self::Target>;
-    type Error = PyErr;
-
-    #[allow(clippy::cast_possible_truncation)]
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        PyDate::new(py, self.year(), self.month() as u8, self.day() as u8)
-    }
-}
-
 impl<'py> FromPyObject<'_, 'py> for Date {
     type Error = PyErr;
 

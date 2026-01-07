@@ -1,7 +1,6 @@
 /target
-#Cargo.lock
+/.coverage
 
-/.tox
-
+perf*
 *.pyc
 *.so

@@ -1,7 +1,5 @@
 //! Options that allow users to change the base accounts for instance.
 
-use std::str::FromStr;
-
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -165,9 +163,10 @@ impl BeancountOptions {
                 .set_from_option(value)
                 .map_err(|()| BeancountOptionError::InvalidToleranceDefault(value.to_owned()))?,
             "inferred_tolerance_multiplier" => {
-                self.inferred_tolerance_multiplier = Decimal::from_str(value).map_err(|_| {
-                    BeancountOptionError::InvalidToleranceMultiplier(value.to_owned())
-                })?;
+                self.inferred_tolerance_multiplier =
+                    Decimal::from_str_exact(value).map_err(|_| {
+                        BeancountOptionError::InvalidToleranceMultiplier(value.to_owned())
+                    })?;
             }
             "insert_pythonpath" => self.insert_pythonpath = check_boolean_option(value),
             "long_string_maxlines" => {

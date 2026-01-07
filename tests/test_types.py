@@ -41,6 +41,13 @@ def test_amount() -> None:
     assert hash(amt) == hash(amt2)
 
 
+def test_amount_decimal_edge_cases() -> None:
+    amt = Amount(Decimal("1E-20"), "USD")
+    assert amt.number == Decimal("1E-20")
+    with pytest.raises(ValueError, match=r"exceeds the maximum precision"):
+        Amount(Decimal("1E-50"), "USD")
+
+
 def test_cost() -> None:
     cost = Cost(Decimal("10.00"), "USD", date(2000, 1, 1), None)
     cost2 = Cost(Decimal("10.00"), "USD", date(2000, 1, 1), None)

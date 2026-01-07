@@ -30,6 +30,7 @@ dev = [
     "maturin[patchelf]>=1.7",
     "mypy>=1.11",
     "pip>=24",
+    "pytest-cov>=6",
     "pytest>=8",
     "ty>=0.0.8",
 ]
@@ -39,6 +40,9 @@ uro = "uromyces._cli:cli"
 
 [tool.black]
 line-length = 79
+
+[tool.coverage.run]
+branch = true
 
 [tool.mypy]
 strict = true

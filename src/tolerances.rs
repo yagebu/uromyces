@@ -29,18 +29,11 @@ pub struct Tolerances {
 pub fn balance_tolerance(balance: &Balance, options: &BeancountOptions) -> Decimal {
     if let Some(explicit) = balance.tolerance {
         explicit
+    } else if let Some(scaled_one) = balance.amount.number.scaled_one() {
+        // twice as lenient for balances than within transactions
+        scaled_one * options.inferred_tolerance_multiplier * Decimal::TWO
     } else {
-        let scale = balance.amount.number.scale();
-        if scale > 0 {
-            let mut scaled_one = Decimal::ONE;
-            scaled_one
-                .set_scale(scale)
-                .expect("setting scale to scale of other Decimal to work");
-            // twice as lenient for balances than within transactions
-            scaled_one * options.inferred_tolerance_multiplier * Decimal::TWO
-        } else {
-            Decimal::ZERO
-        }
+        Decimal::ZERO
     }
 }
 
@@ -56,7 +49,7 @@ impl Tolerances {
     pub fn quantize(&self, currency: &Currency, num: Decimal) -> Decimal {
         let tolerance = self.map.get(currency);
         match tolerance {
-            Some(tol) => num.round_dp((tol * Decimal::TWO).normalize().scale()),
+            Some(tol) => num.round_with_tolerance(tol),
             None => num,
         }
     }
@@ -87,12 +80,7 @@ impl Tolerances {
 
     /// Infer tolerance for the given number and currency.
     fn add_inferred(&mut self, number: &Decimal, currency: &Currency, multiplier: &Decimal) {
-        let scale = number.scale();
-        if scale > 0 {
-            let mut scaled_one = Decimal::ONE;
-            scaled_one
-                .set_scale(scale)
-                .expect("setting scale to scale of other Decimal to work");
+        if let Some(scaled_one) = number.scaled_one() {
             let mut tolerance = scaled_one * multiplier;
             self.map
                 .raw_entry_mut()

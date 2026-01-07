@@ -102,13 +102,13 @@ impl From<Flag> for char {
     }
 }
 
-impl<'py> IntoPyObject<'py> for Flag {
+impl<'py> IntoPyObject<'py> for &Flag {
     type Target = PyString;
     type Output = Bound<'py, Self::Target>;
     type Error = Infallible;
 
     fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        Into::<char>::into(self).into_pyobject(py)
+        Into::<char>::into(*self).into_pyobject(py)
     }
 }
 
