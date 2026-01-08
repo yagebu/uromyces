@@ -37,7 +37,6 @@ def test_entry_header_mapping() -> None:
     )
     assert isinstance(header, Mapping)
     assert dict(header) == meta_dict
-    assert header._asdict() == meta_dict
 
     assert header["filename"] == "<string>"
     assert header.get("filename") == "<string>"

@@ -4,11 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from fava.beans import abc
-
 from uromyces import uromyces
-from uromyces._convert import beancount_entries as convert_entries
-from uromyces._convert import convert_options
 from uromyces._plugins import run
 from uromyces._types import Entry
 from uromyces.uromyces import Amount
@@ -17,6 +13,7 @@ from uromyces.uromyces import Close
 from uromyces.uromyces import Commodity
 from uromyces.uromyces import Cost
 from uromyces.uromyces import Custom
+from uromyces.uromyces import CustomValue
 from uromyces.uromyces import Document
 from uromyces.uromyces import EntryHeader
 from uromyces.uromyces import Event
@@ -32,6 +29,7 @@ from uromyces.uromyces import Transaction
 
 if TYPE_CHECKING:
     from pathlib import Path
+
 
 __all__ = [  # noqa: RUF022
     # Entries
@@ -50,6 +48,7 @@ __all__ = [  # noqa: RUF022
     # Other classes
     "Amount",
     "Cost",
+    "CustomValue",
     "Entry",
     "EntryHeader",
     "Ledger",
@@ -63,22 +62,28 @@ __all__ = [  # noqa: RUF022
 ]
 
 
-# Register
-abc.Posting.register(Posting)
+try:
+    from fava.beans import abc
 
-# Register entry types
-abc.Balance.register(Balance)
-abc.Close.register(Close)
-abc.Commodity.register(Commodity)
-abc.Custom.register(Custom)
-abc.Document.register(Document)
-abc.Event.register(Event)
-abc.Note.register(Note)
-abc.Open.register(Open)
-abc.Pad.register(Pad)
-abc.Price.register(Price)
-abc.Query.register(Query)
-abc.Transaction.register(Transaction)
+    # Register
+    abc.Posting.register(Posting)
+
+    # Register entry types
+    abc.Balance.register(Balance)
+    abc.Close.register(Close)
+    abc.Commodity.register(Commodity)
+    abc.Custom.register(Custom)
+    abc.Document.register(Document)
+    abc.Event.register(Event)
+    abc.Note.register(Note)
+    abc.Open.register(Open)
+    abc.Pad.register(Pad)
+    abc.Price.register(Price)
+    abc.Query.register(Query)
+    abc.Transaction.register(Transaction)
+except ImportError:
+    # Nothing to register if Fava is not installed
+    pass
 
 
 def load_file(filename: Path | str) -> Ledger:

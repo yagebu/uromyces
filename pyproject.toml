@@ -5,6 +5,7 @@ build-backend = "maturin"
 [tool.maturin]
 include = ["tree-sitter-beancount/**/*"]
 features = ["pyo3/extension-module"]
+use-base-python = true
 
 [project]
 name = "uromyces"
@@ -61,6 +62,7 @@ extend-select = [
     "ALL",
 ]
 extend-ignore = [
+    "C901",        # Ignore over-zealous complexity warnings
     "COM812",      # Handled by formatter
     "ANN401",      # Allow typing.Any
     "PLR2004",     # allow magic constants in comparisons

@@ -25,13 +25,13 @@ const PRE_PLUGINS: [(&str, ExtendPlugin); 2] = [
 
 /// Run plugins that should run right after booking.
 pub fn run_pre(ledger: &mut Ledger) {
-    let mut total = SimpleTimer::new();
+    let mut t = SimpleTimer::new();
     let res = PRE_PLUGINS
         .iter()
         .map(|(name, plugin)| {
             let mut t = SimpleTimer::new();
             let r = plugin(ledger);
-            t.log_elapsed(&format!("pre_plugin '{name}'"));
+            log::info!("{}", t.elapsed(&format!("pre_plugin '{name}'")));
             r
         })
         .collect::<Vec<_>>();
@@ -40,7 +40,7 @@ pub fn run_pre(ledger: &mut Ledger) {
         ledger.errors.append(&mut errors);
     }
     ledger.entries.sort();
-    total.log_elapsed("pre_plugin");
+    log::info!("{}", t.elapsed("pre_plugin"));
 }
 
 const NAMED_PLUGINS: [(&str, ExtendPlugin); 1] =
@@ -59,7 +59,7 @@ pub fn run_named_plugin(ledger: &mut Ledger, plugin: &str) -> bool {
     ledger.entries.append(&mut entries);
     ledger.errors.append(&mut errors);
     ledger.entries.sort();
-    t.log_elapsed(&format!("plugin '{plugin}'"));
+    log::info!("{}", t.elapsed(&format!("plugin '{plugin}'")));
     true
 }
 
@@ -83,16 +83,16 @@ const VALIDATORS: [(&str, Validator); 8] = [
 ///
 /// The list of entries is assumed to be sorted.
 pub fn run_validations(ledger: &Ledger) -> Vec<UroError> {
-    let mut total = SimpleTimer::new();
+    let mut t = SimpleTimer::new();
     let res = VALIDATORS
         .iter()
         .flat_map(|(name, validation)| {
             let mut t = SimpleTimer::new();
             let r = validation(ledger);
-            t.log_elapsed(&format!("validation '{name}'"));
+            log::info!("{}", t.elapsed(&format!("validation '{name}'")));
             r
         })
         .collect();
-    total.log_elapsed("validation");
+    log::info!("{}", t.elapsed("validation"));
     res
 }

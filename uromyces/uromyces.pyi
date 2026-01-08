@@ -8,7 +8,10 @@ from collections.abc import ValuesView
 from decimal import Decimal
 from enum import Enum
 from typing import Any
+from typing import Literal
+from typing import overload
 
+from beancount.core import data
 from fava.beans import abc
 from fava.beans import protocols
 from fava.beans.abc import Meta
@@ -34,6 +37,8 @@ class _Directive:
     date: datetime.date
     links: frozenset[str]
     tags: frozenset[str]
+
+    def _convert(self) -> data.Directive: ...
 
 class Amount:
     number: Decimal
@@ -63,6 +68,27 @@ class CustomValue:
     value: MetaValue
     dtype: Any
 
+    @overload
+    def __new__(
+        cls: Any, value: str, dtype: Literal["<AccountDummy>"]
+    ) -> CustomValue: ...
+    @overload
+    def __new__(cls: Any, value: int, dtype: type[int]) -> CustomValue: ...
+    @overload
+    def __new__(
+        cls: Any, value: Decimal, dtype: type[Decimal]
+    ) -> CustomValue: ...
+    @overload
+    def __new__(
+        cls: Any, value: protocols.Amount, dtype: type[Any]
+    ) -> CustomValue: ...
+    @overload
+    def __new__(cls: Any, value: str, dtype: type[str]) -> CustomValue: ...
+    @overload
+    def __new__(
+        cls: Any, value: datetime.date, dtype: type[datetime.date]
+    ) -> CustomValue: ...
+
 class EntryHeader(Mapping[str, MetaValue]):
     date: datetime.date
     filename: str
@@ -80,7 +106,6 @@ class EntryHeader(Mapping[str, MetaValue]):
     def __getitem__(self, key: str) -> MetaValue: ...
     def __iter__(self) -> Iterator[str]: ...
     def __len__(self) -> int: ...
-    def _asdict(self) -> dict[str, MetaValue]: ...
     def items(self) -> ItemsView[str, MetaValue]: ...
     def keys(self) -> KeysView[str]: ...
     def values(self) -> ValuesView[MetaValue]: ...

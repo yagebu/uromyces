@@ -34,7 +34,7 @@ pub fn load(main_path: AbsoluteUTF8Path) -> Ledger {
 
     let mut t = SimpleTimer::new();
     let (mut ledger, _) = booking::book_entries(raw_ledger);
-    t.log_elapsed("booking");
+    log::info!("{}", t.elapsed("booking"));
 
     crate::plugins::run_pre(&mut ledger);
     ledger
@@ -58,7 +58,7 @@ pub fn load_string(string: &str, filename: Filename) -> Ledger {
 
     let mut t = SimpleTimer::new();
     let (mut ledger, _) = booking::book_entries(raw_ledger);
-    t.log_elapsed("booking");
+    log::info!("{}", t.elapsed("booking"));
 
     crate::plugins::run_pre(&mut ledger);
     ledger
@@ -73,7 +73,7 @@ fn load_single_beancount_file(path: &AbsoluteUTF8Path) -> Result<ParsedFile, Uro
     })?;
     let mut t = SimpleTimer::new();
     let result = parse::parse_string(&string, &path.clone().into());
-    t.log_elapsed(&format!("{path}: parsing"));
+    log::info!("{}", t.elapsed(&format!("{path}: parsing")));
     Ok(result)
 }
 
@@ -151,14 +151,14 @@ fn combine_files(result: Vec<PathAndResult>) -> RawLedger {
                 .collect(),
         );
     }
-    t.log_elapsed("combining options and entries");
+    log::info!("{}", t.elapsed("combining options and entries"));
 
     combined.entries.sort();
-    t.log_elapsed("sorting entries");
+    log::info!("{}", t.elapsed("sorting entries"));
 
     combined.options.display_precisions =
         DisplayPrecisionsStats::from_raw_entries(&combined.entries).get_precisions();
-    t.log_elapsed("compute display context");
+    log::info!("{}", t.elapsed("compute display context"));
 
     combined
 }

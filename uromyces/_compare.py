@@ -100,7 +100,7 @@ def compare_entries(
             self.meta == other.meta
             and self.date == other.date
             and self.flag == other.flag
-            and self.payee == other.payee
+            and (self.payee or "") == (other.payee or "")
             and self.narration == other.narration
             and self.tags == other.tags
             and self.links == other.links

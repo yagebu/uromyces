@@ -13,8 +13,8 @@ use crate::types::{Account, Amount, Currency, Date, Decimal, Filename, LineNumbe
     Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, FromPyObject, IntoPyObjectRef,
 )]
 pub enum MetaValue {
-    Account(Account),
     String(String),
+    Account(Account),
     Tag(String),
     Date(Date),
     Bool(bool),
@@ -141,6 +141,11 @@ impl EntryHeader {
             key: key.to_owned(),
             value: Some(value.into()),
         });
+    }
+
+    pub(super) fn to_py_dict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
+        self.meta
+            .to_py_dict(py, Some(&self.filename), Some(self.line))
     }
 
     /// Create a copy, possibly replacing the metadata, tags and links.
@@ -274,11 +279,6 @@ impl EntryHeader {
         VALUES_VIEW
             .import(py, "collections.abc", "ValuesView")?
             .call1((self.clone(),))
-    }
-
-    fn _asdict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
-        self.meta
-            .to_py_dict(py, Some(&self.filename), Some(self.line))
     }
 
     fn __len__(&self) -> usize {

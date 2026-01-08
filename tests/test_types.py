@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from beancount.core import amount
+from beancount.core import data
 
 from uromyces import Amount
 from uromyces import Balance
@@ -14,6 +15,7 @@ from uromyces import Close
 from uromyces import Commodity
 from uromyces import Cost
 from uromyces import Custom
+from uromyces import CustomValue
 from uromyces import Document
 from uromyces import EntryHeader
 from uromyces import Event
@@ -74,6 +76,21 @@ def test_equals() -> None:
         Amount(Decimal(10), "USD"),
         None,
     )
+
+
+def test_custo_value() -> None:
+    value = CustomValue("a string", "<AccountDummy>")
+    assert value.value == "a string"
+    assert value.dtype == "<AccountDummy>"
+    value = CustomValue("a string", str)
+    assert value.value == "a string"
+    assert value.dtype == str
+    value = CustomValue(True, bool)  # noqa: FBT003
+    assert value.value is True
+    assert value.dtype == bool
+    value = CustomValue(Decimal("1.0"), Decimal)
+    assert value.value == Decimal("1.0")
+    assert value.dtype == Decimal
 
 
 def test_balance() -> None:
@@ -147,6 +164,10 @@ def test_entry_types(entry: Entry) -> None:
 
     assert isinstance(entry.meta, EntryHeader)
     assert isinstance(entry.meta, Mapping)
+    converted_entry = entry._convert()  # noqa: SLF001
+    assert isinstance(converted_entry, data.ALL_DIRECTIVES)
+    assert isinstance(converted_entry.meta, dict)
+    assert converted_entry.meta == {"filename": "<string>", "lineno": 0}
 
     with pytest.raises(TypeError, match="takes 0 positional arguments"):
         assert entry._replace("")  # type: ignore[arg-type,misc]

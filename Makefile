@@ -1,49 +1,50 @@
 all: .venv
 
-# note: It's best to activate the venv before running the following
-#       targets to avoid rebuilds: https://github.com/PyO3/pyo3/issues/1708
+RUST_SOURCES := $(shell find src tree-sitter-beancount -type f)
 
-# Create and sync a dev environment.
-.venv: uv.lock pyproject.toml
-	uv sync
+# note: These commands are run in the venv with `uv run` to
+#       avoid rebuilds: https://github.com/PyO3/pyo3/issues/1708
+CARGO = uv run cargo
+
+# Create and sync a dev environment, making sure to recompile the Rust module.
+.venv: uv.lock pyproject.toml $(RUST_SOURCES)
+	uv sync --reinstall-package uromyces
 	touch -m .venv
-
-# Compile Rust extension module
-dev: .venv
-	uv run maturin develop --uv --skip-install --release
+# Rebuild Rust module (should normally not be needed).
+dev:
+	uv sync --reinstall-package uromyces
 
 # Run linters
 lint: .venv
-	cargo fmt
-	cargo clippy
+	$(CARGO) fmt
+	$(CARGO) clippy
 	pre-commit run -a
 	uv run mypy uromyces tests contrib
 	uv run ty check uromyces tests contrib
 
 # Run Rust and Python tests
-.PHONY: test test-py test-rust
 test: test-rust test-py
 test-py: .venv
 	uv run pytest --cov=uromyces --cov-report=term-missing:skip-covered --cov-report=html
 test-rust:
-	cargo test
+	$(CARGO) test
 
 # Generate Rust documentation
 doc: .venv
-	cargo doc --document-private-items
+	$(CARGO) doc --document-private-items
 
 # Update lockfiles
 update: .venv
 	uv lock --upgrade
 	pre-commit autoupdate
-	cargo update
-	cargo outdated
+	$(CARGO) update
+	$(CARGO) outdated
 	# uv run maturin generate-ci github > .github/workflows/maturin.yml
 
 # Update snapshot tests
 insta: .venv
-	-cargo insta test --unreferenced=delete
-	cargo insta review
+	-$(CARGO) insta test --unreferenced=delete
+	$(CARGO) insta review
 
 # Import Beancount booking_full_test DSL-based tests
 import-booking-tests:
@@ -52,10 +53,13 @@ import-booking-tests:
 
 clean:
 	rm -rf .*cache
+	rm -rf .coverage
 	rm -rf .venv
+	rm -rf dist
+	rm -rf htmlcov
 	rm -rf target
 	find . -type f -name '*.so' -delete
 	find . -type f -name '*.py[c0]' -delete
 	find . -type d -name "__pycache__" -delete
 
-.PHONY: clean dev doc insta lint test update
+.PHONY: clean dev doc insta lint test test-py test-rust update

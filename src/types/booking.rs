@@ -24,7 +24,7 @@ pub enum Booking {
 impl Booking {
     // It needs to be passed by ref for pyo3
     #[getter]
-    fn value<'py>(&self, py: Python<'py>) -> &Bound<'py, PyString> {
+    pub fn value<'py>(&self, py: Python<'py>) -> &Bound<'py, PyString> {
         match self {
             Self::Strict => pyo3::intern!(py, "STRICT"),
             Self::None => pyo3::intern!(py, "NONE"),

@@ -8,13 +8,12 @@ from logging import getLogger
 from pprint import pformat
 
 import click
-from beancount.core import data
-from fava.core.tree import Tree
 
 from uromyces import load_file
 from uromyces._compare import clean_metadata
 from uromyces._compare import compare_entries
 from uromyces._compat import load_beancount
+from uromyces._convert import convert_options
 from uromyces._convert import uromyces_to_beancount
 
 logger = getLogger(__name__)
@@ -29,12 +28,11 @@ class NoFileGivenError(click.UsageError):
 def cli() -> None: ...
 
 
+FILENAME_TYPE = click.Path(exists=True, dir_okay=False, resolve_path=True)
+
+
 @cli.command()
-@click.argument(
-    "filenames",
-    nargs=-1,
-    type=click.Path(exists=True, dir_okay=False, resolve_path=True),
-)
+@click.argument("filenames", nargs=-1, type=FILENAME_TYPE)
 @click.option("-v", "--verbose", is_flag=True, help="Verbose output.")
 def check(*, filenames: tuple[str, ...], verbose: bool) -> None:
     """Run uro for FILENAMES."""
@@ -59,12 +57,19 @@ def check(*, filenames: tuple[str, ...], verbose: bool) -> None:
 
 
 @cli.command()
-@click.argument(
-    "filename",
-    type=click.Path(exists=True, dir_okay=False, resolve_path=True),
-)
+@click.argument("filename", type=FILENAME_TYPE)
 @click.option("-v", "--verbose", is_flag=True, help="Verbose output.")
-def compare(*, filename: str, verbose: bool) -> None:
+@click.option(
+    "--diff-balances",
+    is_flag=True,
+    help="Print out account balances where different.",
+)
+@click.option(
+    "--print-options", is_flag=True, help="Print out the options from both."
+)
+def compare(
+    *, filename: str, verbose: bool, print_options: bool, diff_balances: bool
+) -> None:
     """Compare uro output for FILENAME to Beancunt.
 
     This loads the given file with both uromyces and Beancount and compares
@@ -72,10 +77,17 @@ def compare(*, filename: str, verbose: bool) -> None:
 
     Some metadata fields (__tolerances__ and __automatic__) are ignored.
     """
+    # Lazily import here to improve startup performance - in particular
+    # the Fava one is slow.
+    from beancount.core import data  # noqa: PLC0415
+    from fava.core.tree import Tree  # noqa: PLC0415
+
     logging.basicConfig(level=logging.INFO if verbose else logging.WARNING)
 
     ledger = load_file(filename)
-    entries_beancount, errors_beancount = load_beancount(filename)
+    entries_beancount, errors_beancount, options_beancount = load_beancount(
+        filename
+    )
 
     click.echo("Errors from uromyces")
     for error in ledger.errors:
@@ -96,25 +108,33 @@ def compare(*, filename: str, verbose: bool) -> None:
         [uromyces_to_beancount(uro) for uro in ledger.entries]
     )
 
-    balances_beancount = {
-        n.name: n.balance.to_strings()
-        for n in Tree(entries_beancount).values()
-    }
-    balances_uromyces = {
-        n.name: n.balance.to_strings() for n in Tree(entries_uromyces).values()
-    }
-    for account, balance_beancount in balances_beancount.items():
-        balance_uromyces = balances_uromyces[account]
-        if balance_beancount != balance_uromyces:
-            click.echo(
-                click.style(
-                    f"Found difference in account balance for {account}"
-                    " between Beancount and uromyces:",
-                    fg="red",
+    if diff_balances:
+        balances_beancount = {
+            n.name: n.balance.to_strings()
+            for n in Tree(entries_beancount).values()
+        }
+        balances_uromyces = {
+            n.name: n.balance.to_strings()
+            for n in Tree(entries_uromyces).values()
+        }
+        for account, balance_beancount in balances_beancount.items():
+            balance_uromyces = balances_uromyces[account]
+            if balance_beancount != balance_uromyces:
+                click.echo(
+                    click.style(
+                        f"Found difference in account balance for {account}"
+                        " between Beancount and uromyces:",
+                        fg="red",
+                    )
                 )
-            )
-            click.echo(balance_beancount)
-            click.echo(balance_uromyces)
+                click.echo(balance_beancount)
+                click.echo(balance_uromyces)
+
+    if print_options:
+        click.echo(click.style("Beancount options:", fg="green"))
+        click.echo(pformat(options_beancount))
+        click.echo(click.style("uromyces options:", fg="green"))
+        click.echo(pformat(convert_options(ledger)))
 
     diff_count = 0
     for bc, uro in zip(entries_beancount, entries_uromyces, strict=True):

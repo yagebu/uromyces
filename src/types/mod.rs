@@ -59,6 +59,7 @@ mod account;
 mod amount;
 mod booking;
 mod box_str;
+mod convert_to_beancount;
 mod cost;
 mod currency;
 mod date;
@@ -83,6 +84,8 @@ pub use paths::{AbsoluteUTF8Path, Filename};
 pub use tags_links::TagsLinks;
 
 use decimal::get_decimal_decimal;
+
+use crate::types::convert_to_beancount::ConvertToBeancount;
 
 /// The type to use for line numbers in file positions.
 pub type LineNumber = u32;
@@ -128,6 +131,17 @@ pub struct CustomValue(pub(crate) MetaValue);
 
 #[pymethods]
 impl CustomValue {
+    #[new]
+    fn __new__(py: Python<'_>, value: MetaValue, dtype: &Bound<'_, PyAny>) -> PyResult<Self> {
+        if let MetaValue::String(s) = &value {
+            let account_dtype = pyo3::intern!(py, "<AccountDummy>");
+            if dtype.eq(account_dtype)? {
+                return Ok(Self(MetaValue::Account(s.as_str().into())));
+            }
+        }
+        Ok(Self(value))
+    }
+
     #[getter]
     fn value(&self) -> &MetaValue {
         &self.0
@@ -932,6 +946,9 @@ macro_rules! pymethods_for_entry {
             }
             fn to_json(&self) -> String {
                 serde_json::to_string(&Into::<Entry>::into(self.clone())).unwrap()
+            }
+            fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+                self.convert_to_beancount(py)
             }
         }
     };

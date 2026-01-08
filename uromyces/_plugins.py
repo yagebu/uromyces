@@ -2,20 +2,19 @@
 
 from __future__ import annotations
 
-import sys
-import time
 from importlib import import_module
 from inspect import signature
 from logging import getLogger
 from pathlib import Path
 from traceback import format_exc
+from typing import NamedTuple
 from typing import TYPE_CHECKING
-
-from fava.helpers import BeancountError
 
 from uromyces._convert import beancount_entries
 from uromyces._convert import convert_options
 from uromyces._convert import uromyces_entries
+from uromyces._util import insert_sys_path
+from uromyces._util import log_timing
 
 if TYPE_CHECKING:
     from typing import Any
@@ -23,15 +22,28 @@ if TYPE_CHECKING:
     from uromyces import Ledger
 
 
-CONVERT = False
-
-
 logger = getLogger(__name__)
+
+
+class PluginError(NamedTuple):
+    """Error when trying to run a plugin."""
+
+    source: None
+    message: str
+    entry: None = None
+
+    @staticmethod
+    def from_exception(message: str) -> PluginError:
+        err = format_exc().replace("\n", "\n  ")
+        return PluginError(
+            None,
+            f"{message}:\n\n{err}",
+        )
 
 
 def import_plugin(
     plugin: str,
-) -> tuple[list[Any], list[BeancountError]]:
+) -> tuple[list[Any], list[PluginError]]:
     """Try importing a plugin and load the list of functions."""
     try:
         module = import_module(plugin)
@@ -43,75 +55,76 @@ def import_plugin(
             ]
             return functions, []
         return [], [
-            BeancountError(
-                None, f"`__plugins__` is missing in plugin '{plugin}'", None
-            )
+            PluginError(None, f"`__plugins__` is missing in plugin '{plugin}'")
         ]
     except ImportError:
         return [], [
-            BeancountError(None, f"Importing plugin '{plugin}' failed", None)
+            PluginError.from_exception(f"Importing plugin '{plugin}' failed")
         ]
 
 
-def run(ledger: Ledger) -> Ledger:  # noqa: C901
-    """Run the Beancount plugins for the ledger."""
+def run(ledger: Ledger, *, convert: bool = True) -> Ledger:
+    """Run the Beancount plugins for the ledger.
+
+    Will try to run pure Rust implementations of plugins via ledger.run_plugin.
+    If this is not possible, the entries will be converted to Beancount entries
+    according to the convert paramater and all subsequent plugins will run via
+    their Python implementation.
+
+    Args:
+        ledger: The ledger to run the plugins on.
+        convert: Whether to convert the entries to Beancount namedtuples.
+    """
     plugin_errors = []
     if not ledger.plugins:
         logger.info("No plugins to run.")
         return ledger
-    entries = None
+    entries: list[Any] | None = None
     options_map = convert_options(ledger)
 
-    if ledger.options.insert_pythonpath:
-        sys.path.insert(0, str(Path(ledger.filename).parent))
-    for plugin in ledger.plugins:
-        if ledger.run_plugin(plugin.name):
-            # Rust implementation of the plugin
-            continue
-        if entries is None:
-            before = time.time()
-            entries = (
-                beancount_entries(ledger.entries)
-                if CONVERT
-                else ledger.entries
-            )
-            if CONVERT:
-                logger.info(
-                    "Converted all entries to Beancount in %s",
-                    time.time() - before,
-                )
-        before = time.time()
-        mod_plugins, errors = import_plugin(plugin.name)
-        plugin_errors.extend(errors)
-        for func in mod_plugins:
-            sig = signature(func)
-            conf_arg = () if len(sig.parameters) == 2 else (plugin.config,)
-            try:
-                entries, new_errors = func(
-                    entries,
-                    options_map,
-                    *conf_arg,
-                )
-                plugin_errors.extend(new_errors)
-            except Exception:  # noqa: BLE001
-                err = format_exc().replace("\n", "\n  ")
-                plugin_errors.append(
-                    BeancountError(
-                        None,
-                        f"Error running plugin '{plugin.name}': {err}",
-                        None,
-                    ),
-                )
+    with insert_sys_path(
+        Path(ledger.filename).parent
+        if ledger.options.insert_pythonpath
+        else None
+    ):
+        for plugin in ledger.plugins:
+            if ledger.run_plugin(plugin.name):
+                # Rust implementation of the plugin
                 continue
-        logger.info("Ran plugin %s in %s", plugin.name, time.time() - before)
+            if entries is None:
+                if convert:
+                    with log_timing(
+                        logger, "Converted all uromyces entries to Beancount"
+                    ):
+                        entries = beancount_entries(ledger.entries)
+                else:
+                    entries = ledger.entries
+            with log_timing(logger, f"Ran plugin '{plugin.name}' (Python)"):
+                mod_plugins, errors = import_plugin(plugin.name)
+                plugin_errors.extend(errors)
+                for func in mod_plugins:
+                    sig = signature(func)
+                    conf_arg = (
+                        () if len(sig.parameters) == 2 else (plugin.config,)
+                    )
+                    try:
+                        entries, new_errors = func(
+                            entries,
+                            options_map,
+                            *conf_arg,
+                        )
+                        plugin_errors.extend(new_errors)
+                    except Exception:  # noqa: BLE001
+                        plugin_errors.append(
+                            PluginError.from_exception(
+                                f"Error running plugin '{plugin.name}'"
+                            )
+                        )
+                        continue
 
     if entries is not None:
-        before = time.time()
-        entries = uromyces_entries(entries)
-        logger.info(
-            "Convert any potential Beancount entries to uromyces in %s",
-            time.time() - before,
-        )
+        with log_timing(logger, "Convert any Beancount entries to uromyces"):
+            entries = uromyces_entries(entries)
         ledger.replace_entries(entries)
     for error in plugin_errors:
         ledger.add_error(error)

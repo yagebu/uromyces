@@ -17,14 +17,14 @@ impl SimpleTimer {
         self.time = Instant::now();
     }
 
-    /// Log the elapsed time since init or the last log and reset.
-    pub fn log_elapsed(&mut self, step: &str) {
+    /// Report the elapsed time since init or the last log and reset.
+    pub fn elapsed(&mut self, step: &str) -> String {
         let elapsed = self.time.elapsed();
-        log::info!(
+        self.reset();
+        format!(
             "{:>4}.{:03}ms - {step}",
             elapsed.as_millis(),
             elapsed.as_micros() % 1000
-        );
-        self.reset();
+        )
     }
 }

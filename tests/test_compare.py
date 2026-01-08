@@ -39,7 +39,7 @@ def test_compare(test_ledgers_dir: Path, ledger_name: str) -> None:
     """Run some comparison tests between Beancount and uromyces."""
     filename = str(test_ledgers_dir / ledger_name)
 
-    entries_bc, _errors = load_beancount(filename)
+    entries_bc, _errors, _options = load_beancount(filename)
     ledger = uromyces.load_file(filename)
     entries_uro = ledger.entries
 
