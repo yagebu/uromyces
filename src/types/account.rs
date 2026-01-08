@@ -1,9 +1,9 @@
-use std::convert::Infallible;
 use std::fmt::{Debug, Display};
 
-use internment::ArcIntern;
-use pyo3::{prelude::*, pybacked::PyBackedStr, types::PyString};
+use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
+
+use crate::types::interned_string::InternedString;
 
 /// Components of the account are separated by colons.
 const SEPARATOR: char = ':';
@@ -16,8 +16,19 @@ const SEPARATOR: char = ':';
 ///
 /// To speed up common operations on account names and reduce memory usage, this uses a string
 /// interner.
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-pub struct Account(ArcIntern<String>);
+#[derive(
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Serialize,
+    Deserialize,
+    FromPyObject,
+    IntoPyObjectRef,
+)]
+pub struct Account(InternedString);
 
 impl Account {
     /// The parent account, if there is one.
@@ -64,38 +75,19 @@ impl Account {
 
 impl Debug for Account {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("Account").field(&self.0.as_ref()).finish()
+        f.debug_tuple("Account").field(&self.0).finish()
     }
 }
 
 impl Display for Account {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        Display::fmt(&self.0.as_ref(), f)
+        Display::fmt(&self.0, f)
     }
 }
 
 impl From<&str> for Account {
     fn from(s: &str) -> Self {
-        Self(ArcIntern::from_ref(s))
-    }
-}
-
-impl<'py> IntoPyObject<'py> for &Account {
-    type Target = PyString;
-    type Output = Bound<'py, Self::Target>;
-    type Error = Infallible;
-
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        self.0.as_str().into_pyobject(py)
-    }
-}
-
-impl<'py> FromPyObject<'_, 'py> for Account {
-    type Error = PyErr;
-
-    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
-        let str = obj.extract::<PyBackedStr>()?;
-        Ok((&*str).into())
+        Self(s.into())
     }
 }
 

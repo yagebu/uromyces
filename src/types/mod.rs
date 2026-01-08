@@ -64,6 +64,7 @@ mod currency;
 mod date;
 mod decimal;
 mod flag;
+mod interned_string;
 mod metadata;
 mod paths;
 mod tags_links;

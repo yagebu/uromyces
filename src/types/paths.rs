@@ -1,16 +1,14 @@
-use std::convert::Infallible;
 use std::fmt::{Debug, Display};
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
 
-use internment::ArcIntern;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::pybacked::PyBackedStr;
-use pyo3::types::PyString;
 use serde::{Deserialize, Serialize};
 
 use crate::types::Account;
+use crate::types::interned_string::InternedString;
 
 /// Type for file paths in uromyces.
 ///
@@ -21,39 +19,39 @@ use crate::types::Account;
 ///
 /// On creation `RealFilePath` ensures it always contains an absolute path. By using `.as_ref()` a
 /// `Path` can be obtained to use all the standard path operations.
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub struct AbsoluteUTF8Path(ArcIntern<String>);
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, IntoPyObjectRef)]
+pub struct AbsoluteUTF8Path(InternedString);
 
 /// Type for filenames in uromyces that might not be real paths.
 ///
 /// This is either an absolute real file path (that is UTF-8) or a string of the form
 /// `<summarize>`.
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Filename(ArcIntern<String>);
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, IntoPyObjectRef)]
+pub struct Filename(InternedString);
 
 impl Filename {
     /// Internal helper to create `FilePath` from a path.
     fn from_ref(path: &str) -> Self {
-        Self(ArcIntern::from_ref(path))
+        Self(path.into())
     }
 
     /// Create a dummy `Filename` - .
     #[must_use]
     pub fn new_dummy(dummy: &str) -> Self {
         let value = format!("<{dummy}>");
-        Self(ArcIntern::from(value))
+        Self(value.into())
     }
 }
 
 impl AbsoluteUTF8Path {
     /// Internal helper to create `RealFilePath` from a path that we know is absolute.
     fn from_ref(path: &str) -> Self {
-        Self(ArcIntern::from_ref(path))
+        Self(path.into())
     }
 
     /// Converts to an owned `PathBuf`.
     fn to_path_buf(&self) -> PathBuf {
-        Path::new(self.0.as_ref()).to_path_buf()
+        Path::new(&*self.0).to_path_buf()
     }
 
     /// Join a path onto this one.
@@ -99,14 +97,12 @@ impl Deref for Filename {
 
 impl Debug for AbsoluteUTF8Path {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("AbsoluteUTF8Path")
-            .field(&self.0.as_ref())
-            .finish()
+        f.debug_tuple("AbsoluteUTF8Path").field(&self.0).finish()
     }
 }
 impl Debug for Filename {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("Filename").field(&self.0.as_ref()).finish()
+        f.debug_tuple("Filename").field(&self.0).finish()
     }
 }
 impl Display for AbsoluteUTF8Path {
@@ -122,7 +118,7 @@ impl Display for Filename {
 
 impl AsRef<Path> for AbsoluteUTF8Path {
     fn as_ref(&self) -> &Path {
-        self.0.as_ref().as_ref()
+        self.0.as_ref()
     }
 }
 
@@ -199,25 +195,6 @@ impl TryFrom<&Path> for AbsoluteUTF8Path {
             }
             None => Err(FilePathError::NonUnicode(value.to_path_buf())),
         }
-    }
-}
-
-impl<'py> IntoPyObject<'py> for &AbsoluteUTF8Path {
-    type Target = PyString;
-    type Output = Bound<'py, Self::Target>;
-    type Error = Infallible;
-
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        self.0.as_str().into_pyobject(py)
-    }
-}
-impl<'py> IntoPyObject<'py> for &Filename {
-    type Target = PyString;
-    type Output = Bound<'py, Self::Target>;
-    type Error = Infallible;
-
-    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        self.0.as_str().into_pyobject(py)
     }
 }
 
