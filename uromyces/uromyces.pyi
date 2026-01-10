@@ -17,12 +17,14 @@ from fava.beans import protocols
 from fava.beans.abc import Meta
 from fava.beans.abc import MetaValue
 
-from uromyces._types import Entry
+from uromyces._types import Directive
 
 class UroError:
     filename: str | None
     line: int | None
+    source: Meta
     message: str
+    entry: Directive | None
 
 class Booking(Enum):
     STRICT = "STRICT"
@@ -422,13 +424,13 @@ class Plugin:
 
 class Ledger:
     filename: str
-    entries: list[Entry]
+    entries: list[Directive]
     errors: list[UroError]
     includes: list[str]
     options: UromycesOptions
     plugins: list[Plugin]
 
-    def replace_entries(self: Ledger, entries: list[Entry]) -> None: ...
+    def replace_entries(self: Ledger, entries: list[Directive]) -> None: ...
     def add_error(self: Ledger, error: Any) -> None: ...
     def run_validations(self: Ledger) -> None: ...
     def run_plugin(self: Ledger, name: str) -> bool: ...
@@ -436,8 +438,8 @@ class Ledger:
 def load_file(filename: str) -> Ledger: ...
 def load_string(string: str, filename: str) -> Ledger: ...
 def summarize_clamp(
-    entries: Sequence[Entry],
+    entries: Sequence[Directive],
     begin_date: datetime.date,
     end_date: datetime.date,
     options: UromycesOptions,
-) -> list[Entry]: ...
+) -> list[Directive]: ...

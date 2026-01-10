@@ -18,7 +18,7 @@ from uromyces.uromyces import Transaction
 if TYPE_CHECKING:
     from typing import TypeAlias
 
-Entry: TypeAlias = (
+Directive: TypeAlias = (
     Balance
     | Close
     | Commodity

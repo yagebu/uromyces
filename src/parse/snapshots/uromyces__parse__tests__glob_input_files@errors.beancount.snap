@@ -53,17 +53,20 @@ input_file: src/parse/test_inputs/errors.beancount
     {
       "filename": "<string>",
       "line": 1,
-      "message": "Invalid booking method: INVALIDBOOKINGMETHOD"
+      "message": "Invalid booking method: INVALIDBOOKINGMETHOD",
+      "entry": null
     },
     {
       "filename": "<string>",
       "line": 4,
-      "message": "Invalid document filename: Filepath is not absolute: 'relative/path'"
+      "message": "Invalid document filename: Filepath is not absolute: 'relative/path'",
+      "entry": null
     },
     {
       "filename": "<string>",
       "line": 6,
-      "message": "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (unary_num_expr (number)) currency: (currency)))) (ERROR (currency) (currency)))"
+      "message": "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (unary_num_expr (number)) currency: (currency)))) (ERROR (currency) (currency)))",
+      "entry": null
     }
   ],
   "directives": []

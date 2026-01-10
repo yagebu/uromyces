@@ -10,11 +10,10 @@ from pprint import pformat
 import click
 
 from uromyces import load_file
-from uromyces._compare import clean_metadata
 from uromyces._compare import compare_entries
 from uromyces._compat import load_beancount
+from uromyces._convert import beancount_entries
 from uromyces._convert import convert_options
-from uromyces._convert import uromyces_to_beancount
 
 logger = getLogger(__name__)
 
@@ -104,9 +103,7 @@ def compare(
         else:
             click.echo(f"{msg}", err=True)
 
-    entries_uromyces = data.sorted(
-        [uromyces_to_beancount(uro) for uro in ledger.entries]
-    )
+    entries_uromyces = data.sorted(beancount_entries(ledger.entries))
 
     if diff_balances:
         balances_beancount = {
@@ -138,8 +135,6 @@ def compare(
 
     diff_count = 0
     for bc, uro in zip(entries_beancount, entries_uromyces, strict=True):
-        clean_metadata(bc)
-
         if not compare_entries(bc, uro):
             diff_count += 1
             if diff_count >= 30:

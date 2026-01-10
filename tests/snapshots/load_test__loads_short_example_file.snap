@@ -2008,17 +2008,553 @@ expression: ledger
     {
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
       "line": 50,
-      "message": "Invalid reference to unknown account Expenses:Financial:Fees."
+      "message": "Invalid reference to unknown account Expenses:Financial:Fees.",
+      "entry": {
+        "t": "Transaction",
+        "date": "2022-01-04",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 50,
+        "flag": "*",
+        "payee": "BANK FEES",
+        "narration": "Monthly bank fee",
+        "postings": [
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 51,
+            "meta": [],
+            "account": "Assets:US:BofA:Checking",
+            "units": {
+              "number": "-4.00",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 52,
+            "meta": [],
+            "account": "Expenses:Financial:Fees",
+            "units": {
+              "number": "4.00",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          }
+        ]
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
       "line": 160,
-      "message": "Invalid reference to unknown account Assets:US:Vanguard:Cash."
+      "message": "Invalid reference to unknown account Assets:US:Vanguard:Cash.",
+      "entry": {
+        "t": "Transaction",
+        "date": "2022-01-06",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 160,
+        "flag": "*",
+        "payee": "Hooli",
+        "narration": "Payroll",
+        "postings": [
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 161,
+            "meta": [],
+            "account": "Assets:US:BofA:Checking",
+            "units": {
+              "number": "1350.60",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 162,
+            "meta": [],
+            "account": "Assets:US:Vanguard:Cash",
+            "units": {
+              "number": "1200.00",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 163,
+            "meta": [],
+            "account": "Income:US:Hooli:Salary",
+            "units": {
+              "number": "-4615.38",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 164,
+            "meta": [],
+            "account": "Income:US:Hooli:GroupTermLife",
+            "units": {
+              "number": "-24.32",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 165,
+            "meta": [],
+            "account": "Expenses:Health:Life:GroupTermLife",
+            "units": {
+              "number": "24.32",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 166,
+            "meta": [],
+            "account": "Expenses:Health:Dental:Insurance",
+            "units": {
+              "number": "2.90",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 167,
+            "meta": [],
+            "account": "Expenses:Health:Medical:Insurance",
+            "units": {
+              "number": "27.38",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 168,
+            "meta": [],
+            "account": "Expenses:Health:Vision:Insurance",
+            "units": {
+              "number": "42.30",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 169,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:Medicare",
+            "units": {
+              "number": "106.62",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 170,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:Federal",
+            "units": {
+              "number": "1062.92",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 171,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:State",
+            "units": {
+              "number": "365.08",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 172,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:CityNYC",
+            "units": {
+              "number": "174.92",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 173,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:SDI",
+            "units": {
+              "number": "1.12",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 174,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:SocSec",
+            "units": {
+              "number": "281.54",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 175,
+            "meta": [],
+            "account": "Assets:US:Federal:PreTax401k",
+            "units": {
+              "number": "-1200.00",
+              "currency": "IRAUSD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 176,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:Federal:PreTax401k",
+            "units": {
+              "number": "1200.00",
+              "currency": "IRAUSD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 177,
+            "meta": [],
+            "account": "Assets:US:Hooli:Vacation",
+            "units": {
+              "number": "5",
+              "currency": "VACHR"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 178,
+            "meta": [],
+            "account": "Income:US:Hooli:Vacation",
+            "units": {
+              "number": "-5",
+              "currency": "VACHR"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          }
+        ]
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
       "line": 180,
-      "message": "Invalid reference to unknown account Assets:US:Vanguard:Cash."
+      "message": "Invalid reference to unknown account Assets:US:Vanguard:Cash.",
+      "entry": {
+        "t": "Transaction",
+        "date": "2022-01-20",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+        "line": 180,
+        "flag": "*",
+        "payee": "Hooli",
+        "narration": "Payroll",
+        "postings": [
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 181,
+            "meta": [],
+            "account": "Assets:US:BofA:Checking",
+            "units": {
+              "number": "1350.60",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 182,
+            "meta": [],
+            "account": "Assets:US:Vanguard:Cash",
+            "units": {
+              "number": "1200.00",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 183,
+            "meta": [],
+            "account": "Income:US:Hooli:Salary",
+            "units": {
+              "number": "-4615.38",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 184,
+            "meta": [],
+            "account": "Income:US:Hooli:GroupTermLife",
+            "units": {
+              "number": "-24.32",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 185,
+            "meta": [],
+            "account": "Expenses:Health:Life:GroupTermLife",
+            "units": {
+              "number": "24.32",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 186,
+            "meta": [],
+            "account": "Expenses:Health:Dental:Insurance",
+            "units": {
+              "number": "2.90",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 187,
+            "meta": [],
+            "account": "Expenses:Health:Medical:Insurance",
+            "units": {
+              "number": "27.38",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 188,
+            "meta": [],
+            "account": "Expenses:Health:Vision:Insurance",
+            "units": {
+              "number": "42.30",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 189,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:Medicare",
+            "units": {
+              "number": "106.62",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 190,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:Federal",
+            "units": {
+              "number": "1062.92",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 191,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:State",
+            "units": {
+              "number": "365.08",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 192,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:CityNYC",
+            "units": {
+              "number": "174.92",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 193,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:SDI",
+            "units": {
+              "number": "1.12",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 194,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:SocSec",
+            "units": {
+              "number": "281.54",
+              "currency": "USD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 195,
+            "meta": [],
+            "account": "Assets:US:Federal:PreTax401k",
+            "units": {
+              "number": "-1200.00",
+              "currency": "IRAUSD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 196,
+            "meta": [],
+            "account": "Expenses:Taxes:Y2022:US:Federal:PreTax401k",
+            "units": {
+              "number": "1200.00",
+              "currency": "IRAUSD"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 197,
+            "meta": [],
+            "account": "Assets:US:Hooli:Vacation",
+            "units": {
+              "number": "5",
+              "currency": "VACHR"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/short-example.beancount",
+            "line": 198,
+            "meta": [],
+            "account": "Income:US:Hooli:Vacation",
+            "units": {
+              "number": "-5",
+              "currency": "VACHR"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          }
+        ]
+      }
     }
   ],
   "options": {

@@ -86,6 +86,7 @@ def compare_entries(
     self: data.Directive, other: data.Directive, tolerance: Decimal = TOLERANCE
 ) -> bool:
     """Compare entries with tolerance for Decimals."""
+    clean_metadata(self)
     if isinstance(self, data.Price) and isinstance(other, data.Price):
         return (
             self.meta == other.meta

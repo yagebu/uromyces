@@ -12,7 +12,6 @@ import uromyces
 from uromyces._compare import clean_metadata
 from uromyces._compare import isclose_decimal
 from uromyces._compat import load_beancount
-from uromyces._convert import uromyces_to_beancount
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -58,4 +57,4 @@ def test_compare(test_ledgers_dir: Path, ledger_name: str) -> None:
         if postings is not None:
             postings.sort(key=lambda p: p.meta.get("lineno", 0))
 
-        assert uromyces_to_beancount(uro) == bc
+        assert uro._convert() == bc  # noqa: SLF001

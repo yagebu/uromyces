@@ -6,15 +6,14 @@
 //! should be contained in the error message.
 
 use pyo3::prelude::*;
-use pyo3::pybacked::PyBackedStr;
 use pyo3::types::{PyDict, PyMapping};
 use serde::{Deserialize, Serialize};
 
 use crate::types::{Entry, Filename, LineNumber};
 
 /// This is a user-surfaceable error.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[pyclass]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[pyclass(frozen, eq, module = "uromyces", skip_from_py_object)]
 pub struct UroError {
     /// The file that this error occured in (if it can be attributed).
     #[pyo3(get)]
@@ -25,12 +24,13 @@ pub struct UroError {
     /// The error message.
     #[pyo3(get)]
     message: String,
+    entry: Option<Box<Entry>>,
 }
 
 #[pymethods]
 impl UroError {
-    #[getter]
     /// Convert this to a Python dictionary like the `meta` attribute of Beancount entries.
+    #[getter]
     fn source<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         let meta = PyDict::new(py);
         meta.set_item(
@@ -43,40 +43,51 @@ impl UroError {
         meta.set_item(pyo3::intern!(py, "lineno"), self.line.unwrap_or(0))?;
         Ok(meta)
     }
+    #[getter]
+    fn entry(&self) -> Option<Entry> {
+        self.entry.as_ref().map(|b| *b.clone())
+    }
 }
 
-/// Turn a Python object into a [`UroError`].
-///
-/// This expects the error object to look like the standard objects/namedtuples used for Beancount
-/// errors. They should have a `.message` property containing a string and `.source` property
-/// containing either `None` or a dict with a filename and line number.
-///
-/// The `entry` property that might also exist is currently ignored/discarded here.
-pub(crate) fn error_from_py(error: &Bound<'_, PyAny>) -> PyResult<UroError> {
-    let py = error.py();
-    let msg = error
-        .getattr(pyo3::intern!(py, "message"))?
-        .extract::<String>()?;
-    let error_source = error.getattr(pyo3::intern!(py, "source"))?;
-    if error_source.is_none() {
-        return Ok(UroError::new(msg));
+// Turn a Python object into a [`UroError`].
+//
+// This expects the error object to look like the standard objects/namedtuples used for Beancount
+// errors. They should have a `.message` property containing a string and `.source` property
+// containing either `None` or a dict with a filename and line number.
+//
+// The `entry` property that might also exist is ignored/discarded here if it is not an uromyces
+// Entry.
+impl<'py> FromPyObject<'_, 'py> for UroError {
+    type Error = PyErr;
+
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        if let Ok(uro_error) = obj.cast::<Self>() {
+            Ok(uro_error.get().clone())
+        } else {
+            let py = obj.py();
+            let mut error = UroError::new(
+                obj.getattr(pyo3::intern!(py, "message"))?
+                    .extract::<String>()?,
+            );
+            let source = obj.getattr(pyo3::intern!(py, "source"))?;
+            if !source.is_none() {
+                let source = source.cast::<PyMapping>()?;
+                if let Ok(filename) = source.get_item(pyo3::intern!(py, "filename")) {
+                    error.filename = Some(filename.extract()?);
+                }
+                if let Ok(line) = source.get_item(pyo3::intern!(py, "lineno")) {
+                    error.line = Some(line.extract()?);
+                }
+            }
+            let entry = obj.getattr(pyo3::intern!(py, "entry"))?;
+            if !entry.is_none()
+                && let Ok(entry) = entry.extract::<Entry>()
+            {
+                error.entry = Some(entry.into());
+            }
+            Ok(error)
+        }
     }
-    let source = error_source.cast::<PyMapping>()?;
-    let filename = source
-        .get_item(pyo3::intern!(py, "filename"))
-        .ok()
-        .and_then(|v| -> Option<PyBackedStr> { v.extract().ok()? })
-        .and_then(|f| -> Option<Filename> { (&*f).try_into().ok() });
-    let lineno = source
-        .get_item(pyo3::intern!(py, "lineno"))
-        .ok()
-        .and_then(|v| -> Option<LineNumber> { v.extract().ok()? });
-    let uro_error = match (filename, lineno) {
-        (Some(f), Some(l)) => UroError::new(msg).with_position(f, l),
-        (Some(f), None) => UroError::new(msg).with_filename(f.clone()),
-        (None, Some(_) | None) => UroError::new(msg),
-    };
-    Ok(uro_error)
 }
 
 impl UroError {
@@ -93,6 +104,7 @@ impl UroError {
             filename: None,
             line: None,
             message: message.as_ref().to_string(),
+            entry: None,
         }
     }
 
@@ -118,6 +130,7 @@ impl UroError {
         let header = e.get_header();
         self.filename = Some(header.filename.clone());
         self.line = Some(header.line);
+        self.entry = Some(e.into());
         self
     }
 }

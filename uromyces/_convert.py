@@ -31,16 +31,18 @@ if TYPE_CHECKING:
 
     from fava.beans.types import BeancountOptions
 
-    from uromyces import Entry
+    from uromyces import Directive
     from uromyces import Ledger
 
 
-def beancount_entries(entries: Sequence[Entry]) -> list[data.Directive]:
+def beancount_entries(entries: Sequence[Directive]) -> list[data.Directive]:
     """Convert entries of the ledger to Beancount entries."""
-    return list(map(uromyces_to_beancount, entries))
+    return [entry._convert() for entry in entries]  # noqa: SLF001
 
 
-def uromyces_entries(entries: Sequence[Entry | data.Directive]) -> list[Entry]:
+def uromyces_entries(
+    entries: Sequence[Directive | data.Directive],
+) -> list[Directive]:
     """Convert Beancount entries to uromyces."""
     return list(map(beancount_to_uromyces, entries))
 
@@ -65,13 +67,8 @@ def convert_options(ledger: Ledger) -> BeancountOptions:
     return opts  # type: ignore[return-value]
 
 
-def uromyces_to_beancount(entry: Entry) -> data.Directive:
-    """Convert a uromyces Entry to a Beancount entry."""
-    return entry._convert()  # noqa: SLF001
-
-
 @singledispatch
-def beancount_to_uromyces(entry: Entry | data.Directive) -> Entry:
+def beancount_to_uromyces(entry: Directive | data.Directive) -> Directive:
     """Convert a Beancount Entry to a uromyces entry."""
     return entry  # type: ignore[return-value]
 

@@ -136,7 +136,8 @@ expression: ledger
     {
       "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
       "line": null,
-      "message": "Could not read documents directory: '[REPO_DIR]/tests/ledgers/not_a_directory'"
+      "message": "Could not read documents directory: '[REPO_DIR]/tests/ledgers/not_a_directory'",
+      "entry": null
     }
   ],
   "options": {

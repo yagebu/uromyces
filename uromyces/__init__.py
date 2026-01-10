@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from uromyces import uromyces
 from uromyces._plugins import run
-from uromyces._types import Entry
+from uromyces._types import Directive
 from uromyces.uromyces import Amount
 from uromyces.uromyces import Balance
 from uromyces.uromyces import Close
@@ -49,7 +49,7 @@ __all__ = [  # noqa: RUF022
     "Amount",
     "Cost",
     "CustomValue",
-    "Entry",
+    "Directive",
     "EntryHeader",
     "Ledger",
     "Posting",

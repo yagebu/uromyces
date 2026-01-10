@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from uromyces import Balance
 from uromyces import load_file
 from uromyces import load_string
 from uromyces.uromyces import Booking
@@ -36,6 +37,23 @@ def test_load_ledger(test_ledgers_dir: Path) -> None:
     assert ledger.entries
 
     assert repr(ledger.entries[0]).startswith("<Commodity")
+
+
+def test_load_ledger_with_errors(test_ledgers_dir: Path) -> None:
+    ledger = load_file(test_ledgers_dir / "invalid-input.beancount")
+    assert ledger.entries
+    assert len(ledger.errors) == 15
+    assert ledger.errors
+    last = ledger.errors[-1]
+    assert last
+    assert isinstance(last.entry, Balance)
+    ledger.add_error(last)
+    assert len(ledger.errors) == 16
+    last_again = ledger.errors[-1]
+    assert last_again
+    assert isinstance(last_again.entry, Balance)
+    assert last_again == last
+    assert last_again is not last
 
 
 def test_load_ledger_options(test_ledgers_dir: Path) -> None:
@@ -76,11 +94,13 @@ def test_ledger_add_error(test_ledgers_dir: Path) -> None:
     with pytest.raises(AttributeError):
         ledger.add_error(None)
     ledger.add_error(_BeancountStyleError(None, "asdf", None))
-    ledger.add_error(_BeancountStyleError({"filename": 12}, "asdf", None))
-    ledger.add_error(
-        _BeancountStyleError({"filename": "relative"}, "asdf", None)
-    )
+    with pytest.raises(TypeError, match=r"int.*as.*str"):
+        ledger.add_error(_BeancountStyleError({"filename": 12}, "asdf", None))
+    with pytest.raises(ValueError, match=r"not absolute"):
+        ledger.add_error(
+            _BeancountStyleError({"filename": "relative"}, "asdf", None)
+        )
     ledger.add_error(
         _BeancountStyleError({"filename": "/absolute"}, "asdf", None)
     )
-    assert len(ledger.errors) == 4
+    assert len(ledger.errors) == 2

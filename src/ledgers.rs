@@ -2,7 +2,7 @@
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::errors::{UroError, error_from_py};
+use crate::errors::UroError;
 use crate::options::BeancountOptions;
 #[cfg(test)]
 use crate::parse::ParsedFile;
@@ -112,7 +112,7 @@ impl Ledger {
     }
 
     /// Append some error (from the Python side).
-    pub fn add_error(&mut self, #[pyo3(from_py_with = error_from_py)] error: UroError) {
+    pub fn add_error(&mut self, error: UroError) {
         self.errors.push(error);
     }
 }

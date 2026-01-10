@@ -28,7 +28,7 @@ from uromyces import Query
 from uromyces import Transaction
 
 if TYPE_CHECKING:
-    from uromyces import Entry
+    from uromyces import Directive
     from uromyces import Ledger
 
 
@@ -151,7 +151,7 @@ HEADER = EntryHeader(
         Transaction(HEADER, "*", "payee", "narration", []),
     ],
 )
-def test_entry_types(entry: Entry) -> None:
+def test_entry_types(entry: Directive) -> None:
     assert hash(entry)
     assert entry == entry._replace(tags={"a-tag"})
     assert entry != entry._replace(tags={"a-different-tag"})

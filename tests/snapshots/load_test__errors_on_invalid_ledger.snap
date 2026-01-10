@@ -319,77 +319,316 @@ expression: ledger
     {
       "filename": null,
       "line": null,
-      "message": "Invalid account name 'NotARoot:Unknown' (invalid root account)."
+      "message": "Invalid account name 'NotARoot:Unknown' (invalid root account).",
+      "entry": null
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 2,
-      "message": "Closing unopened account Assets:Account1."
+      "message": "Closing unopened account Assets:Account1.",
+      "entry": {
+        "t": "Close",
+        "date": "2000-01-01",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 2,
+        "account": "Assets:Account1"
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 7,
-      "message": "Duplicate open directive for account Assets:Account2."
+      "message": "Duplicate open directive for account Assets:Account2.",
+      "entry": {
+        "t": "Open",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 7,
+        "account": "Assets:Account2",
+        "currencies": [],
+        "booking": null
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 12,
-      "message": "Duplicate close directive for account Assets:Account3."
+      "message": "Duplicate close directive for account Assets:Account3.",
+      "entry": {
+        "t": "Close",
+        "date": "2000-01-03",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 12,
+        "account": "Assets:Account3"
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 27,
-      "message": "Duplicate balance assertions with different amounts."
+      "message": "Duplicate balance assertions with different amounts.",
+      "entry": {
+        "t": "Balance",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 27,
+        "account": "Assets:DuplBalance2",
+        "amount": {
+          "number": "11",
+          "currency": "EUR"
+        },
+        "tolerance": null
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 31,
-      "message": "Duplicate commodity directive for EUR."
+      "message": "Duplicate commodity directive for EUR.",
+      "entry": {
+        "t": "Commodity",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 31,
+        "currency": "EUR"
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 41,
-      "message": "Invalid reference to unknown account Assets:Unknown."
+      "message": "Invalid reference to unknown account Assets:Unknown.",
+      "entry": {
+        "t": "Note",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 41,
+        "account": "Assets:Unknown",
+        "comment": "note"
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 36,
-      "message": "Invalid reference to inactive account Assets:Inactive."
+      "message": "Invalid reference to inactive account Assets:Inactive.",
+      "entry": {
+        "t": "Transaction",
+        "date": "2000-01-03",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 36,
+        "flag": "*",
+        "payee": null,
+        "narration": "",
+        "postings": [
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+            "line": 37,
+            "meta": [],
+            "account": "Assets:Inactive",
+            "units": {
+              "number": "10",
+              "currency": "EUR"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+            "line": 38,
+            "meta": [],
+            "account": "Assets:Inactive",
+            "units": {
+              "number": "-10",
+              "currency": "EUR"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          }
+        ]
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 36,
-      "message": "Invalid reference to inactive account Assets:Inactive."
+      "message": "Invalid reference to inactive account Assets:Inactive.",
+      "entry": {
+        "t": "Transaction",
+        "date": "2000-01-03",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 36,
+        "flag": "*",
+        "payee": null,
+        "narration": "",
+        "postings": [
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+            "line": 37,
+            "meta": [],
+            "account": "Assets:Inactive",
+            "units": {
+              "number": "10",
+              "currency": "EUR"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          },
+          {
+            "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+            "line": 38,
+            "meta": [],
+            "account": "Assets:Inactive",
+            "units": {
+              "number": "-10",
+              "currency": "EUR"
+            },
+            "price": null,
+            "cost": null,
+            "flag": null
+          }
+        ]
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 16,
-      "message": "Balance failed for 'Assets:DuplBalance': expected 10 EUR != accumulated 0 EUR (10 too little)"
+      "message": "Balance failed for 'Assets:DuplBalance': expected 10 EUR != accumulated 0 EUR (10 too little)",
+      "entry": {
+        "t": "Balance",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 16,
+        "account": "Assets:DuplBalance",
+        "amount": {
+          "number": "10",
+          "currency": "EUR"
+        },
+        "tolerance": null
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 17,
-      "message": "Balance failed for 'Assets:DuplBalance': expected 10 EUR != accumulated 0 EUR (10 too little)"
+      "message": "Balance failed for 'Assets:DuplBalance': expected 10 EUR != accumulated 0 EUR (10 too little)",
+      "entry": {
+        "t": "Balance",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 17,
+        "account": "Assets:DuplBalance",
+        "amount": {
+          "number": "10",
+          "currency": "EUR"
+        },
+        "tolerance": null
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 21,
-      "message": "Balance failed for 'Assets:DuplBalance1': expected 10 EUR != accumulated 0 EUR (10 too little)"
+      "message": "Balance failed for 'Assets:DuplBalance1': expected 10 EUR != accumulated 0 EUR (10 too little)",
+      "entry": {
+        "t": "Balance",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 21,
+        "account": "Assets:DuplBalance1",
+        "amount": {
+          "number": "10",
+          "currency": "EUR"
+        },
+        "tolerance": null
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 22,
-      "message": "Balance failed for 'Assets:DuplBalance1': expected 10 USD != accumulated 0 USD (10 too little)"
+      "message": "Balance failed for 'Assets:DuplBalance1': expected 10 USD != accumulated 0 USD (10 too little)",
+      "entry": {
+        "t": "Balance",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 22,
+        "account": "Assets:DuplBalance1",
+        "amount": {
+          "number": "10",
+          "currency": "USD"
+        },
+        "tolerance": null
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 26,
-      "message": "Balance failed for 'Assets:DuplBalance2': expected 10 EUR != accumulated 0 EUR (10 too little)"
+      "message": "Balance failed for 'Assets:DuplBalance2': expected 10 EUR != accumulated 0 EUR (10 too little)",
+      "entry": {
+        "t": "Balance",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 26,
+        "account": "Assets:DuplBalance2",
+        "amount": {
+          "number": "10",
+          "currency": "EUR"
+        },
+        "tolerance": null
+      }
     },
     {
       "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
       "line": 27,
-      "message": "Balance failed for 'Assets:DuplBalance2': expected 11 EUR != accumulated 0 EUR (11 too little)"
+      "message": "Balance failed for 'Assets:DuplBalance2': expected 11 EUR != accumulated 0 EUR (11 too little)",
+      "entry": {
+        "t": "Balance",
+        "date": "2000-01-02",
+        "meta": [],
+        "tags": [],
+        "links": [],
+        "filename": "[REPO_DIR]/tests/ledgers/invalid-input.beancount",
+        "line": 27,
+        "account": "Assets:DuplBalance2",
+        "amount": {
+          "number": "11",
+          "currency": "EUR"
+        },
+        "tolerance": null
+      }
     }
   ],
   "options": {
