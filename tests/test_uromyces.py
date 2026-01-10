@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 
 import pytest
-from fava.helpers import BeancountError
 
 from uromyces import load_file
 from uromyces import load_string
@@ -14,6 +14,12 @@ from uromyces.uromyces import UromycesOptions
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+
+class _BeancountStyleError(NamedTuple):
+    source: dict[str, str | int] | None
+    message: str
+    entry: None
 
 
 def test_load_ledger_invalid_path() -> None:
@@ -69,8 +75,12 @@ def test_ledger_add_error(test_ledgers_dir: Path) -> None:
 
     with pytest.raises(AttributeError):
         ledger.add_error(None)
-    ledger.add_error(BeancountError(None, "asdf", None))
-    ledger.add_error(BeancountError({"filename": 12}, "asdf", None))
-    ledger.add_error(BeancountError({"filename": "relative"}, "asdf", None))
-    ledger.add_error(BeancountError({"filename": "/absolute"}, "asdf", None))
+    ledger.add_error(_BeancountStyleError(None, "asdf", None))
+    ledger.add_error(_BeancountStyleError({"filename": 12}, "asdf", None))
+    ledger.add_error(
+        _BeancountStyleError({"filename": "relative"}, "asdf", None)
+    )
+    ledger.add_error(
+        _BeancountStyleError({"filename": "/absolute"}, "asdf", None)
+    )
     assert len(ledger.errors) == 4

@@ -1184,6 +1184,10 @@ source = { editable = "." }
 dependencies = [
     { name = "beancount" },
     { name = "click" },
+]
+
+[package.optional-dependencies]
+fava = [
     { name = "fava" },
 ]
 
@@ -1195,14 +1199,16 @@ dev = [
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ty" },
+    { name = "uromyces", extra = ["fava"] },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "beancount", specifier = ">=3" },
     { name = "click", specifier = ">=7,<9" },
-    { name = "fava" },
+    { name = "fava", marker = "extra == 'fava'", specifier = ">=1.30" },
 ]
+provides-extras = ["fava"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1212,6 +1218,7 @@ dev = [
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-cov", specifier = ">=6" },
     { name = "ty", specifier = ">=0.0.8" },
+    { name = "uromyces", extras = ["fava"] },
 ]
 
 [[package]]
