@@ -38,7 +38,6 @@ mod uromyces {
     use pyo3::prelude::*;
     use pyo3::types::PyMapping;
 
-    use crate::options::BeancountOptions;
     use crate::types::{AbsoluteUTF8Path, Filename};
     use crate::{summarize, types};
 
@@ -47,8 +46,11 @@ mod uromyces {
     use crate::Ledger;
     #[pymodule_export]
     use crate::types::{Amount, Booking, Cost, CustomValue, EntryHeader, Posting};
-
     // Entry types
+    #[pymodule_export]
+    use crate::display_precision::Precisions;
+    #[pymodule_export]
+    use crate::options::BeancountOptions;
     #[pymodule_export]
     use crate::types::{
         Balance, Close, Commodity, Custom, Document, Event, Note, Open, Pad, Price, Query,

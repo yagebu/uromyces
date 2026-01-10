@@ -4,18 +4,22 @@
 //! of all numbers (with a matching currency) in the input files and count the number of times that
 //! each display precision is used.
 
-use std::{collections::BTreeMap, fmt::Display};
+use std::collections::BTreeMap;
 
 use hashbrown::HashMap;
+use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::types::{Amount, Currency, Decimal, IncompleteAmount, MetaValue, RawEntry};
 
+const MAX_PRECISION: usize = Decimal::MAX_SCALE as usize;
+const MAX_PRECISION_INDEX: usize = MAX_PRECISION + 1;
+
 /// Stats about the used precisions for a currency.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PrecisionStats {
+struct PrecisionStats {
     has_sign: bool,
-    precisions: [u32; 29],
+    precisions: [u32; MAX_PRECISION_INDEX],
 }
 
 impl PrecisionStats {
@@ -25,7 +29,7 @@ impl PrecisionStats {
     pub fn new() -> Self {
         Self {
             has_sign: false,
-            precisions: [0; 29],
+            precisions: [0; MAX_PRECISION_INDEX],
         }
     }
 
@@ -56,69 +60,83 @@ impl PrecisionStats {
     /// Update stats with the given number.
     fn update(&mut self, dec: Decimal) {
         self.has_sign = self.has_sign || !dec.is_sign_positive();
-        self.precisions[dec.scale() as usize] += 1;
-    }
-}
-
-impl Default for PrecisionStats {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Display for PrecisionStats {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "fractional_common={} fractional_max={}",
-            self.get_common(),
-            self.get_max()
-        )
+        let scale = dec.scale() as usize;
+        assert!(scale < MAX_PRECISION_INDEX);
+        self.precisions[scale] += 1;
     }
 }
 
 #[derive(Clone, Debug)]
-pub struct DisplayPrecisionsStats {
+struct DisplayPrecisionsStats {
     map: HashMap<Currency, PrecisionStats>,
 }
 
+/// Precisions for a currency.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
 pub struct Precisions {
     has_sign: bool,
     max: u8,
     common: u8,
 }
 
+#[pymethods]
+impl Precisions {
+    fn __repr__(&self) -> String {
+        format!(
+            "Precisions(has_sign={}, max={}, common={})",
+            self.has_sign, self.max, self.common
+        )
+    }
+}
+
+impl From<PrecisionStats> for Precisions {
+    fn from(value: PrecisionStats) -> Self {
+        Precisions {
+            has_sign: value.has_sign,
+            max: value.get_max(),
+            common: value.get_common(),
+        }
+    }
+}
+
+impl<'py> IntoPyObject<'py> for &Precisions {
+    type Target = Precisions;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        self.clone().into_pyobject(py)
+    }
+}
+
 /// The summarised precisions for some currencies
 ///
 /// This uses an ordered `BTreeMap` to allow for consistent serialisation of this as part of the
 /// options
-pub type DisplayPrecisions = BTreeMap<Currency, Precisions>;
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, IntoPyObjectRef)]
+pub struct DisplayPrecisions(BTreeMap<Currency, Precisions>);
+
+impl DisplayPrecisions {
+    /// Create precision stats and summarise them to obtain the most common and max precisions.
+    #[must_use]
+    pub fn from_raw_entries(entries: &[RawEntry]) -> Self {
+        DisplayPrecisionsStats::from_raw_entries(entries).into()
+    }
+}
+
+impl From<DisplayPrecisionsStats> for DisplayPrecisions {
+    fn from(value: DisplayPrecisionsStats) -> Self {
+        Self(value.map.into_iter().map(|(c, p)| (c, p.into())).collect())
+    }
+}
 
 impl DisplayPrecisionsStats {
     #[must_use]
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self {
             map: HashMap::new(),
         }
-    }
-
-    /// Summarise the precision stats and obtain the most common and max precisions.
-    #[must_use]
-    pub fn get_precisions(self) -> DisplayPrecisions {
-        self.map
-            .iter()
-            .map(|(c, p)| {
-                (
-                    c.clone(),
-                    Precisions {
-                        has_sign: p.has_sign,
-                        max: p.get_max(),
-                        common: p.get_common(),
-                    },
-                )
-            })
-            .collect()
     }
 
     fn update(&mut self, number: Decimal, currency: &Currency) {
@@ -135,7 +153,7 @@ impl DisplayPrecisionsStats {
             });
     }
 
-    pub fn update_from_amount(&mut self, a: &Amount) {
+    fn update_from_amount(&mut self, a: &Amount) {
         self.update(a.number, &a.currency);
     }
 
@@ -145,11 +163,6 @@ impl DisplayPrecisionsStats {
         {
             self.update(number, currency);
         }
-    }
-
-    #[must_use]
-    pub fn get(&self, currency: &Currency) -> Option<&PrecisionStats> {
-        self.map.get(currency)
     }
 
     #[must_use]
@@ -190,21 +203,6 @@ impl DisplayPrecisionsStats {
             }
         }
         res
-    }
-}
-
-impl Default for DisplayPrecisionsStats {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Display for DisplayPrecisionsStats {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (currency, prec) in &self.map {
-            writeln!(f, "{currency:>10}: {prec}")?;
-        }
-        write!(f, "")
     }
 }
 
@@ -259,6 +257,7 @@ mod tests {
         p.update_from_amount(&c_eur2);
         p.update_from_amount(&c_eur2);
         p.update_from_amount(&c_eur2);
-        assert_eq!(p.get(&("EUR".into())).unwrap().get_common(), 2);
+        let eur: Currency = "EUR".into();
+        assert_eq!(p.map.get(&eur).unwrap().get_common(), 2);
     }
 }

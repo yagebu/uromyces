@@ -39,6 +39,8 @@ impl Decimal {
     pub const ONE: Decimal = Self(rust_decimal::Decimal::ONE);
     pub const TWO: Decimal = Self(rust_decimal::Decimal::TWO);
 
+    pub const MAX_SCALE: u32 = rust_decimal::Decimal::MAX_SCALE;
+
     /// Create a new decimal.
     #[must_use]
     pub fn new(num: i64, scale: u32) -> Self {

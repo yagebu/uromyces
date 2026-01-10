@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 import pytest
@@ -7,6 +8,9 @@ from fava.helpers import BeancountError
 
 from uromyces import load_file
 from uromyces import load_string
+from uromyces.uromyces import Booking
+from uromyces.uromyces import Precisions
+from uromyces.uromyces import UromycesOptions
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -26,6 +30,37 @@ def test_load_ledger(test_ledgers_dir: Path) -> None:
     assert ledger.entries
 
     assert repr(ledger.entries[0]).startswith("<Commodity")
+
+
+def test_load_ledger_options(test_ledgers_dir: Path) -> None:
+    ledger = load_file(test_ledgers_dir / "example.beancount")
+    assert ledger.entries
+    options = ledger.options
+    assert isinstance(options, UromycesOptions)
+
+    assert options.title == "Example Beancount file"
+    assert options.root_accounts.assets == "Assets"
+    assert options.root_accounts.equity == "Equity"
+    assert options.root_accounts.expenses == "Expenses"
+    assert options.root_accounts.income == "Income"
+    assert options.root_accounts.liabilities == "Liabilities"
+    assert options.account_current_conversions == "Conversions:Current"
+    assert options.account_current_earnings == "Earnings:Current"
+    assert options.account_previous_balances == "Opening-Balances"
+    assert options.account_previous_conversions == "Conversions:Previous"
+    assert options.account_previous_earnings == "Earnings:Previous"
+    assert not options.render_commas
+    assert options.operating_currency == ["USD"]
+    assert options.conversion_currency == "NOTHING"
+    assert options.documents == []
+    assert not options.insert_pythonpath
+    assert options.booking_method == Booking.STRICT
+
+    assert isinstance(options.display_precisions, Mapping)
+    usd = options.display_precisions["USD"]
+    assert usd.has_sign
+    assert usd.common == 2
+    assert isinstance(usd, Precisions)
 
 
 def test_ledger_add_error(test_ledgers_dir: Path) -> None:

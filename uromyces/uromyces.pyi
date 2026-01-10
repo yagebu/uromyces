@@ -395,7 +395,12 @@ class _RootAccounts:
     income: str
     expenses: str
 
-class BeancountOptions:
+class Precisions:
+    has_sign: bool
+    max: int
+    common: int
+
+class UromycesOptions:
     title: str
     root_accounts: _RootAccounts
     account_current_conversions: str
@@ -403,7 +408,13 @@ class BeancountOptions:
     account_previous_balances: str
     account_previous_conversions: str
     account_previous_earnings: str
+    render_commas: bool
+    operating_currency: Sequence[str]
+    conversion_currency: str
+    documents: Sequence[str]
+    booking_method: Booking
     insert_pythonpath: bool
+    display_precisions: Mapping[str, Precisions]
 
 class Plugin:
     name: str
@@ -414,7 +425,7 @@ class Ledger:
     entries: list[Entry]
     errors: list[UroError]
     includes: list[str]
-    options: BeancountOptions
+    options: UromycesOptions
     plugins: list[Plugin]
 
     def replace_entries(self: Ledger, entries: list[Entry]) -> None: ...
@@ -428,5 +439,5 @@ def summarize_clamp(
     entries: Sequence[Entry],
     begin_date: datetime.date,
     end_date: datetime.date,
-    options: BeancountOptions,
+    options: UromycesOptions,
 ) -> list[Entry]: ...

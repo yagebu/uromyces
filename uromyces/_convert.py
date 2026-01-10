@@ -62,7 +62,6 @@ def convert_options(ledger: Ledger) -> BeancountOptions:
     opts["name_equity"] = root_accounts.equity
     opts["name_income"] = root_accounts.income
     opts["name_expenses"] = root_accounts.expenses
-    opts["_uro_options"] = ledger.options
     return opts  # type: ignore[return-value]
 
 

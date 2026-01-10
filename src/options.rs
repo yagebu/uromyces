@@ -43,7 +43,7 @@ impl std::fmt::Display for BeancountOptionError {
 
 /// Beancount's options.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, module = "uromyces", name = "UromycesOptions")]
 #[allow(clippy::module_name_repetitions)]
 pub struct BeancountOptions {
     /// Title of the Beancount ledger.
@@ -93,6 +93,7 @@ pub struct BeancountOptions {
     // - account_rounding
     // - infer_tolerance_from_cost
     // - plugin_processing_mode
+    #[pyo3(get)]
     pub display_precisions: DisplayPrecisions,
 }
 

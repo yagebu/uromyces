@@ -6,7 +6,7 @@ use std::fs;
 use hashbrown::HashSet;
 
 use crate::booking;
-use crate::display_precision::DisplayPrecisionsStats;
+use crate::display_precision::DisplayPrecisions;
 use crate::errors::UroError;
 use crate::ledgers::{Ledger, RawLedger};
 use crate::parse;
@@ -156,8 +156,7 @@ fn combine_files(result: Vec<PathAndResult>) -> RawLedger {
     combined.entries.sort();
     log::info!("{}", t.elapsed("sorting entries"));
 
-    combined.options.display_precisions =
-        DisplayPrecisionsStats::from_raw_entries(&combined.entries).get_precisions();
+    combined.options.display_precisions = DisplayPrecisions::from_raw_entries(&combined.entries);
     log::info!("{}", t.elapsed("compute display context"));
 
     combined
