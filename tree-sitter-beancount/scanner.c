@@ -1,5 +1,11 @@
 #include "tree_sitter/parser.h"
 
+#ifdef _MSC_VER
+    #define UNUSED
+#else
+    #define UNUSED __attribute__((unused))
+#endif
+
 enum TokenType {
   EOL,
   INDENT,
@@ -18,29 +24,29 @@ void * tree_sitter_beancount_external_scanner_create() {
 }
 
 void tree_sitter_beancount_external_scanner_destroy(
-  __attribute__((unused)) void *payload
+  UNUSED void *payload
 ) {
   // noop
 }
 
 unsigned tree_sitter_beancount_external_scanner_serialize(
-  __attribute__((unused)) void *payload,
-  __attribute__((unused)) char *buffer
+  UNUSED void *payload,
+  UNUSED char *buffer
 ) {
   return 0;
 }
 
 
 void tree_sitter_beancount_external_scanner_deserialize(
-  __attribute__((unused)) void *payload,
-  __attribute__((unused)) char *buffer,
-  __attribute__((unused)) unsigned length
+  UNUSED void *payload,
+  UNUSED char *buffer,
+  UNUSED unsigned length
 ) {
   // noop
 }
 
 bool tree_sitter_beancount_external_scanner_scan(
-  __attribute__((unused)) void *payload,
+  UNUSED void *payload,
   TSLexer *lexer,
   const bool *valid_symbols
 ) {
