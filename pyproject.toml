@@ -1,3 +1,45 @@
+[project]
+name = "uromyces"
+description = "uromyces implements parts of Beancount's plain text accounting functionality in Rust"
+dynamic = [
+    "version",  # from Cargo.toml by maturin
+]
+authors = [
+  {name = "Jakob Schnitzer", email = "mail@jakobschnitzer.de"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+license = "GPL-2.0-only"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Education",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Information Technology",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Office/Business :: Financial :: Accounting",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+dependencies = [
+  "click>=7,<9",
+  "beancount>=3",
+  "tatsu-lts<5.15" # temporary pin to unbreak beanquery
+]
+
+[project.optional-dependencies]
+fava = [
+  "fava>=1.30",
+]
+
+[project.scripts]
+uro = "uromyces._cli:cli"
+
+[project.urls]
+Source = "https://github.com/yagebu/uromyces/"
+Issues = "https://github.com/yagebu/uromyces/issues/"
+
 [build-system]
 requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
@@ -6,27 +48,6 @@ build-backend = "maturin"
 include = ["tree-sitter-beancount/**/*"]
 features = ["pyo3/extension-module"]
 use-base-python = true
-
-[project]
-name = "uromyces"
-dynamic = ["version"]
-requires-python = ">=3.10"
-classifiers = [
-    "Programming Language :: Rust",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
-]
-dependencies = [
-  "click>=7,<9",
-  "beancount>=3",
-  "tatsu-lts<5.15" # temporary pin to unbreak beanquery
-]
-
-
-[project.optional-dependencies]
-fava = [
-  "fava>=1.30",
-]
 
 # [tool.uv.sources]
 # fava = { git = "https://github.com/beancount/fava" }
@@ -42,9 +63,6 @@ dev = [
     "pytest>=8",
     "ty>=0.0.8",
 ]
-
-[project.scripts]
-uro = "uromyces._cli:cli"
 
 [tool.black]
 line-length = 79
