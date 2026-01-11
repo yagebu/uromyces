@@ -39,7 +39,9 @@ update: .venv
 	pre-commit autoupdate
 	$(CARGO) update
 	$(CARGO) outdated
-	# uv run maturin generate-ci github > .github/workflows/maturin.yml
+
+maturin-generate-ci:
+	uv run maturin generate-ci github > .github/workflows/maturin.yml
 
 # Update snapshot tests
 insta: .venv
@@ -62,4 +64,4 @@ clean:
 	find . -type f -name '*.py[c0]' -delete
 	find . -type d -name "__pycache__" -delete
 
-.PHONY: clean dev doc insta lint test test-py test-rust update
+.PHONY: clean dev doc insta lint maturin-generate-ci test test-py test-rust update
