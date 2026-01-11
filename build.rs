@@ -55,11 +55,13 @@ fn main() {
     let parser = &dir.join("parser.c");
     let scanner = &dir.join("scanner.c");
 
-    cc::Build::new()
-        .include(&dir)
-        .file(parser)
-        .file(scanner)
-        // Enable C11 mode - for tree-sitter
-        .flag("-std=c11")
-        .compile("tree-sitter-beancount");
+    let mut build = cc::Build::new();
+    build.include(&dir).file(parser).file(scanner);
+    // Enable C11 mode - for tree-sitter
+    if build.get_compiler().is_like_msvc() {
+        build.flag("/std:c11");
+    } else {
+        build.flag("-std=c11");
+    }
+    build.compile("tree-sitter-beancount");
 }
