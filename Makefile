@@ -41,7 +41,7 @@ update: .venv
 	$(CARGO) outdated
 
 maturin-generate-ci:
-	uv run maturin generate-ci github > .github/workflows/maturin.yml
+	uv run maturin generate-ci github --output=.github/workflows/maturin.yml --platform manylinux --platform windows --platform macos
 
 # Update snapshot tests
 insta: .venv
