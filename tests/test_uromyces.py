@@ -9,9 +9,9 @@ import pytest
 from uromyces import Balance
 from uromyces import load_file
 from uromyces import load_string
-from uromyces.uromyces import Booking
-from uromyces.uromyces import Precisions
-from uromyces.uromyces import UromycesOptions
+from uromyces._uromyces import Booking
+from uromyces._uromyces import Precisions
+from uromyces._uromyces import UromycesOptions
 
 if TYPE_CHECKING:
     from pathlib import Path

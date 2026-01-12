@@ -8,7 +8,7 @@ from datetime import date
 
 import pytest
 
-from uromyces.uromyces import EntryHeader
+from uromyces import EntryHeader
 
 
 def test_entry_header() -> None:

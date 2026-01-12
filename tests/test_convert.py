@@ -6,10 +6,10 @@ from decimal import Decimal
 from beancount.core import amount
 from beancount.core import data
 
+from uromyces import Amount
+from uromyces import Balance
 from uromyces._convert import beancount_to_uromyces
-from uromyces.uromyces import Amount
-from uromyces.uromyces import Balance
-from uromyces.uromyces import Booking
+from uromyces._uromyces import Booking
 
 
 def test_amount_constructor() -> None:

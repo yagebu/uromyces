@@ -9,22 +9,22 @@ from typing import TYPE_CHECKING
 from beancount.core import data
 from beancount.parser.options import OPTIONS_DEFAULTS
 
-from uromyces.uromyces import Balance
-from uromyces.uromyces import Booking
-from uromyces.uromyces import Close
-from uromyces.uromyces import Commodity
-from uromyces.uromyces import Custom
-from uromyces.uromyces import CustomValue
-from uromyces.uromyces import Document
-from uromyces.uromyces import EntryHeader
-from uromyces.uromyces import Event
-from uromyces.uromyces import Note
-from uromyces.uromyces import Open
-from uromyces.uromyces import Pad
-from uromyces.uromyces import Posting
-from uromyces.uromyces import Price
-from uromyces.uromyces import Query
-from uromyces.uromyces import Transaction
+from uromyces._uromyces import Balance
+from uromyces._uromyces import Booking
+from uromyces._uromyces import Close
+from uromyces._uromyces import Commodity
+from uromyces._uromyces import Custom
+from uromyces._uromyces import CustomValue
+from uromyces._uromyces import Document
+from uromyces._uromyces import EntryHeader
+from uromyces._uromyces import Event
+from uromyces._uromyces import Note
+from uromyces._uromyces import Open
+from uromyces._uromyces import Pad
+from uromyces._uromyces import Posting
+from uromyces._uromyces import Price
+from uromyces._uromyces import Query
+from uromyces._uromyces import Transaction
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

@@ -45,8 +45,12 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [tool.maturin]
-include = ["tree-sitter-beancount/**/*"]
+include = [
+  { path = "tree-sitter-beancount", format = "sdist" },
+]
+python-source = "python"
 features = ["pyo3/extension-module"]
+module-name = "uromyces._uromyces"
 use-base-python = true
 
 # [tool.uv.sources]

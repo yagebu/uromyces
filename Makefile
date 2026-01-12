@@ -19,8 +19,8 @@ lint: .venv
 	$(CARGO) fmt
 	$(CARGO) clippy
 	pre-commit run -a
-	uv run mypy uromyces tests contrib
-	uv run ty check uromyces tests contrib
+	uv run mypy python tests contrib
+	uv run ty check python tests contrib
 
 # Run Rust and Python tests
 test: test-rust test-py

@@ -8,8 +8,10 @@ from collections.abc import ValuesView
 from decimal import Decimal
 from enum import Enum
 from typing import Any
+from typing import final
 from typing import Literal
 from typing import overload
+from typing import TypeAlias
 
 from beancount.core import data
 from fava.beans import abc
@@ -42,16 +44,18 @@ class _Directive:
 
     def _convert(self) -> data.Directive: ...
 
+@final
 class Amount:
     number: Decimal
     currency: str
 
     def __new__(
-        cls: Any,
+        cls: type[Amount],
         number: Decimal,
         currency: str,
     ) -> Amount: ...
 
+@final
 class Cost:
     number: Decimal
     currency: str
@@ -59,7 +63,7 @@ class Cost:
     label: str | None
 
     def __new__(
-        cls: Any,
+        cls: type[Cost],
         number: Decimal,
         currency: str,
         date: datetime.date | None,
@@ -68,29 +72,38 @@ class Cost:
 
 class CustomValue:
     value: MetaValue
-    dtype: Any
+    dtype: type[MetaValue] | Literal["<AccountDummy>"]
 
     @overload
     def __new__(
-        cls: Any, value: str, dtype: Literal["<AccountDummy>"]
-    ) -> CustomValue: ...
-    @overload
-    def __new__(cls: Any, value: int, dtype: type[int]) -> CustomValue: ...
-    @overload
-    def __new__(
-        cls: Any, value: Decimal, dtype: type[Decimal]
+        cls: type[CustomValue], value: str, dtype: Literal["<AccountDummy>"]
     ) -> CustomValue: ...
     @overload
     def __new__(
-        cls: Any, value: protocols.Amount, dtype: type[Any]
+        cls: type[CustomValue], value: int, dtype: type[int]
     ) -> CustomValue: ...
     @overload
-    def __new__(cls: Any, value: str, dtype: type[str]) -> CustomValue: ...
+    def __new__(
+        cls: type[CustomValue], value: Decimal, dtype: type[Decimal]
+    ) -> CustomValue: ...
     @overload
     def __new__(
-        cls: Any, value: datetime.date, dtype: type[datetime.date]
+        cls: type[CustomValue],
+        value: protocols.Amount,
+        dtype: type[protocols.Amount],
+    ) -> CustomValue: ...
+    @overload
+    def __new__(
+        cls: type[CustomValue], value: str, dtype: type[str]
+    ) -> CustomValue: ...
+    @overload
+    def __new__(
+        cls: type[CustomValue],
+        value: datetime.date,
+        dtype: type[datetime.date],
     ) -> CustomValue: ...
 
+@final
 class EntryHeader(Mapping[str, MetaValue]):
     date: datetime.date
     filename: str
@@ -98,7 +111,7 @@ class EntryHeader(Mapping[str, MetaValue]):
     links: frozenset[str]
 
     def __new__(
-        cls: Any,
+        cls: type[EntryHeader],
         meta: Meta,
         date: datetime.date,
         tags: set[str] | frozenset[str] | None = None,
@@ -112,6 +125,7 @@ class EntryHeader(Mapping[str, MetaValue]):
     def keys(self) -> KeysView[str]: ...
     def values(self) -> ValuesView[MetaValue]: ...
 
+@final
 class Balance(_Directive, abc.Balance):
     account: str
     amount: Amount
@@ -119,7 +133,7 @@ class Balance(_Directive, abc.Balance):
     diff_amount: None
 
     def __new__(
-        cls: Any,
+        cls: type[Balance],
         header: EntryHeader,
         account: str,
         amount: protocols.Amount,
@@ -136,11 +150,12 @@ class Balance(_Directive, abc.Balance):
         amount: protocols.Amount | None = None,
     ) -> Balance: ...
 
+@final
 class Close(_Directive, abc.Close):
     account: str
 
     def __new__(
-        cls: Any,
+        cls: type[Close],
         header: EntryHeader,
         account: str,
     ) -> Close: ...
@@ -154,11 +169,12 @@ class Close(_Directive, abc.Close):
         account: str | None = None,
     ) -> Close: ...
 
+@final
 class Commodity(_Directive, abc.Commodity):
     currency: str
 
     def __new__(
-        cls: Any,
+        cls: type[Commodity],
         header: EntryHeader,
         currency: str,
     ) -> Commodity: ...
@@ -172,12 +188,17 @@ class Commodity(_Directive, abc.Commodity):
         currency: str | None = None,
     ) -> Commodity: ...
 
+# workaround type-checkers confusing 'type' with the function param below:
+_CustomType: TypeAlias = type[Custom]
+_EventType: TypeAlias = type[Event]
+
+@final
 class Custom(_Directive, abc.Custom):
     type: str
     values: list[CustomValue]
 
     def __new__(
-        cls: Any,
+        cls: _CustomType,
         header: EntryHeader,
         type: str,  # noqa: A002
         values: list[CustomValue],
@@ -193,12 +214,13 @@ class Custom(_Directive, abc.Custom):
         value: list[CustomValue] | None = None,
     ) -> Custom: ...
 
+@final
 class Document(_Directive, abc.Document):
     account: str
     filename: str
 
     def __new__(
-        cls: Any,
+        cls: type[Document],
         header: EntryHeader,
         account: str,
         filename: str,
@@ -214,13 +236,14 @@ class Document(_Directive, abc.Document):
         filename: str | None = None,
     ) -> Document: ...
 
+@final
 class Event(_Directive, abc.Event):
     account: str
     type: str
     description: str
 
     def __new__(
-        cls: Any,
+        cls: _EventType,
         header: EntryHeader,
         type: str,  # noqa: A002
         description: str,
@@ -236,12 +259,13 @@ class Event(_Directive, abc.Event):
         description: str | None = None,
     ) -> Event: ...
 
+@final
 class Note(_Directive, abc.Note):
     account: str
     comment: str
 
     def __new__(
-        cls: Any,
+        cls: type[Note],
         header: EntryHeader,
         account: str,
         comment: str,
@@ -257,13 +281,14 @@ class Note(_Directive, abc.Note):
         comment: str | None = None,
     ) -> Note: ...
 
+@final
 class Open(_Directive, abc.Open):
     account: str
     currencies: list[str]
     booking: Booking | None  # type: ignore[assignment]
 
     def __new__(
-        cls: Any,
+        cls: type[Open],
         header: EntryHeader,
         account: str,
         currencies: list[str] | None,
@@ -281,12 +306,13 @@ class Open(_Directive, abc.Open):
         booking: Booking | None = None,
     ) -> Open: ...
 
+@final
 class Pad(_Directive, abc.Pad):
     account: str
     source_account: str
 
     def __new__(
-        cls: Any,
+        cls: type[Pad],
         header: EntryHeader,
         account: str,
         source_account: str,
@@ -302,12 +328,13 @@ class Pad(_Directive, abc.Pad):
         source_account: str | None = None,
     ) -> Pad: ...
 
+@final
 class Price(_Directive, abc.Price):
     currency: str
     amount: protocols.Amount
 
     def __new__(
-        cls: Any,
+        cls: type[Price],
         header: EntryHeader,
         currency: str,
         amount: Amount,
@@ -323,13 +350,14 @@ class Price(_Directive, abc.Price):
         amount: Amount | None = None,
     ) -> Price: ...
 
+@final
 class Query(_Directive, abc.Query):
     account: str
     name: str
     query_string: str
 
     def __new__(
-        cls: Any,
+        cls: type[Query],
         header: EntryHeader,
         name: str,
         query_string: str,
@@ -345,6 +373,7 @@ class Query(_Directive, abc.Query):
         query_string: str | None = None,
     ) -> Query: ...
 
+@final
 class Posting(abc.Posting):
     account: str
     units: protocols.Amount
@@ -354,7 +383,7 @@ class Posting(abc.Posting):
     meta: Meta | None
 
     def __new__(
-        cls: Any,
+        cls: type[Posting],
         account: str,
         units: Amount,
         cost: Cost | None = None,
@@ -363,6 +392,7 @@ class Posting(abc.Posting):
         meta: Meta | None = None,
     ) -> Posting: ...
 
+@final
 class Transaction(_Directive, abc.Transaction):
     flag: str
     payee: str
@@ -370,7 +400,7 @@ class Transaction(_Directive, abc.Transaction):
     postings: list[Posting]
 
     def __new__(
-        cls: Any,
+        cls: type[Transaction],
         header: EntryHeader,
         flag: str,
         payee: str,
@@ -390,7 +420,7 @@ class Transaction(_Directive, abc.Transaction):
         postings: list[Posting] | None = None,
     ) -> Transaction: ...
 
-class _RootAccounts:
+class RootAccounts:
     assets: str
     liabilities: str
     equity: str
@@ -404,7 +434,7 @@ class Precisions:
 
 class UromycesOptions:
     title: str
-    root_accounts: _RootAccounts
+    root_accounts: RootAccounts
     account_current_conversions: str
     account_current_earnings: str
     account_previous_balances: str

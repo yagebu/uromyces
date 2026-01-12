@@ -33,7 +33,7 @@ pub use combine::{load, load_string};
 pub use ledgers::Ledger;
 
 /// [pymodule] The uromyces.uromyces Python extension module.
-#[pymodule]
+#[pymodule(name = "_uromyces")]
 mod uromyces {
     use pyo3::prelude::*;
     use pyo3::types::PyMapping;

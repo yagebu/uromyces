@@ -63,7 +63,7 @@ def import_plugin(
         ]
 
 
-def run(ledger: Ledger, *, convert: bool = True) -> Ledger:
+def run(ledger: Ledger, *, convert: bool = True) -> None:
     """Run the Beancount plugins for the ledger.
 
     Will try to run pure Rust implementations of plugins via ledger.run_plugin.
@@ -78,7 +78,7 @@ def run(ledger: Ledger, *, convert: bool = True) -> Ledger:
     plugin_errors = []
     if not ledger.plugins:
         logger.info("No plugins to run.")
-        return ledger
+        return
     entries: list[Any] | None = None
     options_map = convert_options(ledger)
 
@@ -128,5 +128,3 @@ def run(ledger: Ledger, *, convert: bool = True) -> Ledger:
         ledger.replace_entries(entries)
     for error in plugin_errors:
         ledger.add_error(error)
-
-    return ledger
