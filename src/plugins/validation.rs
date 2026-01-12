@@ -17,11 +17,20 @@ impl From<InvalidAccountNameRoot<'_>> for UroError {
     }
 }
 
+struct InvalidAccountNameSyntax<'a>(&'a Account);
+impl From<InvalidAccountNameSyntax<'_>> for UroError {
+    fn from(val: InvalidAccountNameSyntax) -> Self {
+        UroError::new(format!(
+            "Invalid account name '{}' (does not match valid pattern).",
+            val.0
+        ))
+    }
+}
+
 /// Check that:
 ///
 /// - Each account name starts with one of the root accounts.
-/// - Each account name consists of the allowed characters (for simplicity, the lexer+parser allow
-///   all non-ASCII Unicode (TODO)
+/// - Each account name matches the valid pattern (uppercase/digit start, letters/digits/hyphens).
 pub fn account_names(ledger: &Ledger) -> Vec<UroError> {
     let mut errors = Vec::new();
 
@@ -35,8 +44,9 @@ pub fn account_names(ledger: &Ledger) -> Vec<UroError> {
     for account in all_accounts {
         if !account.has_valid_root(roots) {
             errors.push(InvalidAccountNameRoot(account).into());
+        } else if !account.has_valid_name() {
+            errors.push(InvalidAccountNameSyntax(account).into());
         }
-        // TODO: check full account syntax
     }
 
     errors

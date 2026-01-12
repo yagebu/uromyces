@@ -1,6 +1,8 @@
 use std::fmt::{Debug, Display};
+use std::sync::LazyLock;
 
 use pyo3::prelude::*;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use crate::types::interned_string::InternedString;
@@ -46,15 +48,15 @@ impl Account {
 
     /// Get the root account.
     #[must_use]
-    pub fn root(&self) -> Self {
+    fn root(&self) -> &str {
         self.0
             .find(SEPARATOR)
-            .map_or(self.clone(), |index| Self::from(&self.0[0..index]))
+            .map_or(&self.0, |index| &self.0[0..index])
     }
 
     /// Check whether the account name has a valid root.
     #[must_use]
-    pub fn has_valid_root(&self, roots: &RootAccounts) -> bool {
+    pub(crate) fn has_valid_root(&self, roots: &RootAccounts) -> bool {
         let root = self.root();
         root == roots.assets
             || root == roots.liabilities
@@ -63,15 +65,23 @@ impl Account {
             || root == roots.expenses
     }
 
-    /// Join an account name.
+    /// Check whether the account name has valid syntax.
+    ///
+    /// A valid account name:
+    /// - Has at least 2 components (root + subaccount)
+    /// - Root component starts with uppercase letter, followed by letters, digits, or hyphens
+    /// - Other components start with uppercase letter or digit, followed by letters, digits, or hyphens
     #[must_use]
-    pub fn join(&self, child: &str) -> Self {
-        let mut self_str = self.0.to_string();
-        self_str.push(':');
-        self_str.push_str(child);
-        self_str.as_str().into()
+    pub fn has_valid_name(&self) -> bool {
+        ACCOUNT_RE.is_match(&self.0)
     }
 }
+
+/// Regex for valid account names.
+static ACCOUNT_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^[\p{Lu}][\p{L}\p{Nd}\-]*(:([\p{Lu}\p{Nd}][\p{L}\p{Nd}\-]*))+$")
+        .expect("valid account regex")
+});
 
 impl Debug for Account {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -91,25 +101,43 @@ impl From<&str> for Account {
     }
 }
 
+pub(crate) trait JoinAccount {
+    /// Join a subaccount name to an account.
+    #[must_use]
+    fn join_account(&self, child: &str) -> Account;
+}
+
+/// Keep roots as plain strings - they're not cloned a lot so there's no need for interning
+type RootAccount = String;
+
+impl JoinAccount for &RootAccount {
+    fn join_account(&self, child: &str) -> Account {
+        let mut self_str = (*self).clone();
+        self_str.push(SEPARATOR);
+        self_str.push_str(child);
+        Account(self_str.into())
+    }
+}
+
 /// The five root accounts.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[pyclass(frozen, module = "uromyces")]
 pub struct RootAccounts {
     /// The root account for assets.
     #[pyo3(get)]
-    pub assets: Account,
+    pub assets: RootAccount,
     /// The root account for liabilities.
     #[pyo3(get)]
-    pub liabilities: Account,
+    pub liabilities: RootAccount,
     /// The root account for equity.
     #[pyo3(get)]
-    pub equity: Account,
+    pub equity: RootAccount,
     /// The root account for income.
     #[pyo3(get)]
-    pub income: Account,
+    pub income: RootAccount,
     /// The root account for expenses.
     #[pyo3(get)]
-    pub expenses: Account,
+    pub expenses: RootAccount,
 }
 
 impl Default for RootAccounts {
@@ -182,9 +210,9 @@ mod tests {
     #[test]
     fn test_account_root() {
         let root: Account = "Assets".into();
-        assert_eq!(root.root(), "Assets".into());
+        assert_eq!(root.root(), "Assets");
         let acc: Account = "Assets:Cash".into();
-        assert_eq!(acc.root(), "Assets".into());
+        assert_eq!(acc.root(), "Assets");
     }
 
     #[test]
@@ -199,9 +227,54 @@ mod tests {
     }
 
     #[test]
+    fn test_account_components() {
+        let acc: Account = "Assets:US:Bank:Checking".into();
+        let components: Vec<_> = acc.components().collect();
+        assert_eq!(components, vec!["Assets", "US", "Bank", "Checking"]);
+    }
+
+    #[test]
     fn test_account_join() {
-        let root: Account = "Assets".into();
+        let root = &"Assets".to_string();
         let acc: Account = "Assets:Cash".into();
-        assert_eq!(root.join("Cash"), acc);
+        let acc_sub: Account = "Assets:Cash:Sub".into();
+        assert_eq!(root.join_account("Cash"), acc);
+        assert_eq!(root.join_account("Cash:Sub"), acc_sub);
+    }
+
+    #[test]
+    fn test_has_valid_name() {
+        // Valid account names
+        assert!(Account::from("Assets:Cash").has_valid_name());
+        assert!(Account::from("Assets:US:RBS:Checking").has_valid_name());
+        assert!(Account::from("Equity:Opening-Balances").has_valid_name());
+        assert!(Account::from("Income:US:ETrade:Dividends-USD").has_valid_name());
+        assert!(Account::from("Assets:401k").has_valid_name()); // digit in subaccount start
+        assert!(Account::from("Assets:2024-Savings").has_valid_name()); // digit start with hyphen
+
+        // Invalid: only one component (no subaccount)
+        assert!(!Account::from("Assets").has_valid_name());
+        assert!(!Account::from("Income").has_valid_name());
+
+        // Invalid: lowercase in component start
+        assert!(!Account::from("Assets:cash").has_valid_name());
+        assert!(!Account::from("Assets:US:rbs").has_valid_name());
+
+        // Invalid: lowercase root
+        assert!(!Account::from("assets:Cash").has_valid_name());
+
+        // Invalid: special characters
+        assert!(!Account::from("Assets:US*RBS").has_valid_name());
+        assert!(!Account::from("Assets:US.RBS").has_valid_name());
+        assert!(!Account::from("Assets:US_RBS").has_valid_name());
+
+        // Valid: Unicode uppercase letters
+        assert!(Account::from("Активы:Наличные").has_valid_name()); // Russian
+        assert!(Account::from("Vermögen:Bank").has_valid_name()); // German umlaut in middle
+        assert!(Account::from("Assets:Épargne").has_valid_name()); // French É
+
+        // Invalid: Unicode lowercase start
+        assert!(!Account::from("Assets:наличные").has_valid_name()); // Russian lowercase
+        assert!(!Account::from("Assets:épargne").has_valid_name()); // French lowercase é
     }
 }

@@ -70,6 +70,7 @@ mod metadata;
 mod paths;
 mod tags_links;
 
+pub(crate) use account::JoinAccount;
 pub use account::{Account, RootAccounts, SummarizationAccounts};
 pub use amount::{Amount, IncompleteAmount};
 pub use booking::Booking;

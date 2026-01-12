@@ -6,7 +6,9 @@ use serde::{Deserialize, Serialize};
 use crate::display_precision::DisplayPrecisions;
 use crate::errors::UroError;
 use crate::tolerances::Tolerances;
-use crate::types::{Booking, Currency, Decimal, RawDirective, RootAccounts, SummarizationAccounts};
+use crate::types::{
+    Booking, Currency, Decimal, JoinAccount, RawDirective, RootAccounts, SummarizationAccounts,
+};
 
 #[derive(Debug)]
 pub(crate) enum BeancountOptionError {
@@ -189,11 +191,11 @@ impl BeancountOptions {
         let equity = &self.root_accounts.equity;
         SummarizationAccounts {
             roots: self.root_accounts.clone(),
-            current_conversions: equity.join(&self.account_current_conversions),
-            current_earnings: equity.join(&self.account_current_earnings),
-            previous_balances: equity.join(&self.account_previous_balances),
-            previous_conversions: equity.join(&self.account_previous_conversions),
-            previous_earnings: equity.join(&self.account_previous_earnings),
+            current_conversions: equity.join_account(&self.account_current_conversions),
+            current_earnings: equity.join_account(&self.account_current_earnings),
+            previous_balances: equity.join_account(&self.account_previous_balances),
+            previous_conversions: equity.join_account(&self.account_previous_conversions),
+            previous_earnings: equity.join_account(&self.account_previous_earnings),
         }
     }
 
