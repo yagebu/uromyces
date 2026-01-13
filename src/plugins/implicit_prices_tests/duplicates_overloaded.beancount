@@ -1,0 +1,24 @@
+;==============================================================================
+; duplicates_overloaded
+;==============================================================================
+
+2013-01-01 open Assets:Account1
+2013-01-01 open Assets:Other
+
+2013-04-01 * "Allowed, sets the price for that day"
+  Assets:Account1             1500 HOOL {520 USD}
+  Assets:Other
+
+2013-04-01 * "Will be ignored, price for the day already set"
+  Assets:Account1             1500 HOOL {530 USD}
+  Assets:Other
+
+2013-04-01 * "Should be ignored too, price for the day already set"
+  Assets:Account1             1500 HOOL {530 USD}
+  Assets:Other
+
+;------------------------------------------------------------------------------
+; prices=[
+;     "date=2013-04-01, currency=HOOL, price=520 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
+;     "date=2013-04-01, currency=HOOL, price=530 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
+; ]

@@ -64,3 +64,48 @@ pub fn add(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
 
     (new_prices, Vec::new())
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use crate::load_string;
+    use crate::test_utils::BeancountSnapshot;
+    use crate::types::AbsoluteUTF8Path;
+
+    use super::*;
+
+    fn run_implicit_prices_test(path: &Path) {
+        let mut snapshot = BeancountSnapshot::load(path);
+
+        let filename: AbsoluteUTF8Path = path.try_into().unwrap();
+        let ledger = load_string(snapshot.input(), filename.into());
+        let (new_prices, errors) = add(&ledger);
+
+        assert!(errors.is_empty());
+
+        let prices = new_prices
+            .iter()
+            .filter_map(|e| {
+                if let Entry::Price(p) = e {
+                    Some(format!(
+                        "date={}, currency={}, price={}, meta={:?}",
+                        p.header.date, p.currency, p.amount, p.header.meta
+                    ))
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>();
+
+        snapshot.add_debug_output("prices", prices);
+        snapshot.write();
+    }
+
+    #[test]
+    fn implicit_prices_test() {
+        insta::glob!("implicit_prices_tests/*.beancount", |path| {
+            run_implicit_prices_test(path);
+        });
+    }
+}

@@ -1,0 +1,24 @@
+;==============================================================================
+; duplicates_on_same_transaction
+;==============================================================================
+
+2013-01-01 open Assets:Account1
+2013-01-01 open Assets:Account2
+2013-01-01 open Assets:Other
+
+2013-04-01 * "Allowed because of same price"
+  Assets:Account1             1500 HOOL {520 USD}
+  Assets:Account2             1500 HOOL {520 USD}
+  Assets:Other
+
+2013-04-02 * "Second one is disallowed because of different price"
+  Assets:Account1             1500 HOOL {520 USD}
+  Assets:Account2             1500 HOOL {530 USD}
+  Assets:Other
+
+;------------------------------------------------------------------------------
+; prices=[
+;     "date=2013-04-01, currency=HOOL, price=520 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
+;     "date=2013-04-02, currency=HOOL, price=520 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
+;     "date=2013-04-02, currency=HOOL, price=530 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
+; ]

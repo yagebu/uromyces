@@ -1,0 +1,15 @@
+;==============================================================================
+; price_conversion
+;==============================================================================
+
+2013-01-01 open Assets:Account1
+2013-01-01 open Assets:Other
+
+2013-04-01 * "A transaction with @ price conversion"
+  Assets:Account1             100 USD @ 0.90 EUR
+  Assets:Other               -90 EUR
+
+;------------------------------------------------------------------------------
+; prices=[
+;     "date=2013-04-01, currency=USD, price=0.90 EUR, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_price\")) }])",
+; ]
