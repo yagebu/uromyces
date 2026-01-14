@@ -17,6 +17,7 @@ pub(super) enum BookingMethod {
     Average,
     Ordered(ClosingOrder),
     Strict,
+    StrictWithSize,
 }
 
 impl BookingMethod {
@@ -28,6 +29,7 @@ impl BookingMethod {
             Booking::Hifo => Some(Self::Ordered(ClosingOrder::Hifo)),
             Booking::Lifo => Some(Self::Ordered(ClosingOrder::Lifo)),
             Booking::Strict => Some(Self::Strict),
+            Booking::StrictWithSize => Some(Self::StrictWithSize),
             Booking::None => None,
         }
     }
@@ -177,6 +179,36 @@ fn resolve_strict(
     }
 }
 
+fn resolve_strict_with_size(
+    posting_units: &Amount,
+    matches: &[InventoryPositionWithCost],
+) -> Result<Vec<(Amount, Cost)>, BookingErrorKind> {
+    let strict_result = resolve_strict(posting_units, matches);
+    // If STRICT succeeds or fails with non-ambiguity error, return that
+    match &strict_result {
+        Err(BookingErrorKind::AmbiguousMatches) => {}
+        Ok(_) | Err(_) => return strict_result,
+    }
+    // STRICT failed with ambiguity - try size-based disambiguation
+    // Filter to matches with exact same size as reduction and select oldest by date.
+    let oldest_matching_position = matches
+        .iter()
+        .filter(|p| *p.number == -posting_units.number)
+        .min_by_key(|p| p.cost.date);
+
+    let Some(selected) = oldest_matching_position else {
+        return Err(BookingErrorKind::AmbiguousMatches);
+    };
+
+    let mut remainder = Remainder::new(posting_units.number);
+    let reduced = remainder.reduce(selected.number);
+
+    Ok(vec![(
+        Amount::new(reduced, selected.currency.clone()),
+        selected.cost.clone(),
+    )])
+}
+
 /// Resolves matching positions.
 pub(super) fn resolve_matches(
     method: &BookingMethod,
@@ -193,6 +225,9 @@ pub(super) fn resolve_matches(
         }
         BookingMethod::Strict => {
             resolve_strict(units, &matches).map_err(|kind| kind.with_posting(posting))
+        }
+        BookingMethod::StrictWithSize => {
+            resolve_strict_with_size(units, &matches).map_err(|kind| kind.with_posting(posting))
         }
         BookingMethod::Average => {
             Err(BookingErrorKind::UnsupportedAverageBooking.with_posting(posting))

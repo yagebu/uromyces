@@ -6,7 +6,8 @@ use crate::ledgers::RawLedger;
 use crate::parse::parse_string;
 use crate::test_utils;
 use crate::types::{
-    AbsoluteUTF8Path, Account, Entry, MIN_DATE, Posting, RawEntry, RawPosting, RawTransaction,
+    AbsoluteUTF8Path, Account, Booking, Entry, MIN_DATE, Posting, RawEntry, RawPosting,
+    RawTransaction,
 };
 
 use super::book_entries;
@@ -61,13 +62,22 @@ fn run_booking_test(path: &Path) {
         filename.clone().into(),
         parse_string(snapshot.input(), &filename.clone().into()),
     );
-    let booking_method = snapshot
-        .title()
-        .split('_')
-        .next()
-        .unwrap_or("")
-        .try_into()
-        .expect("valid booking method");
+    let title = snapshot.title();
+    let booking_methods = [
+        "STRICT_WITH_SIZE",
+        "AVERAGE",
+        "STRICT",
+        "FIFO",
+        "HIFO",
+        "LIFO",
+        "NONE",
+    ];
+    let booking_method: Booking = (*booking_methods
+        .iter()
+        .find(|m| title.starts_with(*m))
+        .expect("valid booking method prefix"))
+    .try_into()
+    .expect("valid booking method");
     let entries = &raw_ledger.entries;
     let txns_apply = entries
         .iter()

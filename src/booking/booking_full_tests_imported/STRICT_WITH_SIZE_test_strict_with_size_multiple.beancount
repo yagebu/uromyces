@@ -16,4 +16,10 @@
   Assets:Account          2 HOOL {101.00 USD, 2014-06-02}
 
 ;------------------------------------------------------------------------------
-; EXPECTED
+; errors=[]
+; booked=[
+;     "units=-2 HOOL, cost=102.00 USD, 2014-06-01",
+; ]
+; ex_balances=[
+;     "units=2 HOOL, cost=101.00 USD, 2014-06-02",
+; ]

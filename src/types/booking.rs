@@ -18,6 +18,8 @@ pub enum Booking {
     Hifo,
     #[pyo3(name = "LIFO")]
     Lifo,
+    #[pyo3(name = "STRICT_WITH_SIZE")]
+    StrictWithSize,
 }
 
 #[pymethods]
@@ -32,6 +34,7 @@ impl Booking {
             Self::Fifo => pyo3::intern!(py, "FIFO"),
             Self::Hifo => pyo3::intern!(py, "HIFO"),
             Self::Lifo => pyo3::intern!(py, "LIFO"),
+            Self::StrictWithSize => pyo3::intern!(py, "STRICT_WITH_SIZE"),
         }
     }
 }
@@ -47,6 +50,7 @@ impl TryFrom<&str> for Booking {
             "HIFO" => Ok(Self::Hifo),
             "LIFO" => Ok(Self::Lifo),
             "STRICT" => Ok(Self::Strict),
+            "STRICT_WITH_SIZE" => Ok(Self::StrictWithSize),
             _ => Err(()),
         }
     }
