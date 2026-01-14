@@ -179,7 +179,7 @@ impl DisplayPrecisionsStats {
                     }
                 }
                 RawEntry::Price(e) => res.update_from_amount(&e.amount),
-                RawEntry::Transaction(e) => {
+                RawEntry::RawTransaction(e) => {
                     for p in &e.postings {
                         res.update_from_incomplete_amount(&p.units);
                         if let Some(price) = &p.price {

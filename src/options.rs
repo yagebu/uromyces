@@ -210,13 +210,14 @@ impl BeancountOptions {
                 key,
                 value,
                 filename,
-                line,
+                lineno,
             } = directive
             {
                 let res = self.set_single_option(key, value);
                 if let Err(e) = res {
-                    errors
-                        .push(UroError::new(e.to_string()).with_position(filename.clone(), *line));
+                    errors.push(
+                        UroError::new(e.to_string()).with_position(filename.clone(), *lineno),
+                    );
                 }
             }
         }

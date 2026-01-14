@@ -10,13 +10,19 @@ use crate::types::{Cost, Currency, Decimal};
 
 /// An amount.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, str, hash, module = "uromyces", skip_from_py_object)]
+#[pyclass(
+    frozen,
+    eq,
+    get_all,
+    str,
+    hash,
+    module = "uromyces",
+    skip_from_py_object
+)]
 pub struct Amount {
     /// The number of units in this amount.
-    #[pyo3(get)]
     pub number: Decimal,
     /// The currency of the units in this amount.
-    #[pyo3(get)]
     pub currency: Currency,
 }
 
@@ -61,7 +67,7 @@ impl<'py> FromPyObject<'_, 'py> for Amount {
     type Error = PyErr;
 
     fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
-        if let Ok(amount) = obj.cast::<Amount>() {
+        if let Ok(amount) = obj.cast::<Self>() {
             Ok(amount.get().clone())
         } else {
             let number = obj.getattr(intern!(obj.py(), "number"))?;

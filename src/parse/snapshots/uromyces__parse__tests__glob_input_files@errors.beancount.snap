@@ -7,12 +7,13 @@ input_file: src/parse/test_inputs/errors.beancount
   "entries": [
     {
       "t": "Open",
+      "meta": {
+        "filename": "<string>",
+        "lineno": 2
+      },
       "date": "2000-01-01",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "<string>",
-      "line": 2,
       "account": "Assets:Cash",
       "currencies": [
         "EUR"
@@ -20,23 +21,23 @@ input_file: src/parse/test_inputs/errors.beancount
       "booking": null
     },
     {
-      "t": "Transaction",
-      "header": {
-        "date": "2022-01-21",
-        "meta": [],
-        "tags": [],
-        "links": [],
+      "t": "RawTransaction",
+      "meta": {
         "filename": "<string>",
-        "line": 9
+        "lineno": 9
       },
+      "date": "2022-01-21",
+      "tags": [],
+      "links": [],
       "flag": "*",
       "payee": null,
       "narration": "valid syntax",
       "postings": [
         {
-          "filename": "<string>",
-          "line": 10,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 10
+          },
           "account": "Income:US:Hooli:Match401k",
           "flag": null,
           "units": {
@@ -52,19 +53,19 @@ input_file: src/parse/test_inputs/errors.beancount
   "errors": [
     {
       "filename": "<string>",
-      "line": 1,
+      "lineno": 1,
       "message": "Invalid booking method: INVALIDBOOKINGMETHOD",
       "entry": null
     },
     {
       "filename": "<string>",
-      "line": 4,
+      "lineno": 4,
       "message": "Invalid document filename: Filepath is not absolute: 'relative/path'",
       "entry": null
     },
     {
       "filename": "<string>",
-      "line": 6,
+      "lineno": 6,
       "message": "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (unary_num_expr (number)) currency: (currency)))) (ERROR (currency) (currency)))",
       "entry": null
     }

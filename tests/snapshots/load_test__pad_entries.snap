@@ -7,55 +7,59 @@ expression: ledger
   "entries": [
     {
       "t": "Open",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
+        "lineno": 1
+      },
       "date": "2002-01-17",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
-      "line": 1,
       "account": "Equity:Opening-Balances",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
+        "lineno": 2
+      },
       "date": "2002-01-17",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
-      "line": 2,
       "account": "Assets:US:BofA:Checking",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Pad",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
+        "lineno": 4
+      },
       "date": "2002-01-17",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
-      "line": 4,
       "account": "Assets:US:BofA:Checking",
       "source_account": "Equity:Opening-Balances"
     },
     {
       "t": "Transaction",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
+        "lineno": 4
+      },
       "date": "2002-01-17",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
-      "line": 4,
       "flag": "P",
       "payee": null,
       "narration": "(Padding inserted for Balance of 987.34 USD for difference 987.34 USD)",
       "postings": [
         {
-          "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
-          "line": null,
-          "meta": [],
+          "meta": {
+            "filename": "[REPO_DIR]/tests/ledgers/pad.beancount"
+          },
           "account": "Assets:US:BofA:Checking",
           "units": {
             "number": "987.34",
@@ -66,9 +70,9 @@ expression: ledger
           "flag": null
         },
         {
-          "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
-          "line": null,
-          "meta": [],
+          "meta": {
+            "filename": "[REPO_DIR]/tests/ledgers/pad.beancount"
+          },
           "account": "Equity:Opening-Balances",
           "units": {
             "number": "-987.34",
@@ -82,12 +86,13 @@ expression: ledger
     },
     {
       "t": "Balance",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
+        "lineno": 6
+      },
       "date": "2014-07-09",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/pad.beancount",
-      "line": 6,
       "account": "Assets:US:BofA:Checking",
       "amount": {
         "number": "987.34",

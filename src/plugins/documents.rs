@@ -2,7 +2,7 @@
 
 use crate::errors::UroError;
 use crate::ledgers::Ledger;
-use crate::types::{AbsoluteUTF8Path, Account, Date, Document, Entry, EntryHeader};
+use crate::types::{AbsoluteUTF8Path, Account, Date, Document, Entry, EntryMeta, TagsLinks};
 
 /// Get a sorted list of all open accounts in the ledger.
 fn get_all_open_accounts(ledger: &Ledger) -> Vec<&Account> {
@@ -88,7 +88,10 @@ pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
             new_documents.extend(&mut account_files.iter().filter_map(|file_name| {
                 if let Ok(date) = Date::try_from_str(file_name) {
                     Some(Document {
-                        header: EntryHeader::new(date, ledger.filename.clone(), 0),
+                        date,
+                        tags: TagsLinks::default(),
+                        links: TagsLinks::default(),
+                        meta: EntryMeta::new(ledger.filename.clone(), 0),
                         account: (*account).clone(),
                         filename: account_dir.join(file_name),
                     })

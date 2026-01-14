@@ -4,7 +4,7 @@ use crate::types::{Filename, LineNumber, RawPosting};
 #[derive(Debug)]
 pub struct BookingError {
     filename: Filename,
-    line: LineNumber,
+    lineno: LineNumber,
     kind: BookingErrorKind,
 }
 
@@ -29,8 +29,8 @@ pub(super) enum BookingErrorKind {
 impl BookingErrorKind {
     pub(super) fn with_posting(self, posting: &RawPosting) -> BookingError {
         BookingError {
-            filename: posting.filename.clone(),
-            line: posting.line,
+            filename: posting.meta.filename.clone(),
+            lineno: posting.meta.lineno,
             kind: self,
         }
     }
@@ -64,6 +64,6 @@ impl std::fmt::Display for BookingError {
 
 impl From<BookingError> for crate::errors::UroError {
     fn from(e: BookingError) -> Self {
-        Self::new(e.to_string()).with_position(e.filename.clone(), e.line)
+        Self::new(e.to_string()).with_position(e.filename, e.lineno)
     }
 }

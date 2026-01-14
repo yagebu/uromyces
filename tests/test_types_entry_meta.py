@@ -4,24 +4,22 @@ from collections.abc import ItemsView
 from collections.abc import KeysView
 from collections.abc import Mapping
 from collections.abc import ValuesView
-from datetime import date
 
 import pytest
 
-from uromyces import EntryHeader
+from uromyces import EntryMeta
 
 
 def test_entry_header() -> None:
-    date_ = date(2022, 12, 12)
     with pytest.raises(ValueError, match="Missing filename"):
-        EntryHeader({}, date_, {"asdf"})
+        EntryMeta({})
     with pytest.raises(ValueError, match="Missing lineno"):
-        EntryHeader({"filename": "<string>"}, date_, {"asdf"})
+        EntryMeta({"filename": "<string>"})
     with pytest.raises(ValueError, match="Invalid filename"):
-        EntryHeader({"filename": "not_a_path", "lineno": 0}, date_, {"asdf"})
+        EntryMeta({"filename": "not_a_path", "lineno": 0})
 
-    EntryHeader({"filename": "<dummy>", "lineno": 0}, date_, {"asdf"})
-    EntryHeader({"filename": "/some/path", "lineno": 0}, date_, {"asdf"})
+    EntryMeta({"filename": "<dummy>", "lineno": 0})
+    EntryMeta({"filename": "/some/path", "lineno": 0})
 
 
 def test_entry_header_mapping() -> None:
@@ -30,11 +28,7 @@ def test_entry_header_mapping() -> None:
         "lineno": 0,
         "key": "string",
     }
-    header = EntryHeader(
-        meta_dict,
-        date(2022, 12, 12),
-        {"asdf"},
-    )
+    header = EntryMeta(meta_dict)
     assert isinstance(header, Mapping)
     assert dict(header) == meta_dict
 
@@ -61,20 +55,10 @@ def test_entry_header_mapping() -> None:
 
 
 def test_entry_header_constructor() -> None:
-    header = EntryHeader(
-        {"filename": "<string>", "lineno": 0},
-        date(2022, 12, 12),
-        {"asdf"},
-    )
-    assert header.tags == frozenset({"asdf"})
-    assert header.links == frozenset()
+    header = EntryMeta({"filename": "<string>", "lineno": 0})
     # not an absolute path
     assert header.filename == "<string>"
-    header = EntryHeader(
-        {"filename": "/home", "lineno": 0, "key": "string"},
-        date(2022, 12, 12),
-        {"asdf"},
-    )
+    header = EntryMeta({"filename": "/home", "lineno": 0, "key": "string"})
     assert header.filename == "/home"
     assert header["filename"] == "/home"
     assert header["lineno"] == 0
@@ -86,8 +70,6 @@ def test_entry_header_constructor() -> None:
     with pytest.raises(KeyError, match="asdf"):
         header["asdf"]
 
-    header = EntryHeader(
-        {"filename": "/home", "lineno": 0, "__implicit_prices": "string"},
-        date(2022, 12, 12),
-        {"asdf"},
+    header = EntryMeta(
+        {"filename": "/home", "lineno": 0, "__implicit_prices": "string"}
     )

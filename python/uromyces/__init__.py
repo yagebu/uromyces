@@ -15,7 +15,7 @@ from uromyces._uromyces import Cost
 from uromyces._uromyces import Custom
 from uromyces._uromyces import CustomValue
 from uromyces._uromyces import Document
-from uromyces._uromyces import EntryHeader
+from uromyces._uromyces import EntryMeta
 from uromyces._uromyces import Event
 from uromyces._uromyces import Ledger
 from uromyces._uromyces import Note
@@ -50,7 +50,7 @@ __all__ = [  # noqa: RUF022
     "Cost",
     "CustomValue",
     "Directive",
-    "EntryHeader",
+    "EntryMeta",
     "Ledger",
     "Posting",
     # Functions

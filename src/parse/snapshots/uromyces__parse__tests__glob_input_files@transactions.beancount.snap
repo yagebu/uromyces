@@ -6,23 +6,23 @@ input_file: src/parse/test_inputs/transactions.beancount
 {
   "entries": [
     {
-      "t": "Transaction",
-      "header": {
-        "date": "2022-01-10",
-        "meta": [],
-        "tags": [],
-        "links": [],
+      "t": "RawTransaction",
+      "meta": {
         "filename": "<string>",
-        "line": 1
+        "lineno": 1
       },
+      "date": "2022-01-10",
+      "tags": [],
+      "links": [],
       "flag": "*",
       "payee": null,
       "narration": "Investing 60% of cash in RGAGX",
       "postings": [
         {
-          "filename": "<string>",
-          "line": 2,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 2
+          },
           "account": "Assets:US:Vanguard:RGAGX",
           "flag": null,
           "units": {
@@ -40,9 +40,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           }
         },
         {
-          "filename": "<string>",
-          "line": 3,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 3
+          },
           "account": "Assets:US:Vanguard:RGAGX",
           "flag": null,
           "units": {
@@ -60,9 +61,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           }
         },
         {
-          "filename": "<string>",
-          "line": 4,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 4
+          },
           "account": "Assets:US:Vanguard:RGAGX",
           "flag": null,
           "units": {
@@ -80,9 +82,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           }
         },
         {
-          "filename": "<string>",
-          "line": 5,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 5
+          },
           "account": "Assets:US:Vanguard:RGAGX",
           "flag": null,
           "units": {
@@ -100,9 +103,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           }
         },
         {
-          "filename": "<string>",
-          "line": 6,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 6
+          },
           "account": "Assets:US:Vanguard:RGAGX",
           "flag": null,
           "units": {
@@ -120,9 +124,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           }
         },
         {
-          "filename": "<string>",
-          "line": 7,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 7
+          },
           "account": "Assets:US:Vanguard:RGAGX",
           "flag": null,
           "units": {
@@ -140,9 +145,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           }
         },
         {
-          "filename": "<string>",
-          "line": 8,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 8
+          },
           "account": "Assets:US:Vanguard:RGAGX",
           "flag": null,
           "units": {
@@ -163,9 +169,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           }
         },
         {
-          "filename": "<string>",
-          "line": 9,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 9
+          },
           "account": "Assets:US:Vanguard:RGAGX",
           "flag": null,
           "units": {
@@ -186,9 +193,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           }
         },
         {
-          "filename": "<string>",
-          "line": 10,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 10
+          },
           "account": "Assets:US:Vanguard:Cash",
           "flag": null,
           "units": {
@@ -201,42 +209,30 @@ input_file: src/parse/test_inputs/transactions.beancount
       ]
     },
     {
-      "t": "Transaction",
-      "header": {
-        "date": "2022-01-21",
-        "meta": [
-          {
-            "key": "info",
-            "value": {
-              "String": "Some metadata"
-            }
-          }
-        ],
-        "tags": [
-          "tag",
-          "another-tag"
-        ],
-        "links": [
-          "link"
-        ],
+      "t": "RawTransaction",
+      "meta": {
         "filename": "<string>",
-        "line": 12
+        "lineno": 12,
+        "info": "Some metadata"
       },
+      "date": "2022-01-21",
+      "tags": [
+        "tag",
+        "another-tag"
+      ],
+      "links": [
+        "link"
+      ],
       "flag": "*",
       "payee": "payee",
       "narration": "narration",
       "postings": [
         {
-          "filename": "<string>",
-          "line": 14,
-          "meta": [
-            {
-              "key": "posting_meta",
-              "value": {
-                "String": "testetss"
-              }
-            }
-          ],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 14,
+            "posting_meta": "testetss"
+          },
           "account": "Assets:US:Vanguard:Cash",
           "flag": null,
           "units": {
@@ -247,9 +243,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           "cost": null
         },
         {
-          "filename": "<string>",
-          "line": 16,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 16
+          },
           "account": "Income:US:Hooli:Match401k",
           "flag": null,
           "units": {
@@ -262,38 +259,27 @@ input_file: src/parse/test_inputs/transactions.beancount
       ]
     },
     {
-      "t": "Transaction",
-      "header": {
-        "date": "2022-01-21",
-        "meta": [
-          {
-            "key": "asdf",
-            "value": {
-              "String": "asdf"
-            }
-          },
-          {
-            "key": "info",
-            "value": {
-              "String": "Some metadata"
-            }
-          }
-        ],
-        "tags": [
-          "tag"
-        ],
-        "links": [],
+      "t": "RawTransaction",
+      "meta": {
         "filename": "<string>",
-        "line": 21
+        "lineno": 21,
+        "asdf": "asdf",
+        "info": "Some metadata"
       },
+      "date": "2022-01-21",
+      "tags": [
+        "tag"
+      ],
+      "links": [],
       "flag": "*",
       "payee": null,
       "narration": "narration",
       "postings": [
         {
-          "filename": "<string>",
-          "line": 23,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 23
+          },
           "account": "Assets:US:Vanguard:Cash",
           "flag": null,
           "units": {
@@ -307,9 +293,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           "cost": null
         },
         {
-          "filename": "<string>",
-          "line": 24,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 24
+          },
           "account": "Income:US:Hooli:Match401k",
           "flag": "!",
           "units": {
@@ -322,30 +309,24 @@ input_file: src/parse/test_inputs/transactions.beancount
       ]
     },
     {
-      "t": "Transaction",
-      "header": {
-        "date": "2022-01-21",
-        "meta": [
-          {
-            "key": "info",
-            "value": {
-              "String": "Some metadata"
-            }
-          }
-        ],
-        "tags": [],
-        "links": [],
+      "t": "RawTransaction",
+      "meta": {
         "filename": "<string>",
-        "line": 29
+        "lineno": 29,
+        "info": "Some metadata"
       },
+      "date": "2022-01-21",
+      "tags": [],
+      "links": [],
       "flag": "*",
       "payee": null,
       "narration": "narration",
       "postings": [
         {
-          "filename": "<string>",
-          "line": 31,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 31
+          },
           "account": "Assets:US:Vanguard:Cash",
           "flag": null,
           "units": {
@@ -359,9 +340,10 @@ input_file: src/parse/test_inputs/transactions.beancount
           "cost": null
         },
         {
-          "filename": "<string>",
-          "line": 32,
-          "meta": [],
+          "meta": {
+            "filename": "<string>",
+            "lineno": 32
+          },
           "account": "Income:US:Hooli:Match401k",
           "flag": "!",
           "units": {

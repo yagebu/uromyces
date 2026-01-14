@@ -10,7 +10,7 @@ input_file: src/parse/test_inputs/directives.beancount
     {
       "Option": {
         "filename": "<string>",
-        "line": 1,
+        "lineno": 1,
         "key": "name",
         "value": "file name"
       }
@@ -18,7 +18,7 @@ input_file: src/parse/test_inputs/directives.beancount
     {
       "Option": {
         "filename": "<string>",
-        "line": 3,
+        "lineno": 3,
         "key": "name_assets",
         "value": "AssetsRootAccount"
       }

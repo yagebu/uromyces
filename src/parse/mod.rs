@@ -222,7 +222,7 @@ pub fn convert_syntax_tree(parsed_tree: &ParsedTree, filename: &Filename) -> Par
                 node_ids::OPTION => {
                     result.directives.push(RawDirective::Option {
                         filename: filename.clone(),
-                        line: node.line_number(),
+                        lineno: node.line_number(),
                         key: String::from_node(node.required_child(1), state),
                         value: String::from_node(node.required_child(2), state),
                     });

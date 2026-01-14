@@ -32,22 +32,18 @@ impl From<String> for CostLabel {
 
 /// A cost (basically an Amount + date and label).
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces", skip_from_py_object)]
+#[pyclass(frozen, eq, get_all, module = "uromyces", skip_from_py_object)]
 pub struct Cost {
     /// The per-unit cost.
-    #[pyo3(get)]
     pub number: Decimal,
     /// The currency.
-    #[pyo3(get)]
     pub currency: Currency,
     /// The date that this lot was created.
     ///
     /// This can be provided in the input but will be filled in by the transaction date
     /// if not provided automatically.
-    #[pyo3(get)]
     pub date: Date,
     /// An optional label to identify a position.
-    #[pyo3(get)]
     pub label: Option<CostLabel>,
 }
 
@@ -91,7 +87,7 @@ impl<'py> FromPyObject<'_, 'py> for Cost {
     type Error = PyErr;
 
     fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
-        if let Ok(a) = obj.cast::<Cost>() {
+        if let Ok(a) = obj.cast::<Self>() {
             Ok(a.get().clone())
         } else {
             let py = obj.py();

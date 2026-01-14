@@ -45,7 +45,7 @@ mod uromyces {
     #[pymodule_export]
     use crate::Ledger;
     #[pymodule_export]
-    use crate::types::{Amount, Booking, Cost, CustomValue, EntryHeader, Posting};
+    use crate::types::{Amount, Booking, Cost, CustomValue, EntryMeta, Posting};
     // Entry types
     #[pymodule_export]
     use crate::display_precision::Precisions;
@@ -90,7 +90,7 @@ mod uromyces {
     fn init_uromyces(m: &Bound<'_, PyModule>) -> PyResult<()> {
         pyo3_log::init();
 
-        PyMapping::register::<types::EntryHeader>(m.py())?;
+        PyMapping::register::<types::EntryMeta>(m.py())?;
 
         Ok(())
     }

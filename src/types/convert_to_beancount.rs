@@ -70,8 +70,7 @@ impl ConvertToBeancount for Posting {
                 &self.cost.convert_to_beancount(py)?,
                 &self.price.convert_to_beancount(py)?,
                 &self.flag,
-                self.meta
-                    .to_py_dict(py, self.filename.as_ref(), self.line)?,
+                self.meta.to_py_dict(py)?,
             ))
     }
 }
@@ -82,8 +81,8 @@ impl ConvertToBeancount for Balance {
         BALANCE
             .import(py, "beancount.core.data", "Balance")?
             .call1((
-                &self.header.to_py_dict(py)?,
-                &self.header.date,
+                &self.meta.to_py_dict(py)?,
+                &self.date,
                 &self.account,
                 &self.amount.convert_to_beancount(py)?,
                 &self.tolerance,
@@ -97,11 +96,7 @@ impl ConvertToBeancount for Commodity {
         static COMMODITY: PyOnceLock<Py<PyType>> = PyOnceLock::new();
         COMMODITY
             .import(py, "beancount.core.data", "Commodity")?
-            .call1((
-                &self.header.to_py_dict(py)?,
-                &self.header.date,
-                &self.currency,
-            ))
+            .call1((&self.meta.to_py_dict(py)?, &self.date, &self.currency))
     }
 }
 
@@ -109,8 +104,8 @@ impl ConvertToBeancount for Close {
     fn convert_to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         static CLOSE: PyOnceLock<Py<PyType>> = PyOnceLock::new();
         CLOSE.import(py, "beancount.core.data", "Close")?.call1((
-            &self.header.to_py_dict(py)?,
-            &self.header.date,
+            &self.meta.to_py_dict(py)?,
+            &self.date,
             &self.account,
         ))
     }
@@ -120,8 +115,8 @@ impl ConvertToBeancount for Custom {
     fn convert_to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         static CUSTOM: PyOnceLock<Py<PyType>> = PyOnceLock::new();
         CUSTOM.import(py, "beancount.core.data", "Custom")?.call1((
-            &self.header.to_py_dict(py)?,
-            &self.header.date,
+            &self.meta.to_py_dict(py)?,
+            &self.date,
             &self.r#type,
             self.values.convert_to_beancount(py)?,
         ))
@@ -134,12 +129,12 @@ impl ConvertToBeancount for Document {
         DOCUMENT
             .import(py, "beancount.core.data", "Document")?
             .call1((
-                &self.header.to_py_dict(py)?,
-                &self.header.date,
+                &self.meta.to_py_dict(py)?,
+                &self.date,
                 &self.account,
                 &self.filename,
-                &self.header.tags,
-                &self.header.links,
+                &self.tags,
+                &self.links,
             ))
     }
 }
@@ -148,8 +143,8 @@ impl ConvertToBeancount for Event {
     fn convert_to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         static EVENT: PyOnceLock<Py<PyType>> = PyOnceLock::new();
         EVENT.import(py, "beancount.core.data", "Event")?.call1((
-            &self.header.to_py_dict(py)?,
-            &self.header.date,
+            &self.meta.to_py_dict(py)?,
+            &self.date,
             &self.r#type,
             &self.description,
         ))
@@ -160,12 +155,12 @@ impl ConvertToBeancount for Note {
     fn convert_to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         static NOTE: PyOnceLock<Py<PyType>> = PyOnceLock::new();
         NOTE.import(py, "beancount.core.data", "Note")?.call1((
-            &self.header.to_py_dict(py)?,
-            &self.header.date,
+            &self.meta.to_py_dict(py)?,
+            &self.date,
             &self.account,
             &self.comment,
-            &self.header.tags,
-            &self.header.links,
+            &self.tags,
+            &self.links,
         ))
     }
 }
@@ -176,8 +171,8 @@ impl ConvertToBeancount for Open {
         static OPEN: PyOnceLock<Py<PyType>> = PyOnceLock::new();
         let booking = BOOKING.import(py, "beancount.core.data", "Booking")?;
         OPEN.import(py, "beancount.core.data", "Open")?.call1((
-            &self.header.to_py_dict(py)?,
-            &self.header.date,
+            &self.meta.to_py_dict(py)?,
+            &self.date,
             &self.account,
             if self.currencies.is_empty() {
                 PyNone::get(py).into_bound_py_any(py)?
@@ -196,8 +191,8 @@ impl ConvertToBeancount for Pad {
     fn convert_to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         static PAD: PyOnceLock<Py<PyType>> = PyOnceLock::new();
         PAD.import(py, "beancount.core.data", "Pad")?.call1((
-            &self.header.to_py_dict(py)?,
-            &self.header.date,
+            &self.meta.to_py_dict(py)?,
+            &self.date,
             &self.account,
             &self.source_account,
         ))
@@ -208,8 +203,8 @@ impl ConvertToBeancount for Price {
     fn convert_to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         static PRICE: PyOnceLock<Py<PyType>> = PyOnceLock::new();
         PRICE.import(py, "beancount.core.data", "Price")?.call1((
-            &self.header.to_py_dict(py)?,
-            &self.header.date,
+            &self.meta.to_py_dict(py)?,
+            &self.date,
             &self.currency,
             self.amount.convert_to_beancount(py)?,
         ))
@@ -222,13 +217,13 @@ impl ConvertToBeancount for Transaction {
         TRANSACTION
             .import(py, "beancount.core.data", "Transaction")?
             .call1((
-                &self.header.to_py_dict(py)?,
-                &self.header.date,
+                &self.meta.to_py_dict(py)?,
+                &self.date,
                 &self.flag,
                 &self.payee,
                 &self.narration,
-                &self.header.tags,
-                &self.header.links,
+                &self.tags,
+                &self.links,
                 self.postings.convert_to_beancount(py)?,
             ))
     }
@@ -237,8 +232,8 @@ impl ConvertToBeancount for Query {
     fn convert_to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         static QUERY: PyOnceLock<Py<PyType>> = PyOnceLock::new();
         QUERY.import(py, "beancount.core.data", "Query")?.call1((
-            &self.header.to_py_dict(py)?,
-            &self.header.date,
+            &self.meta.to_py_dict(py)?,
+            &self.date,
             &self.name,
             &self.query_string,
         ))

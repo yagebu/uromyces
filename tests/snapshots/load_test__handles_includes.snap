@@ -7,12 +7,13 @@ expression: ledger
   "entries": [
     {
       "t": "Open",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/includes/included.beancount",
+        "lineno": 1
+      },
       "date": "1980-05-12",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/includes/included.beancount",
-      "line": 1,
       "account": "Equity:Included-Account",
       "currencies": [],
       "booking": null

@@ -7,127 +7,138 @@ expression: ledger
   "entries": [
     {
       "t": "Open",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 4
+      },
       "date": "2000-01-01",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 4,
       "account": "Assets:Account1",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 5
+      },
       "date": "2000-01-01",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 5,
       "account": "Assets:Account2",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 6
+      },
       "date": "2000-01-01",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 6,
       "account": "Assets:Account3",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 7
+      },
       "date": "2000-01-01",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 7,
       "account": "Assets:AccountWithoutDocuments",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Open",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 8
+      },
       "date": "2000-01-01",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 8,
       "account": "Expenses:AccountWithoutDocuments",
       "currencies": [],
       "booking": null
     },
     {
       "t": "Document",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 0
+      },
       "date": "2000-01-01",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 0,
       "account": "Assets:Account1",
       "filename": "[REPO_DIR]/tests/ledgers/documents/Assets/Account1/2000-01-01.doc.txt"
     },
     {
       "t": "Document",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 0
+      },
       "date": "2000-01-01",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 0,
       "account": "Assets:Account2",
       "filename": "[REPO_DIR]/tests/ledgers/documents/Assets/Account2/2000-01-01.doc.txt"
     },
     {
       "t": "Document",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 0
+      },
       "date": "2000-01-01",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 0,
       "account": "Assets:Account3",
       "filename": "[REPO_DIR]/tests/ledgers/documents/Assets/Account3/2000-01-01.doc.txt"
     },
     {
       "t": "Document",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 0
+      },
       "date": "2022-12-31",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 0,
       "account": "Assets:Account1",
       "filename": "[REPO_DIR]/tests/ledgers/documents/Assets/Account1/2022-12-31 test.txt"
     },
     {
       "t": "Document",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 0
+      },
       "date": "2022-12-31",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 0,
       "account": "Assets:Account2",
       "filename": "[REPO_DIR]/tests/ledgers/documents/Assets/Account2/2022-12-31 test.txt"
     },
     {
       "t": "Document",
+      "meta": {
+        "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
+        "lineno": 0
+      },
       "date": "2022-12-31",
-      "meta": [],
       "tags": [],
       "links": [],
-      "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": 0,
       "account": "Assets:Account3",
       "filename": "[REPO_DIR]/tests/ledgers/documents/Assets/Account3/2022-12-31 test.txt"
     }
@@ -135,7 +146,7 @@ expression: ledger
   "errors": [
     {
       "filename": "[REPO_DIR]/tests/ledgers/documents.beancount",
-      "line": null,
+      "lineno": null,
       "message": "Could not read documents directory: '[REPO_DIR]/tests/ledgers/not_a_directory'",
       "entry": null
     }

@@ -3,7 +3,7 @@ use hashbrown::{HashMap, HashSet};
 use crate::Ledger;
 use crate::errors::UroError;
 use crate::inventory::{BookingResult, Inventory};
-use crate::types::{Amount, Entry, EntryHeader, Price};
+use crate::types::{Amount, Entry, EntryMeta, Price, TagsLinks};
 
 const META_KEY: &str = "__implicit_prices__";
 
@@ -14,49 +14,53 @@ pub fn add(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
     let mut balances = HashMap::new();
     let mut unique_prices = HashSet::new();
 
-    for e in &ledger.entries {
-        if let Entry::Transaction(txn) = e {
-            for posting in &txn.postings {
-                let res = balances
-                    .entry(&posting.account)
-                    .or_insert_with(Inventory::new)
-                    .add_position(posting);
+    for transaction in ledger.entries.iter().filter_map(|e| e.as_transaction()) {
+        for posting in &transaction.postings {
+            let res = balances
+                .entry(&posting.account)
+                .or_insert_with(Inventory::new)
+                .add_position(posting);
 
-                let price_entry = if let Some(price) = &posting.price {
-                    let mut header = EntryHeader::from_existing(&txn.header);
-                    header.add_meta(META_KEY, "from_price");
-                    Some(Price {
-                        header,
-                        currency: posting.units.currency.clone(),
-                        amount: price.clone(),
-                    })
-                } else if let Some(cost) = &posting.cost {
-                    if res == BookingResult::REDUCED {
-                        None
-                    } else {
-                        let mut header = EntryHeader::from_existing(&txn.header);
-                        header.add_meta(META_KEY, "from_cost");
-                        Some(Price {
-                            header,
-                            currency: posting.units.currency.clone(),
-                            amount: Amount::from_cost(cost),
-                        })
-                    }
-                } else {
+            let price_entry = if let Some(price) = &posting.price {
+                let mut header = EntryMeta::from_existing(&transaction.meta);
+                header.add_meta(META_KEY, "from_price");
+                Some(Price {
+                    date: transaction.date,
+                    tags: TagsLinks::default(),
+                    links: TagsLinks::default(),
+                    meta: header,
+                    currency: posting.units.currency.clone(),
+                    amount: price.clone(),
+                })
+            } else if let Some(cost) = &posting.cost {
+                if res == BookingResult::REDUCED {
                     None
-                };
+                } else {
+                    let mut header = EntryMeta::from_existing(&transaction.meta);
+                    header.add_meta(META_KEY, "from_cost");
+                    Some(Price {
+                        date: transaction.date,
+                        tags: TagsLinks::default(),
+                        links: TagsLinks::default(),
+                        meta: header,
+                        currency: posting.units.currency.clone(),
+                        amount: Amount::from_cost(cost),
+                    })
+                }
+            } else {
+                None
+            };
 
-                if let Some(p) = price_entry {
-                    let key = (
-                        p.header.date,
-                        p.currency.clone(),
-                        p.amount.number,
-                        p.amount.currency.clone(),
-                    );
-                    if !unique_prices.contains(&key) {
-                        unique_prices.insert(key);
-                        new_prices.push(p.into());
-                    }
+            if let Some(p) = price_entry {
+                let key = (
+                    p.date,
+                    p.currency.clone(),
+                    p.amount.number,
+                    p.amount.currency.clone(),
+                );
+                if !unique_prices.contains(&key) {
+                    unique_prices.insert(key);
+                    new_prices.push(p.into());
                 }
             }
         }
@@ -86,15 +90,12 @@ mod tests {
 
         let prices = new_prices
             .iter()
-            .filter_map(|e| {
-                if let Entry::Price(p) = e {
-                    Some(format!(
-                        "date={}, currency={}, price={}, meta={:?}",
-                        p.header.date, p.currency, p.amount, p.header.meta
-                    ))
-                } else {
-                    None
-                }
+            .filter_map(|e| e.as_price())
+            .map(|p| {
+                format!(
+                    "date={}, currency={}, price={}, meta={:?}",
+                    p.date, p.currency, p.amount, p.meta.meta
+                )
             })
             .collect::<Vec<_>>();
 

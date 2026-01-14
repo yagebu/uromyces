@@ -121,22 +121,17 @@ impl JoinAccount for &RootAccount {
 
 /// The five root accounts.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
 pub struct RootAccounts {
     /// The root account for assets.
-    #[pyo3(get)]
     pub assets: RootAccount,
     /// The root account for liabilities.
-    #[pyo3(get)]
     pub liabilities: RootAccount,
     /// The root account for equity.
-    #[pyo3(get)]
     pub equity: RootAccount,
     /// The root account for income.
-    #[pyo3(get)]
     pub income: RootAccount,
     /// The root account for expenses.
-    #[pyo3(get)]
     pub expenses: RootAccount,
 }
 

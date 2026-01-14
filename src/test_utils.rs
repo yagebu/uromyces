@@ -34,7 +34,7 @@ pub fn postings_from_strings(postings: &[&str]) -> Vec<RawPosting> {
     assert_eq!(res.entries.len(), 1);
     let entry = res.entries.pop().unwrap();
     match entry {
-        RawEntry::Transaction(t) => t.postings,
+        RawEntry::RawTransaction(t) => t.postings,
         _ => panic!("expected transaction"),
     }
 }

@@ -325,10 +325,10 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> (Ledger, AccountBalances) {
                     postings,
                     &currency,
                     &tolerances,
-                    txn.header.date,
+                    txn.date,
                 )?);
             }
-            booked_postings.sort_by_key(|p| p.line);
+            booked_postings.sort_by_key(|p| p.meta.lineno);
             booked_postings
         };
         Ok(txn.complete(booked_postings))
@@ -341,7 +341,7 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> (Ledger, AccountBalances) {
 
     for raw_entry in raw_ledger.entries {
         match raw_entry {
-            RawEntry::Transaction(i) => match handle_txn(&balances, i) {
+            RawEntry::RawTransaction(i) => match handle_txn(&balances, i) {
                 Ok(txn) => {
                     update_running_balances(&mut balances, &txn);
                     entries.push(Entry::Transaction(txn));

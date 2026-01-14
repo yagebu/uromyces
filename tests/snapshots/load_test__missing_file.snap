@@ -8,7 +8,7 @@ expression: ledger
   "errors": [
     {
       "filename": "[REPO_DIR]/tests/ledgers/non-existent-file-missing.beancount",
-      "line": null,
+      "lineno": null,
       "message": "Could not read file due to IO error: No such file or directory (os error 2)",
       "entry": null
     }

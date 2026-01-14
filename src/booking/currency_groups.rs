@@ -221,9 +221,10 @@ mod tests {
         insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": "<string>",
-            "line": 2,
-            "meta": [],
+            "meta": {
+              "filename": "<string>",
+              "lineno": 2
+            },
             "account": "Assets:Cash",
             "flag": null,
             "units": {
@@ -243,9 +244,10 @@ mod tests {
         insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": "<string>",
-            "line": 2,
-            "meta": [],
+            "meta": {
+              "filename": "<string>",
+              "lineno": 2
+            },
             "account": "Assets:Cash",
             "flag": null,
             "units": {
@@ -256,9 +258,10 @@ mod tests {
             "cost": null
           },
           {
-            "filename": "<string>",
-            "line": 3,
-            "meta": [],
+            "meta": {
+              "filename": "<string>",
+              "lineno": 3
+            },
             "account": "Assets:Cash2",
             "flag": null,
             "units": {
@@ -281,9 +284,10 @@ mod tests {
             "USD",
             [
               {
-                "filename": "<string>",
-                "line": 2,
-                "meta": [],
+                "meta": {
+                  "filename": "<string>",
+                  "lineno": 2
+                },
                 "account": "Assets:Cash",
                 "flag": null,
                 "units": {
@@ -294,9 +298,10 @@ mod tests {
                 "cost": null
               },
               {
-                "filename": "<string>",
-                "line": 4,
-                "meta": [],
+                "meta": {
+                  "filename": "<string>",
+                  "lineno": 4
+                },
                 "account": "Assets:Cash2",
                 "flag": null,
                 "units": {
@@ -312,9 +317,10 @@ mod tests {
             "EUR",
             [
               {
-                "filename": "<string>",
-                "line": 3,
-                "meta": [],
+                "meta": {
+                  "filename": "<string>",
+                  "lineno": 3
+                },
                 "account": "Assets:Cash",
                 "flag": null,
                 "units": {
@@ -325,9 +331,10 @@ mod tests {
                 "cost": null
               },
               {
-                "filename": "<string>",
-                "line": 4,
-                "meta": [],
+                "meta": {
+                  "filename": "<string>",
+                  "lineno": 4
+                },
                 "account": "Assets:Cash2",
                 "flag": null,
                 "units": {
@@ -349,9 +356,10 @@ mod tests {
         insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": "<string>",
-            "line": 2,
-            "meta": [],
+            "meta": {
+              "filename": "<string>",
+              "lineno": 2
+            },
             "account": "Assets:Cash",
             "flag": null,
             "units": {
@@ -362,9 +370,10 @@ mod tests {
             "cost": null
           },
           {
-            "filename": "<string>",
-            "line": 3,
-            "meta": [],
+            "meta": {
+              "filename": "<string>",
+              "lineno": 3
+            },
             "account": "Assets:Cash2",
             "flag": null,
             "units": {
@@ -391,9 +400,10 @@ mod tests {
         insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": "<string>",
-            "line": 2,
-            "meta": [],
+            "meta": {
+              "filename": "<string>",
+              "lineno": 2
+            },
             "account": "Assets:Cash",
             "flag": null,
             "units": {
@@ -404,9 +414,10 @@ mod tests {
             "cost": null
           },
           {
-            "filename": "<string>",
-            "line": 3,
-            "meta": [],
+            "meta": {
+              "filename": "<string>",
+              "lineno": 3
+            },
             "account": "Assets:Cash2",
             "flag": null,
             "units": {
@@ -429,9 +440,10 @@ mod tests {
         insta::assert_json_snapshot!(group, @r#"
         [
           {
-            "filename": "<string>",
-            "line": 2,
-            "meta": [],
+            "meta": {
+              "filename": "<string>",
+              "lineno": 2
+            },
             "account": "Assets:Cash",
             "flag": null,
             "units": {
@@ -442,9 +454,10 @@ mod tests {
             "cost": null
           },
           {
-            "filename": "<string>",
-            "line": 3,
-            "meta": [],
+            "meta": {
+              "filename": "<string>",
+              "lineno": 3
+            },
             "account": "Assets:Cash2",
             "flag": null,
             "units": {

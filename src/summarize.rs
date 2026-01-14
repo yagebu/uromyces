@@ -12,7 +12,7 @@ use crate::inventory::Inventory;
 use crate::inventory::Position;
 use crate::types::Filename;
 use crate::types::{
-    Account, Date, Entry, EntryHeader, Flag, Posting, SummarizationAccounts, Transaction,
+    Account, Date, Entry, EntryMeta, Flag, Posting, SummarizationAccounts, TagsLinks, Transaction,
 };
 
 type AccountBalances<'a> = HashMap<&'a Account, Inventory>;
@@ -69,7 +69,10 @@ fn create_summarisation_entries(
                 ));
             }
             Transaction::new(
-                EntryHeader::new(date, summarize_filename.clone(), 0),
+                EntryMeta::new(summarize_filename.clone(), 0),
+                date,
+                TagsLinks::default(),
+                TagsLinks::default(),
                 Flag::SUMMARIZE,
                 None,
                 format!("Opening balance for '{account}' (Summarization)"),
@@ -101,8 +104,8 @@ pub fn clamp(
     accounts: &SummarizationAccounts,
 ) -> Vec<Entry> {
     debug_assert!(entries.is_sorted());
-    let start_index = entries.partition_point(|e| e.get_header().date < begin_date);
-    let end_index = entries.partition_point(|e| e.get_header().date < end_date);
+    let start_index = entries.partition_point(|e| e.date() < begin_date);
+    let end_index = entries.partition_point(|e| e.date() < end_date);
     let entries_before = &entries[0..start_index];
     let entries_during = &entries[start_index..end_index];
 
@@ -234,68 +237,73 @@ mod tests {
         [
           {
             "t": "Open",
+            "meta": {
+              "filename": "<string>",
+              "lineno": 2
+            },
             "date": "2012-01-01",
-            "meta": [],
             "tags": [],
             "links": [],
-            "filename": "<string>",
-            "line": 2,
             "account": "Income:Salary",
             "currencies": [],
             "booking": null
           },
           {
             "t": "Open",
+            "meta": {
+              "filename": "<string>",
+              "lineno": 3
+            },
             "date": "2012-01-01",
-            "meta": [],
             "tags": [],
             "links": [],
-            "filename": "<string>",
-            "line": 3,
             "account": "Expenses:Taxes",
             "currencies": [],
             "booking": null
           },
           {
             "t": "Open",
+            "meta": {
+              "filename": "<string>",
+              "lineno": 4
+            },
             "date": "2012-01-01",
-            "meta": [],
             "tags": [],
             "links": [],
-            "filename": "<string>",
-            "line": 4,
             "account": "Assets:US:Checking",
             "currencies": [],
             "booking": null
           },
           {
             "t": "Open",
+            "meta": {
+              "filename": "<string>",
+              "lineno": 5
+            },
             "date": "2012-01-01",
-            "meta": [],
             "tags": [],
             "links": [],
-            "filename": "<string>",
-            "line": 5,
             "account": "Assets:CA:Checking",
             "currencies": [],
             "booking": null
           },
           {
             "t": "Transaction",
+            "meta": {
+              "filename": "<summarize>",
+              "lineno": 0
+            },
             "date": "2012-05-31",
-            "meta": [],
             "tags": [],
             "links": [],
-            "filename": "<summarize>",
-            "line": 0,
             "flag": "S",
             "payee": null,
             "narration": "Opening balance for 'Assets:CA:Checking' (Summarization)",
             "postings": [
               {
-                "filename": "<summarize>",
-                "line": null,
-                "meta": [],
+                "meta": {
+                  "filename": "<summarize>"
+                },
                 "account": "Assets:CA:Checking",
                 "units": {
                   "number": "6000.00",
@@ -306,9 +314,9 @@ mod tests {
                 "flag": null
               },
               {
-                "filename": "<summarize>",
-                "line": null,
-                "meta": [],
+                "meta": {
+                  "filename": "<summarize>"
+                },
                 "account": "Equity:Opening-Balances",
                 "units": {
                   "number": "-6000.00",
@@ -322,20 +330,21 @@ mod tests {
           },
           {
             "t": "Transaction",
+            "meta": {
+              "filename": "<summarize>",
+              "lineno": 0
+            },
             "date": "2012-05-31",
-            "meta": [],
             "tags": [],
             "links": [],
-            "filename": "<summarize>",
-            "line": 0,
             "flag": "S",
             "payee": null,
             "narration": "Opening balance for 'Assets:US:Checking' (Summarization)",
             "postings": [
               {
-                "filename": "<summarize>",
-                "line": null,
-                "meta": [],
+                "meta": {
+                  "filename": "<summarize>"
+                },
                 "account": "Assets:US:Checking",
                 "units": {
                   "number": "-18600.00",
@@ -346,9 +355,9 @@ mod tests {
                 "flag": null
               },
               {
-                "filename": "<summarize>",
-                "line": null,
-                "meta": [],
+                "meta": {
+                  "filename": "<summarize>"
+                },
                 "account": "Equity:Opening-Balances",
                 "units": {
                   "number": "18600.00",
@@ -362,20 +371,21 @@ mod tests {
           },
           {
             "t": "Transaction",
+            "meta": {
+              "filename": "<summarize>",
+              "lineno": 0
+            },
             "date": "2012-05-31",
-            "meta": [],
             "tags": [],
             "links": [],
-            "filename": "<summarize>",
-            "line": 0,
             "flag": "S",
             "payee": null,
             "narration": "Opening balance for 'Equity:Earnings:Previous' (Summarization)",
             "postings": [
               {
-                "filename": "<summarize>",
-                "line": null,
-                "meta": [],
+                "meta": {
+                  "filename": "<summarize>"
+                },
                 "account": "Equity:Earnings:Previous",
                 "units": {
                   "number": "13600.00",
@@ -386,9 +396,9 @@ mod tests {
                 "flag": null
               },
               {
-                "filename": "<summarize>",
-                "line": null,
-                "meta": [],
+                "meta": {
+                  "filename": "<summarize>"
+                },
                 "account": "Equity:Opening-Balances",
                 "units": {
                   "number": "-13600.00",
@@ -402,20 +412,22 @@ mod tests {
           },
           {
             "t": "Transaction",
+            "meta": {
+              "filename": "<string>",
+              "lineno": 18
+            },
             "date": "2012-08-01",
-            "meta": [],
             "tags": [],
             "links": [],
-            "filename": "<string>",
-            "line": 18,
             "flag": "*",
             "payee": null,
             "narration": "Some income and expense to show",
             "postings": [
               {
-                "filename": "<string>",
-                "line": 19,
-                "meta": [],
+                "meta": {
+                  "filename": "<string>",
+                  "lineno": 19
+                },
                 "account": "Income:Salary",
                 "units": {
                   "number": "11000.00",
@@ -426,9 +438,10 @@ mod tests {
                 "flag": null
               },
               {
-                "filename": "<string>",
-                "line": 20,
-                "meta": [],
+                "meta": {
+                  "filename": "<string>",
+                  "lineno": 20
+                },
                 "account": "Expenses:Taxes",
                 "units": {
                   "number": "3200.00",
@@ -439,9 +452,10 @@ mod tests {
                 "flag": null
               },
               {
-                "filename": "<string>",
-                "line": 21,
-                "meta": [],
+                "meta": {
+                  "filename": "<string>",
+                  "lineno": 21
+                },
                 "account": "Assets:US:Checking",
                 "units": {
                   "number": "-14200.00",
@@ -455,20 +469,22 @@ mod tests {
           },
           {
             "t": "Transaction",
+            "meta": {
+              "filename": "<string>",
+              "lineno": 23
+            },
             "date": "2012-08-02",
-            "meta": [],
             "tags": [],
             "links": [],
-            "filename": "<string>",
-            "line": 23,
             "flag": "*",
             "payee": null,
             "narration": "Some other conversion to be summarized",
             "postings": [
               {
-                "filename": "<string>",
-                "line": 24,
-                "meta": [],
+                "meta": {
+                  "filename": "<string>",
+                  "lineno": 24
+                },
                 "account": "Assets:US:Checking",
                 "units": {
                   "number": "-3000.00",
@@ -482,9 +498,10 @@ mod tests {
                 "flag": null
               },
               {
-                "filename": "<string>",
-                "line": 25,
-                "meta": [],
+                "meta": {
+                  "filename": "<string>",
+                  "lineno": 25
+                },
                 "account": "Assets:CA:Checking",
                 "units": {
                   "number": "3750.00",

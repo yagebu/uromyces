@@ -74,13 +74,7 @@ pub fn check_balance_assertions(ledger: &Ledger) -> Vec<UroError> {
     let balance_entries = ledger
         .entries
         .iter()
-        .filter_map(|e| {
-            if let Entry::Balance(b) = e {
-                Some(b)
-            } else {
-                None
-            }
-        })
+        .filter_map(|e| e.as_balance())
         .collect::<Vec<_>>();
 
     if balance_entries.is_empty() {

@@ -16,7 +16,6 @@ from uromyces._uromyces import Commodity
 from uromyces._uromyces import Custom
 from uromyces._uromyces import CustomValue
 from uromyces._uromyces import Document
-from uromyces._uromyces import EntryHeader
 from uromyces._uromyces import Event
 from uromyces._uromyces import Note
 from uromyces._uromyces import Open
@@ -76,7 +75,8 @@ def beancount_to_uromyces(entry: Directive | data.Directive) -> Directive:
 @beancount_to_uromyces.register(data.Balance)
 def _(entry: data.Balance) -> Balance:
     return Balance(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.account,
         entry.amount,  # type: ignore[arg-type]
         entry.tolerance,
@@ -86,7 +86,8 @@ def _(entry: data.Balance) -> Balance:
 @beancount_to_uromyces.register(data.Commodity)
 def _(entry: data.Commodity) -> Commodity:
     return Commodity(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.currency,
     )
 
@@ -94,7 +95,8 @@ def _(entry: data.Commodity) -> Commodity:
 @beancount_to_uromyces.register(data.Close)
 def _(entry: data.Close) -> Close:
     return Close(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.account,
     )
 
@@ -102,7 +104,8 @@ def _(entry: data.Close) -> Close:
 @beancount_to_uromyces.register(data.Custom)
 def _(entry: data.Custom) -> Custom:
     return Custom(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.type,
         [CustomValue(v.value, v.dtype) for v in entry.values],
     )
@@ -111,16 +114,20 @@ def _(entry: data.Custom) -> Custom:
 @beancount_to_uromyces.register(data.Document)
 def _(entry: data.Document) -> Document:
     return Document(
-        EntryHeader(entry.meta, entry.date, entry.tags, entry.links),
+        entry.meta,
+        entry.date,
         entry.account,
         entry.filename,
+        entry.tags,
+        entry.links,
     )
 
 
 @beancount_to_uromyces.register(data.Event)
 def _(entry: data.Event) -> Event:
     return Event(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.type,
         entry.description,
     )
@@ -129,7 +136,8 @@ def _(entry: data.Event) -> Event:
 @beancount_to_uromyces.register(data.Open)
 def _(entry: data.Open) -> Open:
     return Open(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.account,
         entry.currencies or [],
         None
@@ -141,7 +149,8 @@ def _(entry: data.Open) -> Open:
 @beancount_to_uromyces.register(data.Note)
 def _(entry: data.Note) -> Note:
     return Note(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.account,
         entry.comment,
     )
@@ -150,7 +159,8 @@ def _(entry: data.Note) -> Note:
 @beancount_to_uromyces.register(data.Pad)
 def _(entry: data.Pad) -> Pad:
     return Pad(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.account,
         entry.source_account,
     )
@@ -159,7 +169,8 @@ def _(entry: data.Pad) -> Pad:
 @beancount_to_uromyces.register(data.Price)
 def _(entry: data.Price) -> Price:
     return Price(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.currency,
         entry.amount,  # type: ignore[arg-type]
     )
@@ -168,7 +179,8 @@ def _(entry: data.Price) -> Price:
 @beancount_to_uromyces.register(data.Query)
 def _(entry: data.Query) -> Query:
     return Query(
-        EntryHeader(entry.meta, entry.date),
+        entry.meta,
+        entry.date,
         entry.name,
         entry.query_string,
     )
@@ -177,7 +189,8 @@ def _(entry: data.Query) -> Query:
 @beancount_to_uromyces.register(data.Transaction)
 def _(entry: data.Transaction) -> Transaction:
     return Transaction(
-        EntryHeader(entry.meta, entry.date, entry.tags, entry.links),
+        entry.meta,
+        entry.date,
         entry.flag or "*",
         entry.payee or "",
         entry.narration,  # type: ignore[arg-type]
@@ -192,4 +205,6 @@ def _(entry: data.Transaction) -> Transaction:
             )
             for p in entry.postings
         ],
+        entry.tags,
+        entry.links,
     )

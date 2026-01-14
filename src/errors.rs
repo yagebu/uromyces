@@ -20,7 +20,7 @@ pub struct UroError {
     filename: Option<Filename>,
     /// The line that this error occured on (if it can be attributed).
     #[pyo3(get)]
-    line: Option<LineNumber>,
+    lineno: Option<LineNumber>,
     /// The error message.
     #[pyo3(get)]
     message: String,
@@ -40,7 +40,7 @@ impl UroError {
                 None => "",
             },
         )?;
-        meta.set_item(pyo3::intern!(py, "lineno"), self.line.unwrap_or(0))?;
+        meta.set_item(pyo3::intern!(py, "lineno"), self.lineno.unwrap_or(0))?;
         Ok(meta)
     }
     #[getter]
@@ -76,7 +76,7 @@ impl<'py> FromPyObject<'_, 'py> for UroError {
                     error.filename = Some(filename.extract()?);
                 }
                 if let Ok(line) = source.get_item(pyo3::intern!(py, "lineno")) {
-                    error.line = Some(line.extract()?);
+                    error.lineno = Some(line.extract()?);
                 }
             }
             let entry = obj.getattr(pyo3::intern!(py, "entry"))?;
@@ -102,7 +102,7 @@ impl UroError {
     pub(crate) fn new<S: AsRef<str>>(message: S) -> Self {
         Self {
             filename: None,
-            line: None,
+            lineno: None,
             message: message.as_ref().to_string(),
             entry: None,
         }
@@ -117,9 +117,9 @@ impl UroError {
 
     /// Add a position for the file and line that this error occurs in.
     #[must_use]
-    pub(crate) fn with_position(mut self, filename: Filename, line: LineNumber) -> Self {
+    pub(crate) fn with_position(mut self, filename: Filename, lineno: LineNumber) -> Self {
         self.filename = Some(filename);
-        self.line = Some(line);
+        self.lineno = Some(lineno);
         self
     }
 
@@ -127,9 +127,9 @@ impl UroError {
     #[must_use]
     pub(crate) fn with_entry<E: Clone + Into<Entry>>(mut self, entry: &E) -> Self {
         let e: Entry = (*entry).clone().into();
-        let header = e.get_header();
+        let header = e.meta();
         self.filename = Some(header.filename.clone());
-        self.line = Some(header.line);
+        self.lineno = Some(header.lineno);
         self.entry = Some(e.into());
         self
     }

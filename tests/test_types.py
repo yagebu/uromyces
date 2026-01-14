@@ -17,7 +17,7 @@ from uromyces import Cost
 from uromyces import Custom
 from uromyces import CustomValue
 from uromyces import Document
-from uromyces import EntryHeader
+from uromyces import EntryMeta
 from uromyces import Event
 from uromyces import Note
 from uromyces import Open
@@ -26,6 +26,7 @@ from uromyces import Posting
 from uromyces import Price
 from uromyces import Query
 from uromyces import Transaction
+from uromyces._convert import beancount_to_uromyces
 
 if TYPE_CHECKING:
     from uromyces import Directive
@@ -60,21 +61,23 @@ def test_cost() -> None:
 
 def test_equals() -> None:
     assert Amount(Decimal("10.00"), "USD") == Amount(Decimal(10), "USD")
-    header = EntryHeader(
+    header = EntryMeta(
         {"filename": "<string>", "lineno": 0},
-        date(2022, 12, 12),
-        {"asdf"},
     )
     assert Balance(
         header,
+        date(2022, 12, 12),
         "Assets:Cash",
         Amount(Decimal("10.00"), "USD"),
         None,
+        tags={"asdf"},
     ) == Balance(
         header,
+        date(2022, 12, 12),
         "Assets:Cash",
         Amount(Decimal(10), "USD"),
         None,
+        tags={"asdf"},
     )
 
 
@@ -94,16 +97,14 @@ def test_custo_value() -> None:
 
 
 def test_balance() -> None:
-    header = EntryHeader(
-        {"filename": "<string>", "lineno": 0},
-        date(2022, 12, 12),
-        {"asdf"},
-    )
+    header = EntryMeta({"filename": "<string>", "lineno": 0})
     balance = Balance(
         header,
+        date(2022, 12, 12),
         "Assets:Cash",
         Amount(Decimal("10.00"), "USD"),
         None,
+        {"asdf"},
     )
     assert balance.account == "Assets:Cash"
 
@@ -123,32 +124,121 @@ def test_balance() -> None:
     assert bal_replace_multi.amount.number == Decimal("20.00")
     assert bal_replace_multi.account == "Assets:Other"
 
-    assert balance._replace(meta={"key": "value"}).meta["key"] == "value"
+    assert (
+        balance._replace(
+            meta={"filename": "<string>", "lineno": 0, "key": "value"}
+        ).meta["key"]
+        == "value"
+    )
 
 
-HEADER = EntryHeader(
-    {"filename": "<string>", "lineno": 0},
-    date(2022, 12, 12),
-    {"a-tag"},
-    {"a-link"},
-)
+HEADER = EntryMeta({"filename": "<string>", "lineno": 0})
+DATE = date(2022, 12, 12)
+TAGS = {"a-tag"}
+LINKS = {"a-link"}
 
 
 @pytest.mark.parametrize(
     "entry",
     [
-        Balance(HEADER, "A:C", Amount(Decimal(1), "USD"), None),
-        Close(HEADER, "A:C"),
-        Commodity(HEADER, "USD"),
-        Custom(HEADER, "custom-type", []),
-        Document(HEADER, "Assets:Cash", "/path/to/file"),
-        Event(HEADER, "event-type", "event-name"),
-        Note(HEADER, "A:C", "account note"),
-        Open(HEADER, "A:C", ["USD"], None),
-        Pad(HEADER, "A:C", "A:Source"),
-        Price(HEADER, "A:C", Amount(Decimal(1), "USD")),
-        Query(HEADER, "name", "query"),
-        Transaction(HEADER, "*", "payee", "narration", []),
+        Balance(
+            HEADER,
+            DATE,
+            "A:C",
+            Amount(Decimal(1), "USD"),
+            None,
+            TAGS,
+            LINKS,
+        ),
+        Close(
+            HEADER,
+            DATE,
+            "A:C",
+            TAGS,
+            LINKS,
+        ),
+        Commodity(
+            HEADER,
+            DATE,
+            "USD",
+            TAGS,
+            LINKS,
+        ),
+        Custom(
+            HEADER,
+            DATE,
+            "custom-type",
+            [],
+            TAGS,
+            LINKS,
+        ),
+        Document(
+            HEADER,
+            DATE,
+            "Assets:Cash",
+            "/path/to/file",
+            TAGS,
+            LINKS,
+        ),
+        Event(
+            HEADER,
+            DATE,
+            "event-type",
+            "event-name",
+            TAGS,
+            LINKS,
+        ),
+        Note(
+            HEADER,
+            DATE,
+            "A:C",
+            "account note",
+            TAGS,
+            LINKS,
+        ),
+        Open(
+            HEADER,
+            DATE,
+            "A:C",
+            ["USD"],
+            None,
+            TAGS,
+            LINKS,
+        ),
+        Pad(
+            HEADER,
+            DATE,
+            "A:C",
+            "A:Source",
+            TAGS,
+            LINKS,
+        ),
+        Price(
+            HEADER,
+            DATE,
+            "A:C",
+            Amount(Decimal(1), "USD"),
+            TAGS,
+            LINKS,
+        ),
+        Query(
+            HEADER,
+            DATE,
+            "name",
+            "query",
+            TAGS,
+            LINKS,
+        ),
+        Transaction(
+            HEADER,
+            DATE,
+            "*",
+            "payee",
+            "narration",
+            [],
+            TAGS,
+            LINKS,
+        ),
     ],
 )
 def test_entry_types(entry: Directive) -> None:
@@ -161,13 +251,15 @@ def test_entry_types(entry: Directive) -> None:
     assert entry._replace(date=date(2022, 12, 13)).date == date(2022, 12, 13)
     assert entry._replace(tags={"another-tag"}).tags == {"another-tag"}
     assert entry._replace(links={"another-link"}).links == {"another-link"}
+    assert entry._replace(meta=entry.meta) == entry
 
-    assert isinstance(entry.meta, EntryHeader)
+    assert isinstance(entry.meta, EntryMeta)
     assert isinstance(entry.meta, Mapping)
     converted_entry = entry._convert()  # noqa: SLF001
     assert isinstance(converted_entry, data.ALL_DIRECTIVES)
     assert isinstance(converted_entry.meta, dict)
     assert converted_entry.meta == {"filename": "<string>", "lineno": 0}
+    assert beancount_to_uromyces(converted_entry)
 
     with pytest.raises(TypeError, match="takes 0 positional arguments"):
         assert entry._replace("")  # type: ignore[arg-type,misc]
@@ -206,14 +298,14 @@ def test_custom_value(load_doc: Ledger) -> None:
 
 
 def test_document() -> None:
-    header = EntryHeader(
-        {"filename": "<string>", "lineno": 0},
-        date(2022, 12, 12),
-        {"asdf"},
-    )
-    document = Document(header, "Assets:Cash", "/path/to/file")
+    meta = EntryMeta({"filename": "<string>", "lineno": 0})
+    day = date(2022, 12, 12)
+    document = Document(meta, day, "Assets:Cash", "/path/to/file")
     assert document == Document(
-        header, account="Assets:Cash", filename="/path/to/file"
+        meta,
+        date(2022, 12, 12),
+        account="Assets:Cash",
+        filename="/path/to/file",
     )
     assert document.filename == "/path/to/file"
     assert document._replace(filename="/other/path").filename == "/other/path"
@@ -221,12 +313,9 @@ def test_document() -> None:
 
 
 def test_transaction() -> None:
-    header = EntryHeader(
-        {"filename": "<string>", "lineno": 0},
-        date(2022, 12, 12),
-        {"asdf"},
-    )
-    transaction = Transaction(header, "*", "payee", "narration", [])
+    meta = EntryMeta({"filename": "<string>", "lineno": 0})
+    day = date(2022, 12, 12)
+    transaction = Transaction(meta, day, "*", "payee", "narration", [])
     assert transaction.flag == "*"
     assert transaction.payee == "payee"
     assert transaction.narration == "narration"

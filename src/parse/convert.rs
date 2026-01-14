@@ -23,7 +23,7 @@ use super::node_fields;
 use super::node_ids;
 use crate::types::{
     AbsoluteUTF8Path, Account, Amount, Balance, Booking, BoxStr, Close, Commodity, CostLabel,
-    CostSpec, Currency, Custom, CustomValue, Date, Decimal, Document, EntryHeader, Event, Filename,
+    CostSpec, Currency, Custom, CustomValue, Date, Decimal, Document, EntryMeta, Event, Filename,
     Flag, IncompleteAmount, Meta, MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query,
     RawPosting, RawTransaction, TagsLinks,
 };
@@ -267,13 +267,15 @@ impl TryFromNode for RawPosting {
             None
         };
         Ok(Self {
-            filename: s.filename.clone(),
-            line: node.line_number(),
-            meta: node
-                .child_by_field_id(node_fields::METADATA)
-                .map(|n| Meta::try_from_node(n, s))
-                .transpose()?
-                .unwrap_or_default(),
+            meta: EntryMeta {
+                meta: node
+                    .child_by_field_id(node_fields::METADATA)
+                    .map(|n| Meta::try_from_node(n, s))
+                    .transpose()?
+                    .unwrap_or_default(),
+                filename: s.filename.clone(),
+                lineno: node.line_number(),
+            },
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             flag: flag.map(|n| s.get_flag(n)),
             units,
@@ -358,7 +360,15 @@ impl TryFromNode for Meta {
     }
 }
 
-impl TryFromNode for EntryHeader {
+/// Helper struct for parsing entry common fields (date, tags, links, meta).
+struct ParsedEntryCommon {
+    date: Date,
+    tags: TagsLinks,
+    links: TagsLinks,
+    meta: EntryMeta,
+}
+
+impl TryFromNode for ParsedEntryCommon {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         let mut tags = s.pushed_tags.clone();
         let mut links = TagsLinks::new();
@@ -375,15 +385,17 @@ impl TryFromNode for EntryHeader {
         }
         Ok(Self {
             date: Date::try_from_node(node.required_child_by_id(node_fields::DATE), s)?,
-            meta: node
-                .child_by_field_id(node_fields::METADATA)
-                .map(|n| Meta::try_from_node(n, s))
-                .transpose()?
-                .unwrap_or_default(),
             tags,
             links,
-            filename: s.filename.clone(),
-            line: node.line_number(),
+            meta: EntryMeta {
+                meta: node
+                    .child_by_field_id(node_fields::METADATA)
+                    .map(|n| Meta::try_from_node(n, s))
+                    .transpose()?
+                    .unwrap_or_default(),
+                filename: s.filename.clone(),
+                lineno: node.line_number(),
+            },
         })
     }
 }
@@ -391,10 +403,14 @@ impl TryFromNode for EntryHeader {
 impl TryFromNode for Balance {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "balance");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         let amt = node.required_child_by_id(node_fields::AMOUNT);
         let tol = amt.child_by_field_id(node_fields::TOLERANCE);
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             amount: Amount::try_from_node(amt, s)?,
             tolerance: tol.map(|n| Decimal::try_from_node(n, s)).transpose()?,
@@ -405,8 +421,12 @@ impl TryFromNode for Balance {
 impl TryFromNode for Commodity {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "commodity");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             currency: Currency::from_node(node.required_child_by_id(node_fields::CURRENCY), s),
         })
     }
@@ -414,8 +434,12 @@ impl TryFromNode for Commodity {
 
 impl TryFromNode for Close {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
         })
     }
@@ -424,8 +448,12 @@ impl TryFromNode for Close {
 impl TryFromNode for Custom {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "custom");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             r#type: String::from_node(node.required_child_by_id(node_fields::NAME), s),
             values: node
                 .children(&mut node.walk())
@@ -439,9 +467,13 @@ impl TryFromNode for Custom {
 impl TryFromNode for Document {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "document");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         let raw_path = String::from_node(node.required_child_by_id(node_fields::FILENAME), s);
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             filename: std::convert::TryInto::<AbsoluteUTF8Path>::try_into(raw_path.as_str())
                 .map_err(|e| {
@@ -454,8 +486,12 @@ impl TryFromNode for Document {
 impl TryFromNode for Event {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "event");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             r#type: String::from_node(node.required_child_by_id(node_fields::TYPE), s),
             description: String::from_node(node.required_child_by_id(node_fields::DESCRIPTION), s),
         })
@@ -465,8 +501,12 @@ impl TryFromNode for Event {
 impl TryFromNode for Note {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "note");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             comment: String::from_node(node.required_child_by_id(node_fields::NOTE), s),
         })
@@ -475,8 +515,12 @@ impl TryFromNode for Note {
 
 impl TryFromNode for Open {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             currencies: node
                 .child_by_field_id(node_fields::CURRENCIES)
@@ -493,8 +537,12 @@ impl TryFromNode for Open {
 impl TryFromNode for Pad {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "pad");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             source_account: Account::from_node(
                 node.required_child_by_id(node_fields::FROM_ACCOUNT),
@@ -507,8 +555,12 @@ impl TryFromNode for Pad {
 impl TryFromNode for Price {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "price");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             currency: Currency::from_node(node.required_child_by_id(node_fields::CURRENCY), s),
             amount: Amount::try_from_node(node.required_child_by_id(node_fields::AMOUNT), s)?,
         })
@@ -518,8 +570,12 @@ impl TryFromNode for Price {
 impl TryFromNode for RawTransaction {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "transaction");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             flag: s.get_flag(node.required_child_by_id(node_fields::FLAG)),
             payee: node
                 .child_by_field_id(node_fields::PAYEE)
@@ -544,8 +600,12 @@ impl TryFromNode for RawTransaction {
 impl TryFromNode for Query {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "query");
+        let common = ParsedEntryCommon::try_from_node(node, s)?;
         Ok(Self {
-            header: EntryHeader::try_from_node(node, s)?,
+            date: common.date,
+            tags: common.tags,
+            links: common.links,
+            meta: common.meta,
             name: String::from_node(node.required_child_by_id(node_fields::NAME), s),
             query_string: String::from_node(node.required_child_by_id(node_fields::QUERY), s),
         })

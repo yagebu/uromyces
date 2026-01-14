@@ -37,7 +37,7 @@ pub fn account_names(ledger: &Ledger) -> Vec<UroError> {
     let all_accounts = ledger
         .entries
         .iter()
-        .flat_map(Entry::get_accounts)
+        .flat_map(Entry::accounts)
         .collect::<HashSet<_>>();
     let roots = &ledger.options.root_accounts;
 
@@ -129,18 +129,16 @@ pub fn duplicate_balances(ledger: &Ledger) -> Vec<UroError> {
     let mut errors = Vec::new();
     let mut balances: HashMap<(&Account, &Date, &Currency), &Balance> = HashMap::new();
 
-    for entry in &ledger.entries {
-        if let Entry::Balance(e) = entry {
-            let key = (&e.account, &e.header.date, &e.amount.currency);
-            match balances.get(&key) {
-                Some(b) => {
-                    if b.amount != e.amount {
-                        errors.push(DuplicateDifferingBalanceDirective(e).into());
-                    }
+    for balance in ledger.entries.iter().filter_map(|e| e.as_balance()) {
+        let key = (&balance.account, &balance.date, &balance.amount.currency);
+        match balances.get(&key) {
+            Some(b) => {
+                if b.amount != balance.amount {
+                    errors.push(DuplicateDifferingBalanceDirective(balance).into());
                 }
-                None => {
-                    balances.insert(key, e);
-                }
+            }
+            None => {
+                balances.insert(key, balance);
             }
         }
     }
@@ -210,7 +208,7 @@ pub fn active_accounts(ledger: &Ledger) -> Vec<UroError> {
                 currently_open_accounts.remove(&e.account);
             }
             _ => {
-                for account in entry.get_accounts() {
+                for account in entry.accounts() {
                     if !(currently_open_accounts.contains(account)
                         || opened_accounts.contains(account)
                             && matches!(
@@ -248,13 +246,15 @@ impl From<TransactionDoesNotBalance<'_>> for UroError {
 pub fn transaction_balances(ledger: &Ledger) -> Vec<UroError> {
     let mut errors = Vec::new();
 
-    for entry in &ledger.entries {
-        if let Entry::Transaction(e) = entry {
-            let residual = e.postings.iter().map(get_weight).collect::<Inventory>();
-            let tolerances = Tolerances::infer_from_booked(&e.postings, &ledger.options);
-            if !tolerances.is_small(&residual) {
-                errors.push(TransactionDoesNotBalance(e).into());
-            }
+    for transaction in ledger.entries.iter().filter_map(|e| e.as_transaction()) {
+        let residual = transaction
+            .postings
+            .iter()
+            .map(get_weight)
+            .collect::<Inventory>();
+        let tolerances = Tolerances::infer_from_booked(&transaction.postings, &ledger.options);
+        if !tolerances.is_small(&residual) {
+            errors.push(TransactionDoesNotBalance(transaction).into());
         }
     }
 

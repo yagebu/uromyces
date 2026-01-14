@@ -37,7 +37,7 @@ class Booking(Enum):
     HIFO = "HIFO"
 
 class _Directive:
-    meta: EntryHeader
+    meta: EntryMeta
     date: datetime.date
     links: frozenset[str]
     tags: frozenset[str]
@@ -104,19 +104,11 @@ class CustomValue:
     ) -> CustomValue: ...
 
 @final
-class EntryHeader(Mapping[str, MetaValue]):
+class EntryMeta(Mapping[str, MetaValue]):
     date: datetime.date
     filename: str
-    tags: frozenset[str]
-    links: frozenset[str]
 
-    def __new__(
-        cls: type[EntryHeader],
-        meta: Meta,
-        date: datetime.date,
-        tags: set[str] | frozenset[str] | None = None,
-        links: set[str] | frozenset[str] | None = None,
-    ) -> EntryHeader: ...
+    def __new__(cls: type[EntryMeta], meta: Meta) -> EntryMeta: ...
     def __contains__(self, key: object) -> bool: ...
     def __getitem__(self, key: str) -> MetaValue: ...
     def __iter__(self) -> Iterator[str]: ...
@@ -134,16 +126,19 @@ class Balance(_Directive, abc.Balance):
 
     def __new__(
         cls: type[Balance],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         account: str,
         amount: protocols.Amount,
         tolerance: Decimal | None,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Balance: ...
     def _replace(
         self: Balance,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         account: str | None = None,
@@ -156,14 +151,17 @@ class Close(_Directive, abc.Close):
 
     def __new__(
         cls: type[Close],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         account: str,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Close: ...
     def _replace(
         self: Close,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         account: str | None = None,
@@ -175,14 +173,17 @@ class Commodity(_Directive, abc.Commodity):
 
     def __new__(
         cls: type[Commodity],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         currency: str,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Commodity: ...
     def _replace(
         self: Commodity,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         currency: str | None = None,
@@ -199,15 +200,18 @@ class Custom(_Directive, abc.Custom):
 
     def __new__(
         cls: _CustomType,
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         type: str,  # noqa: A002
         values: list[CustomValue],
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Custom: ...
     def _replace(
         self: Custom,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         type: str | None = None,  # noqa: A002
@@ -221,15 +225,18 @@ class Document(_Directive, abc.Document):
 
     def __new__(
         cls: type[Document],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         account: str,
         filename: str,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Document: ...
     def _replace(
         self: Document,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         account: str | None = None,
@@ -244,15 +251,18 @@ class Event(_Directive, abc.Event):
 
     def __new__(
         cls: _EventType,
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         type: str,  # noqa: A002
         description: str,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Event: ...
     def _replace(
         self: Event,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         type: str | None = None,  # noqa: A002
@@ -266,15 +276,18 @@ class Note(_Directive, abc.Note):
 
     def __new__(
         cls: type[Note],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         account: str,
         comment: str,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Note: ...
     def _replace(
         self: Note,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         account: str | None = None,
@@ -289,16 +302,19 @@ class Open(_Directive, abc.Open):
 
     def __new__(
         cls: type[Open],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         account: str,
         currencies: list[str] | None,
         booking: Booking | None,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Open: ...
     def _replace(
         self: Open,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         account: str | None = None,
@@ -313,15 +329,18 @@ class Pad(_Directive, abc.Pad):
 
     def __new__(
         cls: type[Pad],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         account: str,
         source_account: str,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Pad: ...
     def _replace(
         self: Pad,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         account: str | None = None,
@@ -335,15 +354,18 @@ class Price(_Directive, abc.Price):
 
     def __new__(
         cls: type[Price],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         currency: str,
         amount: Amount,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Price: ...
     def _replace(
         self: Price,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         currency: str | None = None,
@@ -358,15 +380,18 @@ class Query(_Directive, abc.Query):
 
     def __new__(
         cls: type[Query],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         name: str,
         query_string: str,
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Query: ...
     def _replace(
         self: Query,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         name: str | None = None,
@@ -401,17 +426,20 @@ class Transaction(_Directive, abc.Transaction):
 
     def __new__(
         cls: type[Transaction],
-        header: EntryHeader,
+        meta: EntryMeta | Meta,
+        date: datetime.date,
         flag: str,
         payee: str,
         narration: str,
         postings: list[Posting],
+        tags: set[str] | frozenset[str] | None = None,
+        links: set[str] | frozenset[str] | None = None,
     ) -> Transaction: ...
     def _replace(
         self: Transaction,
         *,
-        date: datetime.date | None = None,
         meta: Meta | None = None,
+        date: datetime.date | None = None,
         tags: set[str] | frozenset[str] | None = None,
         links: set[str] | frozenset[str] | None = None,
         flag: str | None = None,

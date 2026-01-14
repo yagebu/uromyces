@@ -26,7 +26,7 @@ impl std::fmt::Display for ParsingError {
 #[derive(Debug)]
 pub struct ConversionError {
     filename: Filename,
-    line: LineNumber,
+    lineno: LineNumber,
     kind: ConversionErrorKind,
 }
 
@@ -38,7 +38,7 @@ impl ConversionError {
     ) -> Self {
         Self {
             filename: s.filename.clone(),
-            line: node.line_number(),
+            lineno: node.line_number(),
             kind,
         }
     }
@@ -81,6 +81,6 @@ impl std::fmt::Display for ConversionError {
 
 impl From<ConversionError> for UroError {
     fn from(e: ConversionError) -> Self {
-        Self::new(e.to_string()).with_position(e.filename.clone(), e.line)
+        Self::new(e.to_string()).with_position(e.filename.clone(), e.lineno)
     }
 }

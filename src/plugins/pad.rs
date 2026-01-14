@@ -55,7 +55,10 @@ impl<'ledger> AccountPadder<'ledger> {
         if diff.abs() > balance_tolerance(entry, &self.ledger.options) && !padded_already {
             let diff_units = Amount::new(-diff, currency.clone());
             let txn = Transaction::new(
-                pad.header.clone(),
+                pad.meta.clone(),
+                pad.date,
+                pad.tags.clone(),
+                pad.links.clone(),
                 Flag::PADDING,
                 None,
                 format!(
@@ -63,12 +66,12 @@ impl<'ledger> AccountPadder<'ledger> {
                 ),
                 vec![
                     Posting::new_simple(
-                        pad.header.filename.clone(),
+                        pad.meta.filename.clone(),
                         pad.account.clone(),
                         diff_units.clone(),
                     ),
                     Posting::new_simple(
-                        pad.header.filename.clone(),
+                        pad.meta.filename.clone(),
                         pad.source_account.clone(),
                         -diff_units.clone(),
                     ),
@@ -85,7 +88,7 @@ pub fn transactions_for_pad_entries(ledger: &Ledger) -> (Vec<Entry>, Vec<UroErro
     let pad_entries = ledger
         .entries
         .iter()
-        .filter_map(|e| if let Entry::Pad(p) = e { Some(p) } else { None })
+        .filter_map(|e| e.as_pad())
         .collect::<Vec<_>>();
 
     if pad_entries.is_empty() {

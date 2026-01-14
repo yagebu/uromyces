@@ -51,7 +51,7 @@
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
-use pyo3::types::{PyBool, PyDate, PyDict, PyString};
+use pyo3::types::{PyBool, PyDate, PyString};
 use pyo3::{PyTypeInfo, prelude::*};
 use serde::{Deserialize, Serialize};
 
@@ -80,13 +80,12 @@ pub use currency::Currency;
 pub use date::{Date, MIN_DATE};
 pub use decimal::Decimal;
 pub use flag::Flag;
-pub use metadata::{EntryHeader, Meta, MetaKeyValuePair, MetaValue};
+pub use metadata::{EntryMeta, Meta, MetaKeyValuePair, MetaValue, PostingMeta};
 pub use paths::{AbsoluteUTF8Path, Filename};
 pub use tags_links::TagsLinks;
 
+use convert_to_beancount::ConvertToBeancount;
 use decimal::get_decimal_decimal;
-
-use crate::types::convert_to_beancount::ConvertToBeancount;
 
 /// The type to use for line numbers in file positions.
 pub type LineNumber = u32;
@@ -99,7 +98,7 @@ pub enum RawDirective {
     /// A raw Beancount option.
     Option {
         filename: Filename,
-        line: LineNumber,
+        lineno: LineNumber,
         key: String,
         value: String,
     },
@@ -113,14 +112,12 @@ pub enum RawDirective {
 }
 
 /// A plugin directive.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
 pub struct Plugin {
     /// The plugin name - name of a Python module that contains plugin functions in `__plugins__`.
-    #[pyo3(get)]
     pub name: String,
     /// Optionally, config for the plugin.
-    #[pyo3(get)]
     pub config: Option<String>,
 }
 
@@ -163,147 +160,14 @@ impl CustomValue {
     }
 }
 
-/// A balance entry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Balance {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub account: Account,
-    #[pyo3(get)]
-    pub amount: Amount,
-    #[pyo3(get)]
-    pub tolerance: Option<Decimal>,
-}
-
-/// An account close entry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Close {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub account: Account,
-}
-
-/// A commodity entry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Commodity {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub currency: Currency,
-}
-
-/// A custom entry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Custom {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub r#type: String,
-    #[pyo3(get)]
-    pub values: Vec<CustomValue>,
-}
-
-/// An document entry for an account.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Document {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub account: Account,
-    #[pyo3(get)]
-    pub filename: AbsoluteUTF8Path,
-}
-
-/// An event for an account.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Event {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub r#type: String,
-    #[pyo3(get)]
-    pub description: String,
-}
-
-/// An account open entry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Open {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub account: Account,
-    #[pyo3(get)]
-    pub currencies: Vec<Currency>,
-    #[pyo3(get)]
-    pub booking: Option<Booking>,
-}
-
-/// A note entry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Note {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub account: Account,
-    #[pyo3(get)]
-    pub comment: String,
-}
-
-/// A pad entry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Pad {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub account: Account,
-    #[pyo3(get)]
-    pub source_account: Account,
-}
-
-/// A price entry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Price {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub currency: Currency,
-    #[pyo3(get)]
-    pub amount: Amount,
-}
-
 /// A raw posting (pre-booking), which might be missing some attributes.
 ///
 /// During booking, the incomplete amounts will be replaced with the actual amounts
 /// and the cost spec will turn into a cost.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RawPosting {
-    /// The filename.
-    pub filename: Filename,
-    /// The 1-based line number.
-    pub line: LineNumber,
-    pub meta: Meta,
+    /// Metadata for the posting.
+    pub meta: EntryMeta,
 
     pub account: Account,
     pub flag: Option<Flag>,
@@ -321,9 +185,11 @@ impl RawPosting {
         cost: Option<Cost>,
     ) -> Posting {
         Posting {
-            filename: Some(self.filename),
-            line: Some(self.line),
-            meta: self.meta,
+            meta: PostingMeta {
+                filename: Some(self.meta.filename),
+                lineno: Some(self.meta.lineno),
+                meta: self.meta.meta,
+            },
             account: self.account,
             flag: self.flag,
             units,
@@ -333,16 +199,45 @@ impl RawPosting {
     }
 }
 
+/// A raw transaction.
+///
+/// After parsing, parts of the transaction might still be missing and will
+/// only be inferred during booking.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RawTransaction {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub flag: Flag,
+    pub payee: Payee,
+    pub narration: Narration,
+    pub postings: Vec<RawPosting>,
+}
+
+impl RawTransaction {
+    /// Complete the transaction with the given booked postings.
+    pub(crate) fn complete(self, postings: Vec<Posting>) -> Transaction {
+        Transaction::new(
+            self.meta,
+            self.date,
+            self.tags,
+            self.links,
+            self.flag,
+            self.payee,
+            self.narration,
+            postings,
+        )
+    }
+}
+
 /// A fully booked posting.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[pyclass(frozen, eq, module = "uromyces")]
 pub struct Posting {
-    /// The filename.
-    pub filename: Option<Filename>,
-    /// The 1-based line number.
-    pub line: Option<LineNumber>,
     /// Metadata for the posting.
-    pub meta: Meta,
+    #[pyo3(get)]
+    pub meta: PostingMeta,
 
     /// The account that the posting should be booked to.
     #[pyo3(get)]
@@ -371,26 +266,16 @@ impl Posting {
         cost: Option<Cost>,
         price: Option<Amount>,
         flag: Option<Flag>,
-        meta: Option<&Bound<'_, PyDict>>,
-    ) -> PyResult<Self> {
-        let (filename, line, meta) = match meta {
-            Some(meta) => metadata::extract_meta_dict(meta)?,
-            None => (None, None, Meta::default()),
-        };
-        Ok(Self {
-            filename,
-            line,
-            meta,
+        meta: Option<PostingMeta>,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_default(),
             account,
             units,
             price,
             cost,
             flag,
-        })
-    }
-    #[getter]
-    fn meta<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
-        self.meta.to_py_dict(py, self.filename.as_ref(), self.line)
+        }
     }
 }
 
@@ -400,13 +285,11 @@ impl Posting {
     pub(crate) fn new_simple(filename: Filename, account: Account, units: Amount) -> Self {
         Self {
             flag: None,
-            filename: Some(filename),
-            line: None,
+            meta: PostingMeta::with_filename(filename),
             account,
             units,
             cost: None,
             price: None,
-            meta: Meta::default(),
         }
     }
 
@@ -420,31 +303,159 @@ impl Posting {
     ) -> Self {
         Self {
             flag: None,
-            filename: Some(filename),
-            line: None,
+            meta: PostingMeta::with_filename(filename),
             account,
             units,
             cost,
             price: None,
-            meta: Meta::default(),
         }
     }
 }
 
+// -----------------------------------------------------------------
+/// A balance entry.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Balance {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub account: Account,
+    pub amount: Amount,
+    pub tolerance: Option<Decimal>,
+}
+
+/// An account close entry.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Close {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub account: Account,
+}
+
+/// A commodity entry.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Commodity {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub currency: Currency,
+}
+
+/// A custom entry.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Custom {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub r#type: String,
+    pub values: Vec<CustomValue>,
+}
+
+/// An document entry for an account.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Document {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub account: Account,
+    pub filename: AbsoluteUTF8Path,
+}
+
+/// An event for an account.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Event {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub r#type: String,
+    pub description: String,
+}
+
+/// An account open entry.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Open {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub account: Account,
+    pub currencies: Vec<Currency>,
+    pub booking: Option<Booking>,
+}
+
+/// A note entry.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Note {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub account: Account,
+    pub comment: String,
+}
+
+/// A pad entry.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Pad {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub account: Account,
+    pub source_account: Account,
+}
+
+/// A price entry.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Price {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub currency: Currency,
+    pub amount: Amount,
+}
+
+/// A query entry.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
+pub struct Query {
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
+    pub name: String,
+    pub query_string: String,
+}
+
 /// A transaction.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
 pub struct Transaction {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
+    pub meta: EntryMeta,
+    pub date: Date,
+    pub tags: TagsLinks,
+    pub links: TagsLinks,
     pub flag: Flag,
-    #[pyo3(get)]
     pub payee: Payee,
-    #[pyo3(get)]
     pub narration: Narration,
-    #[pyo3(get)]
     pub postings: Vec<Posting>,
 }
 
@@ -453,54 +464,28 @@ impl Transaction {
     ///
     /// Generic to allow &str, String, etc. to be used for narration.
     #[must_use]
+    #[allow(clippy::too_many_arguments)]
     pub fn new<T: Into<Narration>>(
-        header: EntryHeader,
+        meta: EntryMeta,
+        date: Date,
+        tags: TagsLinks,
+        links: TagsLinks,
         flag: Flag,
         payee: Payee,
         narration: T,
         postings: Vec<Posting>,
     ) -> Self {
         Self {
-            header,
+            date,
+            tags,
+            links,
+            meta,
             flag,
             payee,
             narration: narration.into(),
             postings,
         }
     }
-}
-
-/// A raw transaction.
-///
-/// After parsing, parts of the transaction might still be missing and will
-/// only be inferred during booking.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct RawTransaction {
-    pub header: EntryHeader,
-    pub flag: Flag,
-    pub payee: Payee,
-    pub narration: Narration,
-    pub postings: Vec<RawPosting>,
-}
-
-impl RawTransaction {
-    /// Complete the transaction with the given booked postings.
-    pub(crate) fn complete(self, postings: Vec<Posting>) -> Transaction {
-        Transaction::new(self.header, self.flag, self.payee, self.narration, postings)
-    }
-}
-
-/// A query entry.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
-pub struct Query {
-    #[serde(flatten)]
-    #[pyo3(get, name = "meta")]
-    pub header: EntryHeader,
-    #[pyo3(get)]
-    pub name: String,
-    #[pyo3(get)]
-    pub query_string: String,
 }
 
 /// The Beancount entries (raw, after parsing).
@@ -518,7 +503,8 @@ pub enum RawEntry {
     Pad(Pad),
     Price(Price),
     Query(Query),
-    Transaction(RawTransaction),
+
+    RawTransaction(RawTransaction),
 }
 
 /// The Beancount entries.
@@ -543,350 +529,484 @@ pub enum Entry {
 #[pymethods]
 impl Balance {
     #[new]
-    #[pyo3(signature = (header, account, amount, tolerance=None))]
+    #[pyo3(signature = (meta, date, account, amount, tolerance=None, tags=None, links=None))]
     fn __new__(
-        header: EntryHeader,
+        meta: EntryMeta,
+        date: Date,
         account: Account,
         amount: Amount,
         tolerance: Option<Decimal>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
     ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             account,
             amount,
             tolerance,
         }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, amount=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, account=None, amount=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         account: Option<Account>,
         amount: Option<Amount>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             account: account.unwrap_or_else(|| self.account.clone()),
             amount: amount.unwrap_or_else(|| self.amount.clone()),
             tolerance: self.tolerance,
-        })
+        }
     }
 }
 #[pymethods]
 impl Close {
     #[new]
-    fn __new__(header: EntryHeader, account: Account) -> Self {
-        Self { header, account }
+    #[pyo3(signature = (meta, date, account, tags=None, links=None))]
+    fn __new__(
+        meta: EntryMeta,
+        date: Date,
+        account: Account,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+    ) -> Self {
+        Self {
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
+            account,
+        }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, account=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         account: Option<Account>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             account: account.unwrap_or_else(|| self.account.clone()),
-        })
+        }
     }
 }
 #[pymethods]
 impl Commodity {
     #[new]
-    fn __new__(header: EntryHeader, currency: Currency) -> Self {
-        Self { header, currency }
+    #[pyo3(signature = (meta, date, currency, tags=None, links=None))]
+    fn __new__(
+        meta: EntryMeta,
+        date: Date,
+        currency: Currency,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+    ) -> Self {
+        Self {
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
+            currency,
+        }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, currency=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, currency=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         currency: Option<Currency>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             currency: currency.unwrap_or_else(|| self.currency.clone()),
-        })
+        }
     }
 }
 #[pymethods]
 impl Custom {
     #[new]
-    fn __new__(header: EntryHeader, r#type: String, values: Vec<CustomValue>) -> Self {
+    #[pyo3(signature = (meta, date, r#type, values, tags=None, links=None))]
+    fn __new__(
+        meta: EntryMeta,
+        date: Date,
+        r#type: String,
+        values: Vec<CustomValue>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+    ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             r#type,
             values,
         }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, r#type=None, values=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, r#type=None, values=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         r#type: Option<String>,
         values: Option<Vec<CustomValue>>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             r#type: r#type.unwrap_or_else(|| self.r#type.clone()),
             values: values.unwrap_or_else(|| self.values.clone()),
-        })
+        }
     }
 }
 #[pymethods]
 impl Document {
     #[new]
-    fn __new__(header: EntryHeader, account: Account, filename: AbsoluteUTF8Path) -> Self {
+    #[pyo3(signature = (meta, date, account, filename, tags=None, links=None))]
+    fn __new__(
+        meta: EntryMeta,
+        date: Date,
+        account: Account,
+        filename: AbsoluteUTF8Path,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+    ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             account,
             filename,
         }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, filename=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, account=None, filename=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         account: Option<Account>,
         filename: Option<AbsoluteUTF8Path>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             account: account.unwrap_or_else(|| self.account.clone()),
             filename: filename.unwrap_or_else(|| self.filename.clone()),
-        })
+        }
     }
 }
 #[pymethods]
 impl Event {
     #[new]
-    fn __new__(header: EntryHeader, r#type: String, description: String) -> Self {
+    #[pyo3(signature = (meta, date, r#type, description, tags=None, links=None))]
+    fn __new__(
+        meta: EntryMeta,
+        date: Date,
+        r#type: String,
+        description: String,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+    ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             r#type,
             description,
         }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, r#type=None, description=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, r#type=None, description=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         r#type: Option<String>,
         description: Option<String>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             r#type: r#type.unwrap_or_else(|| self.r#type.clone()),
             description: description.unwrap_or_else(|| self.description.clone()),
-        })
+        }
     }
 }
 #[pymethods]
 impl Note {
     #[new]
-    fn __new__(header: EntryHeader, account: Account, comment: String) -> Self {
+    #[pyo3(signature = (meta, date, account, comment, tags=None, links=None))]
+    fn __new__(
+        meta: EntryMeta,
+        date: Date,
+        account: Account,
+        comment: String,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+    ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             account,
             comment,
         }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, comment=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, account=None, comment=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         account: Option<Account>,
         comment: Option<String>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             account: account.unwrap_or_else(|| self.account.clone()),
             comment: comment.unwrap_or_else(|| self.comment.clone()),
-        })
+        }
     }
 }
 #[pymethods]
 impl Open {
     #[new]
-    #[pyo3(signature = (header, account, currencies, booking=None))]
+    #[pyo3(signature = (meta, date, account, currencies, booking=None, tags=None, links=None))]
     fn __new__(
-        header: EntryHeader,
+        meta: EntryMeta,
+        date: Date,
         account: Account,
         currencies: Vec<Currency>,
         booking: Option<Booking>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
     ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             account,
             currencies,
             booking,
         }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, currencies=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, account=None, currencies=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         account: Option<Account>,
         currencies: Option<Vec<Currency>>,
         // TODO: booking: Option<Booking>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             account: account.unwrap_or_else(|| self.account.clone()),
             currencies: currencies.unwrap_or_else(|| self.currencies.clone()),
             booking: self.booking,
-        })
+        }
     }
 }
 #[pymethods]
 impl Pad {
     #[new]
-    fn __new__(header: EntryHeader, account: Account, source_account: Account) -> Self {
+    #[pyo3(signature = (meta, date, account, source_account, tags=None, links=None))]
+    fn __new__(
+        meta: EntryMeta,
+        date: Date,
+        account: Account,
+        source_account: Account,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+    ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             account,
             source_account,
         }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, account=None, source_account=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, account=None, source_account=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         account: Option<Account>,
         source_account: Option<Account>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             account: account.unwrap_or_else(|| self.account.clone()),
             source_account: source_account.unwrap_or_else(|| self.source_account.clone()),
-        })
+        }
     }
 }
 #[pymethods]
 impl Price {
     #[new]
-    fn __new__(header: EntryHeader, currency: Currency, amount: Amount) -> Self {
+    #[pyo3(signature = (meta, date, currency, amount, tags=None, links=None))]
+    fn __new__(
+        meta: EntryMeta,
+        date: Date,
+        currency: Currency,
+        amount: Amount,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+    ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             currency,
             amount,
         }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, currency=None, amount=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, currency=None, amount=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         currency: Option<Currency>,
         amount: Option<Amount>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             currency: currency.unwrap_or_else(|| self.currency.clone()),
             amount: amount.unwrap_or_else(|| self.amount.clone()),
-        })
+        }
     }
 }
 #[pymethods]
 impl Query {
     #[new]
-    fn __new__(header: EntryHeader, name: String, query_string: String) -> Self {
+    #[pyo3(signature = (meta, date, name, query_string, tags=None, links=None))]
+    fn __new__(
+        meta: EntryMeta,
+        date: Date,
+        name: String,
+        query_string: String,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
+    ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             name,
             query_string,
         }
     }
 
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, name=None, query_string=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, name=None, query_string=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         name: Option<String>,
         query_string: Option<String>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             name: name.unwrap_or_else(|| self.name.clone()),
             query_string: query_string.unwrap_or_else(|| self.query_string.clone()),
-        })
+        }
     }
 }
 #[pymethods]
 impl Transaction {
     #[new]
+    #[pyo3(signature = (meta, date, flag, payee, narration, postings, tags=None, links=None))]
+    #[allow(clippy::too_many_arguments)]
     fn __new__(
-        header: EntryHeader,
+        meta: EntryMeta,
+        date: Date,
         flag: Flag,
         payee: Payee,
         narration: Narration,
         postings: Vec<Posting>,
+        tags: Option<TagsLinks>,
+        links: Option<TagsLinks>,
     ) -> Self {
         Self {
-            header,
+            date,
+            tags: tags.unwrap_or_default(),
+            links: links.unwrap_or_default(),
+            meta,
             flag,
             payee,
             narration,
@@ -895,47 +1015,36 @@ impl Transaction {
     }
 
     #[allow(clippy::too_many_arguments)]
-    #[pyo3(signature = (*, date=None, meta=None, tags=None, links=None, flag=None, payee=None, narration=None, postings=None))]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, flag=None, payee=None, narration=None, postings=None))]
     fn _replace(
         &self,
+        meta: Option<EntryMeta>,
         date: Option<Date>,
-        meta: Option<&Bound<'_, PyDict>>,
         tags: Option<TagsLinks>,
         links: Option<TagsLinks>,
         flag: Option<Flag>,
         payee: Option<BoxStr>,
         narration: Option<Narration>,
         postings: Option<Vec<Posting>>,
-    ) -> PyResult<Self> {
-        Ok(Self {
-            header: self
-                .header
-                .replace_meta_tags_links(date, meta, tags, links)?,
+    ) -> Self {
+        Self {
+            meta: meta.unwrap_or_else(|| self.meta.clone()),
+            date: date.unwrap_or(self.date),
+            tags: tags.unwrap_or_else(|| self.tags.clone()),
+            links: links.unwrap_or_else(|| self.links.clone()),
             flag: flag.unwrap_or(self.flag),
             payee: payee.or_else(|| self.payee.clone()),
             narration: narration.unwrap_or_else(|| self.narration.clone()),
             postings: postings.unwrap_or_else(|| self.postings.clone()),
-        })
+        }
     }
 }
 
-/// Since all the entry types need the same additional getter functions, this macro provides them.
+/// Since all the entry types need the same additional functions, this macro provides them.
 macro_rules! pymethods_for_entry {
     ($a:ident) => {
         #[pymethods]
         impl $a {
-            #[getter]
-            fn date(&self) -> &Date {
-                &self.header.date
-            }
-            #[getter]
-            fn links(&self) -> &TagsLinks {
-                &self.header.links
-            }
-            #[getter]
-            fn tags(&self) -> &TagsLinks {
-                &self.header.tags
-            }
             fn __repr__(&self) -> String {
                 format!("<{:?}>", self)
             }
@@ -968,25 +1077,63 @@ pymethods_for_entry!(Price);
 pymethods_for_entry!(Query);
 pymethods_for_entry!(Transaction);
 
+macro_rules! as_inner_method {
+    ($method_name:ident,$variant:ident) => {
+        /// Turn the enum into the given variant.
+        pub(crate) fn $method_name(&self) -> Option<&$variant> {
+            if let Self::$variant(e) = self {
+                Some(e)
+            } else {
+                None
+            }
+        }
+    };
+}
+
 impl Entry {
-    /// Get the entry header.
+    /// Get the entry metadata.
     #[must_use]
-    pub fn get_header(&self) -> &EntryHeader {
+    pub(crate) fn meta(&self) -> &EntryMeta {
         match self {
-            Self::Balance(e) => &e.header,
-            Self::Close(e) => &e.header,
-            Self::Commodity(e) => &e.header,
-            Self::Custom(e) => &e.header,
-            Self::Document(e) => &e.header,
-            Self::Event(e) => &e.header,
-            Self::Note(e) => &e.header,
-            Self::Open(e) => &e.header,
-            Self::Pad(e) => &e.header,
-            Self::Price(e) => &e.header,
-            Self::Query(e) => &e.header,
-            Self::Transaction(e) => &e.header,
+            Self::Balance(e) => &e.meta,
+            Self::Close(e) => &e.meta,
+            Self::Commodity(e) => &e.meta,
+            Self::Custom(e) => &e.meta,
+            Self::Document(e) => &e.meta,
+            Self::Event(e) => &e.meta,
+            Self::Note(e) => &e.meta,
+            Self::Open(e) => &e.meta,
+            Self::Pad(e) => &e.meta,
+            Self::Price(e) => &e.meta,
+            Self::Query(e) => &e.meta,
+            Self::Transaction(e) => &e.meta,
         }
     }
+
+    /// Get the entry date.
+    #[must_use]
+    pub(crate) fn date(&self) -> Date {
+        match self {
+            Self::Balance(e) => e.date,
+            Self::Close(e) => e.date,
+            Self::Commodity(e) => e.date,
+            Self::Custom(e) => e.date,
+            Self::Document(e) => e.date,
+            Self::Event(e) => e.date,
+            Self::Note(e) => e.date,
+            Self::Open(e) => e.date,
+            Self::Pad(e) => e.date,
+            Self::Price(e) => e.date,
+            Self::Query(e) => e.date,
+            Self::Transaction(e) => e.date,
+        }
+    }
+
+    as_inner_method!(as_balance, Balance);
+    as_inner_method!(as_pad, Pad);
+    #[cfg(test)]
+    as_inner_method!(as_price, Price);
+    as_inner_method!(as_transaction, Transaction);
 
     /// Sort key for an entry.
     ///
@@ -1001,24 +1148,24 @@ impl Entry {
     /// - Close
     fn sort_key(&self) -> (&Date, i8) {
         match self {
-            Self::Balance(e) => (&e.header.date, -1),
-            Self::Close(e) => (&e.header.date, 2),
-            Self::Commodity(e) => (&e.header.date, 0),
-            Self::Custom(e) => (&e.header.date, 0),
-            Self::Document(e) => (&e.header.date, 1),
-            Self::Event(e) => (&e.header.date, 0),
-            Self::Note(e) => (&e.header.date, 0),
-            Self::Open(e) => (&e.header.date, -2),
-            Self::Pad(e) => (&e.header.date, 0),
-            Self::Price(e) => (&e.header.date, 0),
-            Self::Query(e) => (&e.header.date, 0),
-            Self::Transaction(e) => (&e.header.date, 0),
+            Self::Balance(e) => (&e.date, -1),
+            Self::Close(e) => (&e.date, 2),
+            Self::Commodity(e) => (&e.date, 0),
+            Self::Custom(e) => (&e.date, 0),
+            Self::Document(e) => (&e.date, 1),
+            Self::Event(e) => (&e.date, 0),
+            Self::Note(e) => (&e.date, 0),
+            Self::Open(e) => (&e.date, -2),
+            Self::Pad(e) => (&e.date, 0),
+            Self::Price(e) => (&e.date, 0),
+            Self::Query(e) => (&e.date, 0),
+            Self::Transaction(e) => (&e.date, 0),
         }
     }
 
     /// Get the accounts for the entry.
     #[must_use]
-    pub fn get_accounts(&self) -> Vec<&Account> {
+    pub fn accounts(&self) -> Vec<&Account> {
         match self {
             Self::Balance(e) => vec![&e.account],
             Self::Close(e) => vec![&e.account],
@@ -1037,24 +1184,8 @@ impl Entry {
 }
 
 impl RawEntry {
-    /// Get the entry header.
-    #[must_use]
-    pub fn get_header(&self) -> &EntryHeader {
-        match self {
-            Self::Balance(e) => &e.header,
-            Self::Close(e) => &e.header,
-            Self::Commodity(e) => &e.header,
-            Self::Custom(e) => &e.header,
-            Self::Document(e) => &e.header,
-            Self::Event(e) => &e.header,
-            Self::Note(e) => &e.header,
-            Self::Open(e) => &e.header,
-            Self::Pad(e) => &e.header,
-            Self::Price(e) => &e.header,
-            Self::Query(e) => &e.header,
-            Self::Transaction(e) => &e.header,
-        }
-    }
+    #[cfg(test)]
+    as_inner_method!(as_transaction, RawTransaction);
 
     /// Sort key for an entry.
     ///
@@ -1069,18 +1200,18 @@ impl RawEntry {
     /// - Close
     fn sort_key(&self) -> (&Date, i8) {
         match self {
-            Self::Balance(e) => (&e.header.date, -1),
-            Self::Close(e) => (&e.header.date, 2),
-            Self::Commodity(e) => (&e.header.date, 0),
-            Self::Custom(e) => (&e.header.date, 0),
-            Self::Document(e) => (&e.header.date, 1),
-            Self::Event(e) => (&e.header.date, 0),
-            Self::Note(e) => (&e.header.date, 0),
-            Self::Open(e) => (&e.header.date, -2),
-            Self::Pad(e) => (&e.header.date, 0),
-            Self::Price(e) => (&e.header.date, 0),
-            Self::Transaction(e) => (&e.header.date, 0),
-            Self::Query(e) => (&e.header.date, 0),
+            Self::Balance(e) => (&e.date, -1),
+            Self::Close(e) => (&e.date, 2),
+            Self::Commodity(e) => (&e.date, 0),
+            Self::Custom(e) => (&e.date, 0),
+            Self::Document(e) => (&e.date, 1),
+            Self::Event(e) => (&e.date, 0),
+            Self::Note(e) => (&e.date, 0),
+            Self::Open(e) => (&e.date, -2),
+            Self::Pad(e) => (&e.date, 0),
+            Self::Price(e) => (&e.date, 0),
+            Self::RawTransaction(e) => (&e.date, 0),
+            Self::Query(e) => (&e.date, 0),
         }
     }
 }
@@ -1109,45 +1240,47 @@ impl Ord for Entry {
     }
 }
 
-/// Macro to define the From trait for the enum for all the entry types.
-macro_rules! raw_entry_enum_from_entry {
-    // Implement the From trait to both RawEntry as well as Entry.
-    ($entry_type:ident) => {
-        impl From<$entry_type> for RawEntry {
-            fn from(e: $entry_type) -> Self {
-                RawEntry::$entry_type(e)
+/// Macro to define the From trait for the enum for all the variants.
+/// Assumes the inner type is the same name as the variant.
+macro_rules! enum_from_inner {
+    ($enum:ident, $($variant:ident),+ $(,)?) => {
+        $(
+            impl From<$variant> for $enum {
+                fn from(e: $variant) -> Self {
+                    $enum::$variant(e)
+                }
             }
-        }
-        impl From<$entry_type> for Entry {
-            fn from(e: $entry_type) -> Self {
-                Entry::$entry_type(e)
-            }
-        }
-    };
-    // For RawTransaction, the type and the name (Transaction) of the enum variant do not match.
-    ($from_entry_type:ident, $to_entry_type:ident) => {
-        impl From<$from_entry_type> for RawEntry {
-            fn from(e: $from_entry_type) -> Self {
-                RawEntry::$to_entry_type(e)
-            }
-        }
-        impl From<$to_entry_type> for Entry {
-            fn from(e: $to_entry_type) -> Self {
-                Entry::$to_entry_type(e)
-            }
-        }
+        )*
     };
 }
 
-raw_entry_enum_from_entry!(Balance);
-raw_entry_enum_from_entry!(Close);
-raw_entry_enum_from_entry!(Commodity);
-raw_entry_enum_from_entry!(Custom);
-raw_entry_enum_from_entry!(Document);
-raw_entry_enum_from_entry!(Event);
-raw_entry_enum_from_entry!(Note);
-raw_entry_enum_from_entry!(Open);
-raw_entry_enum_from_entry!(Pad);
-raw_entry_enum_from_entry!(Price);
-raw_entry_enum_from_entry!(Query);
-raw_entry_enum_from_entry!(RawTransaction, Transaction);
+enum_from_inner!(
+    RawEntry,
+    Balance,
+    Close,
+    Commodity,
+    Custom,
+    Document,
+    Event,
+    Note,
+    Open,
+    Pad,
+    Price,
+    Query,
+    RawTransaction
+);
+enum_from_inner!(
+    Entry,
+    Balance,
+    Close,
+    Commodity,
+    Custom,
+    Document,
+    Event,
+    Note,
+    Open,
+    Pad,
+    Price,
+    Query,
+    Transaction
+);

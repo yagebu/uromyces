@@ -20,14 +20,8 @@ const BOOKED: &str = "booked";
 /// Find the first transaction for the given tag.
 fn find_first_with_tag(tag: &str, txns: &[RawEntry]) -> Option<RawTransaction> {
     txns.iter()
-        .filter_map(|e| {
-            if let RawEntry::Transaction(p) = e {
-                Some(p)
-            } else {
-                None
-            }
-        })
-        .find(|t| t.header.tags.contains(tag))
+        .filter_map(|e| e.as_transaction())
+        .find(|t| t.tags.contains(tag))
         .cloned()
 }
 
@@ -81,7 +75,8 @@ fn run_booking_test(path: &Path) {
     let entries = &raw_ledger.entries;
     let txns_apply = entries
         .iter()
-        .filter(|t| t.get_header().tags.contains(APPLY))
+        .filter_map(|e| e.as_transaction())
+        .filter(|t| t.tags.contains(APPLY))
         .cloned()
         .collect::<Vec<_>>();
 
@@ -99,7 +94,7 @@ fn run_booking_test(path: &Path) {
         if let Some(ante_txn) = find_first_with_tag(ANTE, entries) {
             ledger.entries.push(ante_txn.into());
         }
-        ledger.entries.push(apply_txn);
+        ledger.entries.push(apply_txn.into());
 
         let (booked, balances) = book_entries(ledger.clone());
 
@@ -141,7 +136,7 @@ fn run_booking_test(path: &Path) {
         );
 
         if let Some(expected_booked_txn) = find_first_with_tag(BOOKED, entries) {
-            if expected_booked_txn.header.meta.contains_key("error") {
+            if expected_booked_txn.meta.meta.contains_key("error") {
                 assert!(!booked.errors.is_empty());
             } else {
                 assert!(booked.errors.is_empty());
