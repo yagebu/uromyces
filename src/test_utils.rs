@@ -12,7 +12,7 @@ fn is_ci() -> bool {
     std::env::var("CI").is_ok()
 }
 
-/// Test helper to create a Currence from a string like `EUR`
+/// Test helper to create a Currency from a string like `EUR`
 pub fn c(cur: &str) -> Currency {
     cur.into()
 }
@@ -81,12 +81,12 @@ impl BeancountSnapshot {
         res
     }
 
-    /// Get a reference to the title.
+    /// Get a reference to the input string.
     pub fn input(&self) -> &str {
         &self.input
     }
 
-    /// Get a reference to the input string.
+    /// Get a reference to the title.
     pub fn title(&self) -> &str {
         &self.title
     }
@@ -99,14 +99,14 @@ impl BeancountSnapshot {
         }
     }
 
-    /// Add output to snaphot, printing with Debug.
+    /// Add output to snapshot, printing with Debug.
     ///
     /// This can be called multiple times to append more output.
     pub fn add_debug_output(&mut self, name: &str, value: impl std::fmt::Debug) {
         self.add_output(&format!("{name}={value:#?}\n"));
     }
 
-    /// Add output to snaphot.
+    /// Add output to snapshot.
     ///
     /// This can be called multiple times to append more output.
     pub fn add_output(&mut self, output: &str) {
