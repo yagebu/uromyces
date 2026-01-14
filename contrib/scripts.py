@@ -91,7 +91,7 @@ def import_booking_tests() -> None:
                 ignored_test_ids.add(test_id)
                 continue
 
-            excluded = {"STRICT_WITH_SIZE"}
+            excluded: set[str] = set()
             if booking_method not in excluded:
                 target_path = BOOKING_TEST_PATH / f"{test_id}.beancount"
                 contents = dedent(method.__doc__)
