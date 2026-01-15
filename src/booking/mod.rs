@@ -66,9 +66,12 @@ fn close_positions(
     methods: &BookingMethods,
 ) -> Result<(), BookingError> {
     let mut additional_postings = Vec::new();
+    // We keep local balances to allow multiple reductions to the same account in one
+    // Transaction, while ensuring the balances do not get partially updated if booking fails
+    // half-way through a Transaction.
     let mut local_balances = AccountBalances::new();
 
-    for posting in &mut *postings {
+    for posting in postings.iter_mut() {
         debug_assert!(posting.units.currency.is_some());
 
         let Some(cost) = &posting.cost else {
@@ -103,22 +106,21 @@ fn close_positions(
         if balance.is_reduced_by(&units) {
             let matches = balance
                 .iter_with_cost()
-                .filter(|pos| units.currency == *pos.currency)
-                .filter(|pos| match &cost.currency {
-                    Some(currency) => currency == &pos.cost.currency,
-                    None => true,
-                })
-                .filter(|pos| match &cost.number_per {
-                    Some(number) => number == &pos.cost.number,
-                    None => true,
-                })
-                .filter(|pos| match &cost.date {
-                    Some(date) => date == &pos.cost.date,
-                    None => true,
-                })
-                .filter(|pos| match &cost.label {
-                    Some(label) => pos.cost.label.iter().any(|v| v == label),
-                    None => true,
+                .filter(|pos| {
+                    units.currency == *pos.currency
+                        && cost
+                            .currency
+                            .as_ref()
+                            .is_none_or(|c| c == &pos.cost.currency)
+                        && cost
+                            .number_per
+                            .as_ref()
+                            .is_none_or(|n| n == &pos.cost.number)
+                        && cost.date.as_ref().is_none_or(|d| d == &pos.cost.date)
+                        && cost
+                            .label
+                            .as_ref()
+                            .is_none_or(|l| pos.cost.label.iter().any(|v| v == l))
                 })
                 .collect::<Vec<_>>();
             if matches.is_empty() {
