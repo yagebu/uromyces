@@ -130,10 +130,75 @@ mod test {
     }
 
     #[test]
+    fn date_from_str_invalid_parse() {
+        assert!(Date::try_from_str("abcd-12-12").is_err());
+        assert!(Date::try_from_str("2022-ab-12").is_err());
+        assert!(Date::try_from_str("2022-12-ab").is_err());
+        assert!(Date::try_from_str("2022-02-30").is_err());
+    }
+
+    #[test]
     fn date_serialisation() {
         let date = serde_json::from_str::<Date>("\"2022-12-12\"").unwrap();
         assert_eq!(serde_json::to_string(&date).unwrap(), "\"2022-12-12\"");
         assert!(serde_json::from_str::<Date>("\"2022\"").is_err());
         assert!(serde_json::from_str::<Date>("\"2022-12-111\"").is_err());
+    }
+
+    #[test]
+    fn date_from_ymd_opt() {
+        let date = Date::from_ymd_opt(2023, 6, 15).unwrap();
+        assert_eq!(date.year(), 2023);
+        assert_eq!(date.month(), 6);
+        assert_eq!(date.day(), 15);
+
+        assert!(Date::from_ymd_opt(2023, 2, 30).is_none());
+    }
+
+    #[test]
+    fn date_previous_day() {
+        let date = Date::from_ymd_opt(2023, 6, 15).unwrap();
+        let prev = date.previous_day().unwrap();
+        assert_eq!(prev.to_string(), "2023-06-14");
+
+        let date = Date::from_ymd_opt(2023, 3, 1).unwrap();
+        let prev = date.previous_day().unwrap();
+        assert_eq!(prev.to_string(), "2023-02-28");
+
+        let date = Date::from_ymd_opt(2023, 1, 1).unwrap();
+        let prev = date.previous_day().unwrap();
+        assert_eq!(prev.to_string(), "2022-12-31");
+
+        // MIN_DATE has no previous day
+        assert!(MIN_DATE.previous_day().is_none());
+    }
+
+    #[test]
+    fn date_debug() {
+        let date = Date::from_ymd_opt(2023, 6, 15).unwrap();
+        assert_eq!(format!("{date:?}"), "Date(\"2023-06-15\")");
+    }
+
+    #[test]
+    fn date_ordering() {
+        let d1 = Date::from_ymd_opt(2023, 1, 1).unwrap();
+        let d2 = Date::from_ymd_opt(2023, 1, 2).unwrap();
+        let d3 = Date::from_ymd_opt(2023, 2, 1).unwrap();
+
+        assert!(d1 < d2);
+        assert!(d2 < d3);
+        assert!(MIN_DATE < d1);
+
+        // Equality
+        let d1_copy = Date::from_ymd_opt(2023, 1, 1).unwrap();
+        assert_eq!(d1, d1_copy);
+    }
+
+    #[test]
+    fn date_display_padding() {
+        let date = Date::from_ymd_opt(2023, 1, 5).unwrap();
+        assert_eq!(date.to_string(), "2023-01-05");
+        let date = Date::from_ymd_opt(123, 12, 31).unwrap();
+        assert_eq!(date.to_string(), "0123-12-31");
     }
 }
