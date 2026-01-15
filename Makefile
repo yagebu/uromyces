@@ -4,7 +4,7 @@ RUST_SOURCES := $(shell find src tree-sitter-beancount -type f)
 
 # note: These commands are run in the venv with `uv run` to
 #       avoid rebuilds: https://github.com/PyO3/pyo3/issues/1708
-CARGO = uv run cargo
+CARGO = uv run --no-project cargo
 
 # Create and sync a dev environment, making sure to recompile the Rust module.
 .venv: uv.lock pyproject.toml $(RUST_SOURCES)
@@ -15,12 +15,14 @@ dev:
 	uv sync --reinstall-package uromyces
 
 # Run linters
-lint: .venv
-	$(CARGO) fmt
-	$(CARGO) clippy
+lint: lint-rust lint-py
+lint-py: .venv
 	pre-commit run -a
 	uv run mypy python tests contrib
 	uv run ty check python tests contrib
+lint-rust: .venv
+	$(CARGO) fmt
+	$(CARGO) clippy
 
 # Run Rust and Python tests
 test: test-rust test-py
@@ -28,6 +30,8 @@ test-py: .venv
 	uv run pytest --cov=uromyces --cov-report=term-missing:skip-covered --cov-report=html
 test-rust:
 	$(CARGO) test
+test-rust-cov:
+	LLVM_COV=llvm-cov LLVM_PROFDATA=llvm-profdata $(CARGO) llvm-cov --html
 
 # Generate Rust documentation
 doc: .venv
@@ -64,4 +68,4 @@ clean:
 	find . -type f -name '*.py[c0]' -delete
 	find . -type d -name "__pycache__" -delete
 
-.PHONY: clean dev doc insta lint maturin-generate-ci test test-py test-rust update
+.PHONY: clean dev doc insta lint lint-py lint-rust maturin-generate-ci test test-py test-rust test-rust-cov update
