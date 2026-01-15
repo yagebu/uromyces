@@ -52,7 +52,7 @@ def check(*, filenames: tuple[str, ...], verbose: bool) -> None:
 
         for error in ledger.errors:
             msg = click.style(error.message, fg="red")
-            click.echo(f"{error.filename}:{error.line}:{msg}", err=True)
+            click.echo(f"{error.filename}:{error.lineno}:{msg}", err=True)
 
 
 @cli.command()
@@ -91,7 +91,7 @@ def compare(
     click.echo("Errors from uromyces")
     for error in ledger.errors:
         msg = click.style(error.message, fg="red")
-        click.echo(f"{error.filename}:{error.line}:{msg}", err=True)
+        click.echo(f"{error.filename}:{error.lineno}:{msg}", err=True)
     click.echo("Errors from Beancount")
     for err in errors_beancount:
         msg = click.style(err.message, fg="red")

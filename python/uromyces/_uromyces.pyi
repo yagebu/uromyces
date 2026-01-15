@@ -23,7 +23,7 @@ from uromyces._types import Directive
 
 class UroError:
     filename: str | None
-    line: int | None
+    lineno: int | None
     source: Meta
     message: str
     entry: Directive | None
