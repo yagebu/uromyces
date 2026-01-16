@@ -22,6 +22,7 @@ from uromyces._uromyces import Note
 from uromyces._uromyces import Open
 from uromyces._uromyces import Pad
 from uromyces._uromyces import Posting
+from uromyces._uromyces import PostingMeta
 from uromyces._uromyces import Price
 from uromyces._uromyces import Query
 from uromyces._uromyces import summarize_clamp
@@ -53,6 +54,7 @@ __all__ = [  # noqa: RUF022
     "EntryMeta",
     "Ledger",
     "Posting",
+    "PostingMeta",
     # Functions
     "convert_entries",
     "convert_options",

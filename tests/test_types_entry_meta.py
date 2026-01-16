@@ -8,9 +8,44 @@ from collections.abc import ValuesView
 import pytest
 
 from uromyces import EntryMeta
+from uromyces import PostingMeta
 
 
-def test_entry_header() -> None:
+def test_posting_meta() -> None:
+    with pytest.raises(ValueError, match="Invalid filename"):
+        PostingMeta({"filename": "not_a_path", "lineno": 0})
+    with pytest.raises(TypeError, match="failed to extract enum MetaValue"):
+        PostingMeta({"key": object()})  # type: ignore[dict-item]
+
+    empty = PostingMeta({})
+    assert empty.filename is None
+    assert empty.lineno is None
+    with pytest.raises(AttributeError):
+        assert empty.not_an_attribute  # type: ignore[attr-defined]
+    with pytest.raises(TypeError):
+        assert PostingMeta(empty)
+
+    with_filename = PostingMeta({"filename": "<dummy>", "lineno": 0})
+    assert with_filename.filename == "<dummy>"
+    assert with_filename.lineno == 0
+    assert with_filename["lineno"] == 0
+    assert isinstance(with_filename["lineno"], int)
+
+    other_key = PostingMeta({"some_key": "test"})
+    assert other_key["some_key"] == "test"
+    assert other_key.get("some_key") == "test"
+    assert other_key.get("other_key") is None
+    assert other_key.get("other_key", "default") == "default"
+
+    assert dict(empty) == {}
+    assert dict(**empty) == {}
+    assert dict(empty, key="value") == {"key": "value"}  # ty:ignore[no-matching-overload]
+
+    assert dict(other_key) == {"some_key": "test"}
+    assert dict(**other_key) == {"some_key": "test"}
+
+
+def test_entry_meta() -> None:
     with pytest.raises(ValueError, match="Missing filename"):
         EntryMeta({})
     with pytest.raises(ValueError, match="Missing lineno"):
@@ -22,7 +57,7 @@ def test_entry_header() -> None:
     EntryMeta({"filename": "/some/path", "lineno": 0})
 
 
-def test_entry_header_mapping() -> None:
+def test_entry_meta_mapping() -> None:
     meta_dict: dict[str, str | int] = {
         "filename": "<string>",
         "lineno": 0,
@@ -31,6 +66,7 @@ def test_entry_header_mapping() -> None:
     header = EntryMeta(meta_dict)
     assert isinstance(header, Mapping)
     assert dict(header) == meta_dict
+    assert dict(**header) == meta_dict
 
     assert header["filename"] == "<string>"
     assert header.get("filename") == "<string>"
@@ -54,7 +90,7 @@ def test_entry_header_mapping() -> None:
     assert list(header.items()) == list(meta_dict.items())
 
 
-def test_entry_header_constructor() -> None:
+def test_entry_meta_constructor() -> None:
     header = EntryMeta({"filename": "<string>", "lineno": 0})
     # not an absolute path
     assert header.filename == "<string>"

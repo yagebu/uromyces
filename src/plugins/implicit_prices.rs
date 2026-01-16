@@ -23,7 +23,7 @@ pub fn add(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
 
             let price_entry = if let Some(price) = &posting.price {
                 let mut header = EntryMeta::from_existing(&transaction.meta);
-                header.add_meta(META_KEY, "from_price");
+                header.add_meta(META_KEY, "from_price".into());
                 Some(Price {
                     date: transaction.date,
                     tags: TagsLinks::default(),
@@ -37,7 +37,7 @@ pub fn add(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
                     None
                 } else {
                     let mut header = EntryMeta::from_existing(&transaction.meta);
-                    header.add_meta(META_KEY, "from_cost");
+                    header.add_meta(META_KEY, "from_cost".into());
                     Some(Price {
                         date: transaction.date,
                         tags: TagsLinks::default(),
@@ -93,8 +93,12 @@ mod tests {
             .filter_map(|e| e.as_price())
             .map(|p| {
                 format!(
-                    "date={}, currency={}, price={}, meta={:?}",
-                    p.date, p.currency, p.amount, p.meta.meta
+                    "date={}, currency={}, price={}, meta[\"{}\"]={}",
+                    p.date,
+                    p.currency,
+                    p.amount,
+                    META_KEY,
+                    p.meta.get(META_KEY).expect("__implicit_prices__ to be set")
                 )
             })
             .collect::<Vec<_>>();

@@ -51,7 +51,7 @@
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
-use pyo3::types::{PyBool, PyDate, PyString};
+use pyo3::types::{PyBool, PyDate, PyInt, PyString};
 use pyo3::{PyTypeInfo, prelude::*};
 use serde::{Deserialize, Serialize};
 
@@ -155,7 +155,8 @@ impl CustomValue {
             MetaValue::Account(_) => pyo3::intern!(py, "<AccountDummy>").clone().into_any(),
             MetaValue::Bool(_) => PyBool::type_object(py).into_any(),
             MetaValue::Amount(_) => Amount::type_object(py).into_any(),
-            MetaValue::Number(_) => get_decimal_decimal(py)?.clone().into_any(),
+            MetaValue::Decimal(_) => get_decimal_decimal(py)?.clone().into_any(),
+            MetaValue::Integer(_) => PyInt::type_object(py).into_any(),
         })
     }
 }
@@ -185,11 +186,7 @@ impl RawPosting {
         cost: Option<Cost>,
     ) -> Posting {
         Posting {
-            meta: PostingMeta {
-                filename: Some(self.meta.filename),
-                lineno: Some(self.meta.lineno),
-                meta: self.meta.meta,
-            },
+            meta: self.meta.into(),
             account: self.account,
             flag: self.flag,
             units,

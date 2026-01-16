@@ -11,5 +11,5 @@
 
 ;------------------------------------------------------------------------------
 ; prices=[
-;     "date=2013-04-01, currency=USD, price=0.90 EUR, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_price\")) }])",
+;     "date=2013-04-01, currency=USD, price=0.90 EUR, meta[\"__implicit_prices__\"]=from_price",
 ; ]

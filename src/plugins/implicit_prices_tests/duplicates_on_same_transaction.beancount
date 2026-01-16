@@ -18,7 +18,7 @@
 
 ;------------------------------------------------------------------------------
 ; prices=[
-;     "date=2013-04-01, currency=HOOL, price=520 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
-;     "date=2013-04-02, currency=HOOL, price=520 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
-;     "date=2013-04-02, currency=HOOL, price=530 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
+;     "date=2013-04-01, currency=HOOL, price=520 USD, meta[\"__implicit_prices__\"]=from_cost",
+;     "date=2013-04-02, currency=HOOL, price=520 USD, meta[\"__implicit_prices__\"]=from_cost",
+;     "date=2013-04-02, currency=HOOL, price=530 USD, meta[\"__implicit_prices__\"]=from_cost",
 ; ]

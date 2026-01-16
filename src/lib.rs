@@ -45,7 +45,7 @@ mod uromyces {
     #[pymodule_export]
     use crate::Ledger;
     #[pymodule_export]
-    use crate::types::{Amount, Booking, Cost, CustomValue, EntryMeta, Posting};
+    use crate::types::{Amount, Booking, Cost, CustomValue, EntryMeta, Posting, PostingMeta};
     // Entry types
     #[pymodule_export]
     use crate::display_precision::Precisions;

@@ -136,7 +136,7 @@ fn run_booking_test(path: &Path) {
         );
 
         if let Some(expected_booked_txn) = find_first_with_tag(BOOKED, entries) {
-            if expected_booked_txn.meta.meta.contains_key("error") {
+            if expected_booked_txn.meta.contains_key("error") {
                 assert!(!booked.errors.is_empty());
             } else {
                 assert!(booked.errors.is_empty());

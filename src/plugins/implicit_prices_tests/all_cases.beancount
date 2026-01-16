@@ -37,9 +37,9 @@
 
 ;------------------------------------------------------------------------------
 ; prices=[
-;     "date=2013-04-01, currency=USD, price=1.12 CAD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_price\")) }])",
-;     "date=2013-04-02, currency=HOOL, price=520 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
-;     "date=2013-04-04, currency=HOOL, price=530 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_price\")) }])",
-;     "date=2013-04-05, currency=HOOL, price=540 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_cost\")) }])",
-;     "date=2013-04-06, currency=HOOL, price=560 USD, meta=Meta([MetaKeyValuePair { key: \"__implicit_prices__\", value: Some(String(\"from_price\")) }])",
+;     "date=2013-04-01, currency=USD, price=1.12 CAD, meta[\"__implicit_prices__\"]=from_price",
+;     "date=2013-04-02, currency=HOOL, price=520 USD, meta[\"__implicit_prices__\"]=from_cost",
+;     "date=2013-04-04, currency=HOOL, price=530 USD, meta[\"__implicit_prices__\"]=from_price",
+;     "date=2013-04-05, currency=HOOL, price=540 USD, meta[\"__implicit_prices__\"]=from_cost",
+;     "date=2013-04-06, currency=HOOL, price=560 USD, meta[\"__implicit_prices__\"]=from_price",
 ; ]

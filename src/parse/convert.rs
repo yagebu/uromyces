@@ -267,15 +267,14 @@ impl TryFromNode for RawPosting {
             None
         };
         Ok(Self {
-            meta: EntryMeta {
-                meta: node
-                    .child_by_field_id(node_fields::METADATA)
+            meta: EntryMeta::new(
+                node.child_by_field_id(node_fields::METADATA)
                     .map(|n| Meta::try_from_node(n, s))
                     .transpose()?
                     .unwrap_or_default(),
-                filename: s.filename.clone(),
-                lineno: node.line_number(),
-            },
+                s.filename.clone(),
+                node.line_number(),
+            ),
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
             flag: flag.map(|n| s.get_flag(n)),
             units,
@@ -323,7 +322,7 @@ impl TryFromNode for MetaValue {
             node_ids::BOOL => Self::Bool(s.get_str(node) == "TRUE"),
             node_ids::AMOUNT => Self::Amount(Amount::try_from_node(node, s)?),
             node_ids::CURRENCY => Self::Currency(Currency::from_node(node, s)),
-            node_ids::NUMBER => Self::Number(Decimal::try_from_node(node, s)?),
+            node_ids::NUMBER => Self::Decimal(Decimal::try_from_node(node, s)?),
             _ => panic!("Invalid metadata value node: {node:?}"),
         })
     }
@@ -332,14 +331,14 @@ impl TryFromNode for MetaValue {
 impl TryFromNode for MetaKeyValuePair {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "key_value");
-        Ok(Self {
-            key: s.get_key(node.required_child(0)).into(),
-            value: if let Some(n) = node.child(1) {
+        Ok(Self::new(
+            s.get_key(node.required_child(0)).into(),
+            if let Some(n) = node.child(1) {
                 Some(MetaValue::try_from_node(n, s)?)
             } else {
                 None
             },
-        })
+        ))
     }
 }
 
@@ -387,15 +386,14 @@ impl TryFromNode for ParsedEntryCommon {
             date: Date::try_from_node(node.required_child_by_id(node_fields::DATE), s)?,
             tags,
             links,
-            meta: EntryMeta {
-                meta: node
-                    .child_by_field_id(node_fields::METADATA)
+            meta: EntryMeta::new(
+                node.child_by_field_id(node_fields::METADATA)
                     .map(|n| Meta::try_from_node(n, s))
                     .transpose()?
                     .unwrap_or_default(),
-                filename: s.filename.clone(),
-                lineno: node.line_number(),
-            },
+                s.filename.clone(),
+                node.line_number(),
+            ),
         })
     }
 }

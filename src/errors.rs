@@ -127,9 +127,9 @@ impl UroError {
     #[must_use]
     pub(crate) fn with_entry<E: Clone + Into<Entry>>(mut self, entry: &E) -> Self {
         let e: Entry = (*entry).clone().into();
-        let header = e.meta();
-        self.filename = Some(header.filename.clone());
-        self.lineno = Some(header.lineno);
+        let meta = e.meta();
+        self.filename = Some(meta.filename.clone());
+        self.lineno = Some(meta.lineno);
         self.entry = Some(e.into());
         self
     }

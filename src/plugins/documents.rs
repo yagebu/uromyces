@@ -91,7 +91,7 @@ pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
                         date,
                         tags: TagsLinks::default(),
                         links: TagsLinks::default(),
-                        meta: EntryMeta::new(ledger.filename.clone(), 0),
+                        meta: EntryMeta::empty(ledger.filename.clone(), 0),
                         account: (*account).clone(),
                         filename: account_dir.join(file_name),
                     })

@@ -69,7 +69,7 @@ fn create_summarisation_entries(
                 ));
             }
             Transaction::new(
-                EntryMeta::new(summarize_filename.clone(), 0),
+                EntryMeta::empty(summarize_filename.clone(), 0),
                 date,
                 TagsLinks::default(),
                 TagsLinks::default(),
