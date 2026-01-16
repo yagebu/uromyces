@@ -53,6 +53,7 @@ pub enum ConversionErrorKind {
     InvalidDocumentFilename(String),
     UnsupportedTotalCost,
     SyntaxError(String),
+    InternalError(String),
 }
 
 impl std::error::Error for ConversionError {}
@@ -74,6 +75,9 @@ impl std::fmt::Display for ConversionError {
             ),
             K::SyntaxError(s) => {
                 write!(f, "Invalid syntax: {s}")
+            }
+            K::InternalError(s) => {
+                write!(f, "InternalError: {s}")
             }
         }
     }

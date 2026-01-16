@@ -1,0 +1,11 @@
+;==============================================================================
+; syntax_error_transaction
+;==============================================================================
+2022-01-21 * "malformed posting"
+  Income:Test  -600.00 USD USD USD
+
+;------------------------------------------------------------------------------
+; errors=[
+;     "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (unary_num_expr (number)) currency: (currency)))) (ERROR (currency) (currency)))",
+; ]
+; num_entries=0

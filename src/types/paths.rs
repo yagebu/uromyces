@@ -97,12 +97,14 @@ impl Deref for Filename {
 
 impl Debug for AbsoluteUTF8Path {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("AbsoluteUTF8Path").field(&self.0).finish()
+        let str: &str = &self.0;
+        f.debug_tuple("AbsoluteUTF8Path").field(&str).finish()
     }
 }
 impl Debug for Filename {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("Filename").field(&self.0).finish()
+        let str: &str = &self.0;
+        f.debug_tuple("Filename").field(&str).finish()
     }
 }
 impl Display for AbsoluteUTF8Path {
@@ -182,6 +184,22 @@ impl TryFrom<Filename> for AbsoluteUTF8Path {
     }
 }
 impl TryFrom<&Path> for AbsoluteUTF8Path {
+    type Error = FilePathError;
+
+    fn try_from(value: &Path) -> Result<Self, Self::Error> {
+        match value.to_str() {
+            Some(s) => {
+                if value.is_absolute() {
+                    Ok(Self::from_ref(s))
+                } else {
+                    Err(FilePathError::NonAbsolute(s.to_owned()))
+                }
+            }
+            None => Err(FilePathError::NonUnicode(value.to_path_buf())),
+        }
+    }
+}
+impl TryFrom<&Path> for Filename {
     type Error = FilePathError;
 
     fn try_from(value: &Path) -> Result<Self, Self::Error> {

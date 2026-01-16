@@ -26,7 +26,8 @@ pub struct Currency(InternedString);
 
 impl Debug for Currency {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("Currency").field(&self.0).finish()
+        let str: &str = &self.0;
+        f.debug_tuple("Currency").field(&str).finish()
     }
 }
 

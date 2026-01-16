@@ -16,7 +16,7 @@ use super::ConversionResult;
 use super::NodeGetters;
 use super::errors::ConversionError;
 use super::errors::ConversionErrorKind::{
-    InvalidBookingMethod, InvalidDate, InvalidDecimal, InvalidDocumentFilename,
+    InternalError, InvalidBookingMethod, InvalidDate, InvalidDecimal, InvalidDocumentFilename,
     UnsupportedTotalCost,
 };
 use super::node_fields;
@@ -185,9 +185,11 @@ impl TryFromNode for Decimal {
                     _ => left / right,
                 })
             }
-            _ => {
-                panic!("Invalid number node: {node:?}");
-            }
+            _ => Err(ConversionError::new(
+                InternalError(format!("Invalid number node: {node:?}")),
+                &node,
+                s,
+            )),
         }
     }
 }
@@ -322,8 +324,7 @@ impl TryFromNode for MetaValue {
             node_ids::BOOL => Self::Bool(s.get_str(node) == "TRUE"),
             node_ids::AMOUNT => Self::Amount(Amount::try_from_node(node, s)?),
             node_ids::CURRENCY => Self::Currency(Currency::from_node(node, s)),
-            node_ids::NUMBER => Self::Decimal(Decimal::try_from_node(node, s)?),
-            _ => panic!("Invalid metadata value node: {node:?}"),
+            _ => Self::Decimal(Decimal::try_from_node(node, s)?),
         })
     }
 }

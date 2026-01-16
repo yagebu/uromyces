@@ -85,7 +85,8 @@ static ACCOUNT_RE: LazyLock<Regex> = LazyLock::new(|| {
 
 impl Debug for Account {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("Account").field(&self.0).finish()
+        let str: &str = &self.0;
+        f.debug_tuple("Account").field(&str).finish()
     }
 }
 

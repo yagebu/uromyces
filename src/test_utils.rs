@@ -70,6 +70,7 @@ pub struct BeancountSnapshot {
     input: String,
     snapshot: String,
     new_snapshot: String,
+    filters: Vec<(String, String)>,
 }
 
 impl BeancountSnapshot {
@@ -77,6 +78,7 @@ impl BeancountSnapshot {
     pub fn load(path: &Path) -> Self {
         let input = fs::read_to_string(path).unwrap();
         let mut res = Self::from_string(input);
+        res.filter_path(path);
         res.path = Some(path.to_owned());
         res
     }
@@ -89,6 +91,16 @@ impl BeancountSnapshot {
     /// Get a reference to the title.
     pub fn title(&self) -> &str {
         &self.title
+    }
+
+    /// Add a filter to replace the parent directory of the given path with `[DIR]`.
+    fn filter_path(&mut self, path: &Path) {
+        if let Some(parent) = path.parent() {
+            let parent_str = parent.to_string_lossy().to_string();
+            if !parent_str.is_empty() {
+                self.filters.push((parent_str, "[DIR]".to_string()));
+            }
+        }
     }
 
     /// Start a new output group - adds a delimiting line if there is output already.
@@ -110,7 +122,11 @@ impl BeancountSnapshot {
     ///
     /// This can be called multiple times to append more output.
     pub fn add_output(&mut self, output: &str) {
-        self.new_snapshot += output;
+        let mut filtered = output.to_string();
+        for (pattern, replacement) in &self.filters {
+            filtered = filtered.replace(pattern, replacement);
+        }
+        self.new_snapshot += &filtered;
     }
 
     /// Write the updated snapshot.
@@ -178,6 +194,7 @@ impl BeancountSnapshot {
             input,
             snapshot,
             new_snapshot: String::with_capacity(current_snapshot_len),
+            filters: Vec::new(),
         }
     }
 }

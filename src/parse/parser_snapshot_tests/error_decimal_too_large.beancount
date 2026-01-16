@@ -1,0 +1,12 @@
+;==============================================================================
+; invalid_decimal
+;==============================================================================
+2000-01-01 * "Test"
+  Assets:Cash  1.2.3 USD
+  Income:Test
+
+;------------------------------------------------------------------------------
+; errors=[
+;     "Invalid syntax: (transaction date: (date) flag: (flag) narration: (string) postings: (postings (posting account: (account) amount: (amount number: (number) (ERROR (UNEXPECTED '.') (number)) currency: (currency))) (posting account: (account))))",
+; ]
+; num_entries=0
