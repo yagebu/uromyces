@@ -24,6 +24,7 @@ pub(super) enum BookingErrorKind {
     TooManyMissingNumbers,
     MissingAmountNumber,
     MissingCostNumber,
+    DivisionFailed,
 }
 
 impl BookingErrorKind {
@@ -58,6 +59,7 @@ impl std::fmt::Display for BookingError {
             T::TooManyMissingNumbers => write!(f, "Too many missing numbers in transaction"),
             T::MissingAmountNumber => write!(f, "Amount is missing a number"),
             T::MissingCostNumber => write!(f, "Cost is missing a number"),
+            T::DivisionFailed => write!(f, "Division failed (e.g. division by zero)"),
         }
     }
 }

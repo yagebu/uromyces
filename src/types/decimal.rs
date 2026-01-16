@@ -1,7 +1,7 @@
 //! Decimal numbers.
 use std::fmt::Display;
 use std::iter::Sum;
-use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Mul, Neg, Sub, SubAssign};
 use std::str::FromStr;
 
 use pyo3::exceptions::PyValueError;
@@ -66,6 +66,12 @@ impl Decimal {
     #[must_use]
     pub(crate) fn is_zero(&self) -> bool {
         self.0.is_zero()
+    }
+
+    /// Checked division. Returns `None` if the divisor is zero, underflow or overflow happens.
+    #[must_use]
+    pub(crate) fn checked_div(self, rhs: Self) -> Option<Self> {
+        self.0.checked_div(rhs.0).map(Self)
     }
 
     /// Check if sign of the Decimal is positive (also true for 0).
@@ -195,13 +201,6 @@ impl Mul<&Decimal> for Decimal {
 
     fn mul(self, rhs: &Decimal) -> Self::Output {
         Self(self.0.mul(rhs.0))
-    }
-}
-impl Div for Decimal {
-    type Output = Self;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        Self(self.0.div(rhs.0))
     }
 }
 impl Sum for Decimal {

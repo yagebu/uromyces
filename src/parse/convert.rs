@@ -16,8 +16,8 @@ use super::ConversionResult;
 use super::NodeGetters;
 use super::errors::ConversionError;
 use super::errors::ConversionErrorKind::{
-    InternalError, InvalidBookingMethod, InvalidDate, InvalidDecimal, InvalidDocumentFilename,
-    UnsupportedTotalCost,
+    DivisionFailed, InternalError, InvalidBookingMethod, InvalidDate, InvalidDecimal,
+    InvalidDocumentFilename, UnsupportedTotalCost,
 };
 use super::node_fields;
 use super::node_ids;
@@ -178,12 +178,14 @@ impl TryFromNode for Decimal {
                 let left = Self::try_from_node(node.required_child(0), s)?;
                 let right = Self::try_from_node(node.required_child(2), s)?;
                 let op = s.get_str(node.required_child(1));
-                Ok(match op {
-                    "+" => left + right,
-                    "-" => left - right,
-                    "*" => left * right,
-                    _ => left / right,
-                })
+                match op {
+                    "+" => Ok(left + right),
+                    "-" => Ok(left - right),
+                    "*" => Ok(left * right),
+                    _ => left
+                        .checked_div(right)
+                        .ok_or_else(|| ConversionError::new(DivisionFailed(left, right), &node, s)),
+                }
             }
             _ => Err(ConversionError::new(
                 InternalError(format!("Invalid number node: {node:?}")),
@@ -254,7 +256,15 @@ impl TryFromNode for RawPosting {
                 Some(if total_price {
                     match (price_amt.number, units.number) {
                         (Some(price_num), Some(units_number)) => IncompleteAmount {
-                            number: Some(price_num / units_number.abs()),
+                            number: Some(price_num.checked_div(units_number.abs()).ok_or_else(
+                                || {
+                                    ConversionError::new(
+                                        DivisionFailed(price_num, units_number),
+                                        &node,
+                                        s,
+                                    )
+                                },
+                            )?),
                             ..price_amt
                         },
                         _ => price_amt,

@@ -162,7 +162,9 @@ fn complete_cost_spec(
         if let Some(number_per) = cost.number_per {
             total += number_per * units_number;
         }
-        total / units_number
+        total
+            .checked_div(units_number)
+            .ok_or(BookingErrorKind::DivisionFailed)?
     } else {
         cost.number_per.ok_or(BookingErrorKind::MissingCostNumber)?
     };
@@ -250,17 +252,21 @@ fn interpolate_and_fill_in_missing(
             })
             .sum::<Decimal>();
 
-        if let Some((units, price, cost)) = match missing {
+        let interpolated: Option<_> = match missing {
             MissingNumber::UnitsNumber(price, cost) => {
                 if weight.is_zero() {
                     None
                 } else {
                     let number = if let Some(c) = &cost {
                         debug_assert_eq!(&c.currency, group_currency);
-                        weight / c.number
+                        weight.checked_div(c.number).ok_or_else(|| {
+                            BookingErrorKind::DivisionFailed.with_posting(&posting)
+                        })?
                     } else if let Some(p) = &price {
                         debug_assert_eq!(&p.currency, group_currency);
-                        weight / p.number
+                        weight.checked_div(p.number).ok_or_else(|| {
+                            BookingErrorKind::DivisionFailed.with_posting(&posting)
+                        })?
                     } else {
                         weight
                     };
@@ -277,18 +283,31 @@ fn interpolate_and_fill_in_missing(
                 if units.number.is_zero() {
                     None
                 } else {
-                    cost_spec.number_per = Some(weight / units.number);
+                    cost_spec.number_per =
+                        Some(weight.checked_div(units.number).ok_or_else(|| {
+                            BookingErrorKind::DivisionFailed.with_posting(&posting)
+                        })?);
                     let cost = complete_cost_spec(&cost_spec, date, posting.units.number)
                         .expect("cost to not have missing number or currency");
                     Some((units, price, Some(cost)))
                 }
             }
             MissingNumber::PriceNumber(units, cost) => {
-                let price = Amount::new(weight / units.number, group_currency.clone());
-                Some((units, Some(price), cost))
+                if units.number.is_zero() {
+                    None
+                } else {
+                    let price = Amount::new(
+                        weight.checked_div(units.number).ok_or_else(|| {
+                            BookingErrorKind::DivisionFailed.with_posting(&posting)
+                        })?,
+                        group_currency.clone(),
+                    );
+                    Some((units, Some(price), cost))
+                }
             }
             MissingNumber::None(units, price, cost) => Some((units, price, cost)),
-        } {
+        };
+        if let Some((units, price, cost)) = interpolated {
             complete_postings.push(posting.complete(units, price, cost));
         }
     }

@@ -1,5 +1,5 @@
 use crate::errors::UroError;
-use crate::types::{Filename, LineNumber};
+use crate::types::{Decimal, Filename, LineNumber};
 
 use super::NodeGetters;
 use super::convert::ConversionState;
@@ -54,6 +54,7 @@ pub enum ConversionErrorKind {
     UnsupportedTotalCost,
     SyntaxError(String),
     InternalError(String),
+    DivisionFailed(Decimal, Decimal),
 }
 
 impl std::error::Error for ConversionError {}
@@ -78,6 +79,9 @@ impl std::fmt::Display for ConversionError {
             }
             K::InternalError(s) => {
                 write!(f, "InternalError: {s}")
+            }
+            K::DivisionFailed(left, right) => {
+                write!(f, "Division failed: {left} / {right}")
             }
         }
     }
