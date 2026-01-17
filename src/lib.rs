@@ -59,14 +59,14 @@ mod uromyces {
 
     /// Load the Beancount ledger at the given file path.
     #[pyfunction]
-    fn load_file(filename: AbsoluteUTF8Path) -> Ledger {
-        crate::load(filename)
+    fn load_file(filename: AbsoluteUTF8Path, py: Python<'_>) -> Ledger {
+        py.detach(|| crate::load(filename))
     }
 
     /// Load a Beancount ledger from the given string.
     #[pyfunction]
-    fn load_string(string: &str, filename: Filename) -> Ledger {
-        crate::load_string(string, filename)
+    fn load_string(string: &str, filename: Filename, py: Python<'_>) -> Ledger {
+        py.detach(|| crate::load_string(string, filename))
     }
 
     /// Clamp the entries to the given interval.
@@ -77,13 +77,16 @@ mod uromyces {
         begin_date: types::Date,
         end_date: types::Date,
         options: &BeancountOptions,
+        py: Python<'_>,
     ) -> Vec<types::Entry> {
-        summarize::clamp(
-            &entries,
-            begin_date,
-            end_date,
-            &options.get_summarization_accounts(),
-        )
+        py.detach(|| {
+            summarize::clamp(
+                &entries,
+                begin_date,
+                end_date,
+                &options.get_summarization_accounts(),
+            )
+        })
     }
 
     #[pymodule_init]

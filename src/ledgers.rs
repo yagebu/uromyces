@@ -92,27 +92,32 @@ impl Ledger {
             plugins: raw_ledger.plugins.clone(),
         }
     }
-}
-
-#[pymethods]
-impl Ledger {
-    /// Run the plugin with the given name (returns true if it exists)
-    pub fn run_plugin(&mut self, plugin: &str) -> bool {
-        run_named_plugin(self, plugin)
-    }
 
     /// Run the validation plugins (and add any errors).
     pub fn run_validations(&mut self) {
         self.errors.append(&mut run_validations(self));
     }
+}
+
+#[pymethods]
+impl Ledger {
+    /// Run the plugin with the given name (returns true if it exists)
+    fn run_plugin(&mut self, plugin: &str, py: Python<'_>) -> bool {
+        py.detach(|| run_named_plugin(self, plugin))
+    }
+
+    #[pyo3(name = "run_validations")]
+    fn py_run_validations(&mut self, py: Python<'_>) {
+        py.detach(|| self.run_validations());
+    }
 
     /// Replace the entries of this ledger.
-    pub fn replace_entries(&mut self, entries: Vec<Entry>) {
+    fn replace_entries(&mut self, entries: Vec<Entry>) {
         self.entries = entries;
     }
 
     /// Append some error (from the Python side).
-    pub fn add_error(&mut self, error: UroError) {
+    fn add_error(&mut self, error: UroError) {
         self.errors.push(error);
     }
 }
