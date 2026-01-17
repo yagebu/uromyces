@@ -1,5 +1,5 @@
 use std::convert::Infallible;
-use std::fmt::{Debug, Display};
+use std::fmt::Display;
 use std::ops::Deref;
 
 use internment::ArcIntern;
@@ -12,16 +12,6 @@ use serde::{Deserialize, Serialize};
 /// the various traits.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct InternedString(ArcIntern<String>);
-
-impl InternedString {}
-
-impl Debug for InternedString {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("InternedString")
-            .field(&self.0.as_ref())
-            .finish()
-    }
-}
 
 impl Display for InternedString {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
