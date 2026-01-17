@@ -25,7 +25,6 @@ classifiers = [
 dependencies = [
   "click>=7,<9",
   "beancount>=3",
-  "tatsu-lts<5.15" # temporary pin to unbreak beanquery
 ]
 
 [project.optional-dependencies]
