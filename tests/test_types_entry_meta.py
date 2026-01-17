@@ -18,6 +18,7 @@ def test_posting_meta() -> None:
         PostingMeta({"key": object()})  # type: ignore[dict-item]
 
     empty = PostingMeta({})
+    assert empty == PostingMeta({})
     assert empty.filename is None
     assert empty.lineno is None
     with pytest.raises(AttributeError):
@@ -26,6 +27,7 @@ def test_posting_meta() -> None:
         assert PostingMeta(empty)
 
     with_filename = PostingMeta({"filename": "<dummy>", "lineno": 0})
+    assert with_filename == PostingMeta({"filename": "<dummy>", "lineno": 0})
     assert with_filename.filename == "<dummy>"
     assert with_filename.lineno == 0
     assert with_filename["lineno"] == 0
@@ -43,6 +45,8 @@ def test_posting_meta() -> None:
 
     assert dict(other_key) == {"some_key": "test"}
     assert dict(**other_key) == {"some_key": "test"}
+    assert other_key == {"some_key": "test"}
+    assert other_key.copy() == {"some_key": "test"}
 
 
 def test_entry_meta() -> None:
@@ -64,9 +68,11 @@ def test_entry_meta_mapping() -> None:
         "key": "string",
     }
     header = EntryMeta(meta_dict)
+    assert header == EntryMeta(meta_dict)
     assert isinstance(header, Mapping)
     assert dict(header) == meta_dict
     assert dict(**header) == meta_dict
+    assert header.copy() == meta_dict
 
     assert header["filename"] == "<string>"
     assert header.get("filename") == "<string>"

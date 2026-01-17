@@ -211,13 +211,18 @@ impl EntryMeta {
         })
     }
 
-    pub(super) fn to_py_dict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
-        self.meta
-            .to_py_dict(py, Some(&self.filename), Some(self.lineno))
-    }
-
     fn get_as_pyany<'py>(&self, key: &str, py: Python<'py>) -> PyResult<Option<Bound<'py, PyAny>>> {
         self.get(key).map(|v| v.into_bound_py_any(py)).transpose()
+    }
+}
+
+impl<'py> IntoPyObject<'py> for &EntryMeta {
+    type Target = EntryMeta;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        self.clone().into_pyobject(py)
     }
 }
 
@@ -301,6 +306,10 @@ impl EntryMeta {
             _ => self.meta.contains_key(key),
         }
     }
+    fn __eq__(&self, other: &Bound<'_, PyAny>) -> PyResult<bool> {
+        let self_as_dict = self.copy(other.py())?;
+        self_as_dict.eq(other)
+    }
     fn __iter__(&self) -> MetaKeysIter {
         let keys = ["filename".to_string(), "lineno".to_string()]
             .into_iter()
@@ -311,6 +320,10 @@ impl EntryMeta {
     fn __getitem__<'py>(&self, key: &str, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let value = self.get_as_pyany(key, py)?;
         value.ok_or_else(|| PyKeyError::new_err(key.to_owned()))
+    }
+    pub(crate) fn copy<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
+        self.meta
+            .to_py_dict(py, Some(&self.filename), Some(self.lineno))
     }
 }
 
@@ -384,11 +397,6 @@ impl PostingMeta {
             filename,
             lineno,
         })
-    }
-
-    pub(crate) fn to_py_dict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
-        self.meta
-            .to_py_dict(py, self.filename.as_ref(), self.lineno)
     }
 
     fn get_as_pyany<'py>(&self, key: &str, py: Python<'py>) -> PyResult<Option<Bound<'py, PyAny>>> {
@@ -521,6 +529,16 @@ impl<'de> Deserialize<'de> for EntryMeta {
     }
 }
 
+impl<'py> IntoPyObject<'py> for &PostingMeta {
+    type Target = PostingMeta;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        self.clone().into_pyobject(py)
+    }
+}
+
 impl<'py> FromPyObject<'_, 'py> for PostingMeta {
     type Error = PyErr;
 
@@ -572,12 +590,20 @@ impl PostingMeta {
             _ => self.meta.contains_key(key),
         }
     }
+    fn __eq__(&self, other: &Bound<'_, PyAny>) -> PyResult<bool> {
+        let self_as_dict = self.copy(other.py())?;
+        self_as_dict.eq(other)
+    }
     fn __iter__(&self) -> MetaKeysIter {
         MetaKeysIter(self.keys().into_iter())
     }
     fn __getitem__<'py>(&self, key: &str, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let value = self.get_as_pyany(key, py)?;
         value.ok_or_else(|| PyKeyError::new_err(key.to_owned()))
+    }
+    pub(crate) fn copy<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
+        self.meta
+            .to_py_dict(py, self.filename.as_ref(), self.lineno)
     }
 }
 
