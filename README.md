@@ -1,7 +1,6 @@
-# urom(yces)
+# uro(myces)
 
-urom is just a toy project to try out the Rust language to implement parts of
-Beancount's functionality.
+uromyces is a toy Rust re-implementation of parts of Beancount's functionality.
 
 ## How to use / run
 
@@ -31,13 +30,21 @@ It does so in the following series of steps.
 
 ## Performance
 
+On my personal ledger, this is faster than Beancount as follows:
+
+- parsing is about 2x faster
+- booking is about 40x faster
+- plugins for documents, implicit prices and validations each about 10x faster
+
 ### Parsing
 
 There's quite some room for improvement in the parser surely, it hasn't been
 the focus so far. Since the parser does more work per-file, parallelisation
 with rayon maybe could give nice speed-ups for users who have multiple
 includes. There's a couple other Rust parser implementations for Beancount
-already, maybe one of them could be adapted as well.
+already, maybe one of them could be adapted as well. With caching, the parsing
+performance should not be that relevant since we only need to reparse files
+that changed.
 
 ### Imcremental computation
 
@@ -45,7 +52,7 @@ In the context of Fava, using salsa-rs ("A generic framework for on-demand,
 incrementalized computation.") seems like a good fit to speed up the
 incremental re-parses and more of a modified ledger.
 
-## Differences to Beancount (V2)
+## Differences to Beancount (V3)
 
 - Not a lot of attention has been placed on generating the same kinds of
   errors. So, e.g., for a transaction that does not balance, the error messages
