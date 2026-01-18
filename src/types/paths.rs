@@ -85,6 +85,22 @@ impl AbsoluteUTF8Path {
                 .expect("valid UTF-8"),
         )
     }
+
+    /// Create an absolute path from a string, resolving relative paths against a base file.
+    ///
+    /// If the path is already absolute, it is returned as-is. Otherwise, it is resolved
+    /// relative to the parent directory of `base_file`.
+    pub(crate) fn from_path_maybe_relative(
+        path: &str,
+        base_file: &Filename,
+    ) -> Result<Self, FilePathError> {
+        if Path::new(path).is_absolute() {
+            Self::try_from(path)
+        } else {
+            let base = Self::try_from(base_file.clone())?;
+            Ok(base.join_relative_to_file(path))
+        }
+    }
 }
 
 impl Deref for Filename {
@@ -124,7 +140,7 @@ impl AsRef<Path> for AbsoluteUTF8Path {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum FilePathError {
     NonUnicode(PathBuf),
     NonAbsolute(String),
@@ -271,5 +287,33 @@ mod tests {
             path.join_account(&account),
             "/tmp/dir/Assets/Cash".try_into().unwrap()
         );
+    }
+
+    #[test]
+    fn test_from_path_maybe_relative_absolute() {
+        let base = Filename::try_from("/base/dir/file.beancount").unwrap();
+        let result = AbsoluteUTF8Path::from_path_maybe_relative("/absolute/path.pdf", &base);
+        assert_eq!(result, AbsoluteUTF8Path::try_from("/absolute/path.pdf"));
+    }
+
+    #[test]
+    fn test_from_path_maybe_relative_relative() {
+        let base = Filename::try_from("/base/dir/file.beancount").unwrap();
+        let result = AbsoluteUTF8Path::from_path_maybe_relative("relative/path.pdf", &base);
+        assert_eq!(
+            result,
+            AbsoluteUTF8Path::try_from("/base/dir/relative/path.pdf")
+        );
+    }
+
+    #[test]
+    fn test_from_path_maybe_relative_dummy_filename() {
+        let base = Filename::new_dummy("string");
+        let result = AbsoluteUTF8Path::from_path_maybe_relative("relative/path.pdf", &base);
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            FilePathError::NoRealFilePath(_)
+        ));
     }
 }

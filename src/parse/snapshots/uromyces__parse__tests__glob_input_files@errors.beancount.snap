@@ -60,7 +60,7 @@ input_file: src/parse/test_inputs/errors.beancount
     {
       "filename": "<string>",
       "lineno": 4,
-      "message": "Invalid document filename: Filepath is not absolute: 'relative/path'",
+      "message": "Invalid document filename: String is no valid file path: '<string>'",
       "entry": null
     },
     {

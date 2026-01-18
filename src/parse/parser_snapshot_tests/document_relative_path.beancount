@@ -1,0 +1,36 @@
+;==============================================================================
+; document_relative_path
+;==============================================================================
+2000-01-01 document Assets:Cash "relative/path/to/file.pdf"
+
+;------------------------------------------------------------------------------
+; entries=[
+;     Document(
+;         Document {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/document_relative_path.beancount",
+;                 ),
+;                 lineno: 1,
+;             },
+;             date: Date(
+;                 "2000-01-01",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:Cash",
+;             ),
+;             filename: AbsoluteUTF8Path(
+;                 "[DIR]/relative/path/to/file.pdf",
+;             ),
+;         },
+;     ),
+; ]

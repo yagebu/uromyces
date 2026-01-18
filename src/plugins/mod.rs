@@ -64,7 +64,7 @@ pub fn run_named_plugin(ledger: &mut Ledger, plugin: &str) -> bool {
 }
 
 // The validations to run after all other plugins.
-const VALIDATORS: [(&str, Validator); 8] = [
+const VALIDATORS: [(&str, Validator); 9] = [
     ("account_names", validation::account_names),
     ("open_close", validation::open_close),
     ("duplicate_balances", validation::duplicate_balances),
@@ -77,6 +77,8 @@ const VALIDATORS: [(&str, Validator); 8] = [
         balances::check_balance_assertions,
     ),
     // All `FilePath`s are absolute, so we do not need to validate this here :)
+    // however, we do the validation that all of them exist
+    ("document_files_exist", validation::document_files_exist),
 ];
 
 /// Run validations for a ledger and return any validation errors.

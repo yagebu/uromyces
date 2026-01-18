@@ -1127,6 +1127,7 @@ impl Entry {
     }
 
     as_inner_method!(as_balance, Balance);
+    as_inner_method!(as_document, Document);
     as_inner_method!(as_pad, Pad);
     #[cfg(test)]
     as_inner_method!(as_price, Price);

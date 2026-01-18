@@ -5,7 +5,9 @@ use crate::conversions::get_weight;
 use crate::errors::UroError;
 use crate::inventory::Inventory;
 use crate::tolerances::Tolerances;
-use crate::types::{Account, Balance, Close, Commodity, Currency, Date, Entry, Open, Transaction};
+use crate::types::{
+    Account, Balance, Close, Commodity, Currency, Date, Document, Entry, Open, Transaction,
+};
 
 struct InvalidAccountNameRoot<'a>(&'a Account);
 impl From<InvalidAccountNameRoot<'_>> for UroError {
@@ -324,5 +326,27 @@ pub fn currency_constraints(ledger: &Ledger) -> Vec<UroError> {
             _ => (),
         }
     }
+    errors
+}
+
+struct DocumentFileDoesNotExist<'a>(&'a Document);
+impl From<DocumentFileDoesNotExist<'_>> for UroError {
+    fn from(val: DocumentFileDoesNotExist) -> Self {
+        UroError::new(format!("File does not exist: '{}'", val.0.filename)).with_entry(val.0)
+    }
+}
+
+/// Check that:
+///
+/// - All document files exist.
+pub fn document_files_exist(ledger: &Ledger) -> Vec<UroError> {
+    let mut errors = Vec::new();
+
+    for document in ledger.entries.iter().filter_map(|e| e.as_document()) {
+        if !document.filename.as_ref().exists() {
+            errors.push(DocumentFileDoesNotExist(document).into());
+        }
+    }
+
     errors
 }

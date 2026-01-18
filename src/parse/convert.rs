@@ -478,16 +478,16 @@ impl TryFromNode for Document {
         debug_assert_eq!(node.kind(), "document");
         let common = ParsedEntryCommon::try_from_node(node, s)?;
         let raw_path = String::from_node(node.required_child_by_id(node_fields::FILENAME), s);
+        let filename = AbsoluteUTF8Path::from_path_maybe_relative(&raw_path, s.filename)
+            .map_err(|e| ConversionError::new(InvalidDocumentFilename(e.to_string()), &node, s))?;
+
         Ok(Self {
             date: common.date,
             tags: common.tags,
             links: common.links,
             meta: common.meta,
             account: Account::from_node(node.required_child_by_id(node_fields::ACCOUNT), s),
-            filename: std::convert::TryInto::<AbsoluteUTF8Path>::try_into(raw_path.as_str())
-                .map_err(|e| {
-                    ConversionError::new(InvalidDocumentFilename(e.to_string()), &node, s)
-                })?,
+            filename,
         })
     }
 }
