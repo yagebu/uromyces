@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from importlib import import_module
-from inspect import signature
 from logging import getLogger
 from pathlib import Path
 from traceback import format_exc
@@ -17,8 +16,12 @@ from uromyces._util import insert_sys_path
 from uromyces._util import log_timing
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from typing import Any
 
+    from beancount.core import data
+
+    from uromyces import Directive
     from uromyces import Ledger
 
 
@@ -63,7 +66,7 @@ def import_plugin(
         ]
 
 
-def run(ledger: Ledger, *, convert: bool = True) -> None:
+def run(ledger: Ledger) -> None:
     """Run the Beancount plugins for the ledger.
 
     Will try to run pure Rust implementations of plugins via ledger.run_plugin.
@@ -75,11 +78,12 @@ def run(ledger: Ledger, *, convert: bool = True) -> None:
         ledger: The ledger to run the plugins on.
         convert: Whether to convert the entries to Beancount namedtuples.
     """
+    plugins = ledger.plugins
     plugin_errors = []
-    if not ledger.plugins:
+    if not plugins:
         logger.info("No plugins to run.")
         return
-    entries: list[Any] | None = None
+    entries: Sequence[Directive | data.Directive] | None = None
     options_map = convert_options(ledger)
 
     with insert_sys_path(
@@ -87,25 +91,22 @@ def run(ledger: Ledger, *, convert: bool = True) -> None:
         if ledger.options.insert_pythonpath
         else None
     ):
-        for plugin in ledger.plugins:
-            if ledger.run_plugin(plugin.name):
-                # Rust implementation of the plugin
-                continue
+        for plugin in plugins:
             if entries is None:
-                if convert:
-                    with log_timing(
-                        logger, "Converted all uromyces entries to Beancount"
-                    ):
-                        entries = beancount_entries(ledger.entries)
-                else:
-                    entries = ledger.entries
-            with log_timing(logger, f"Ran plugin '{plugin.name}' (Python)"):
+                if ledger.run_plugin(plugin.name):
+                    # Rust implementation of the plugin
+                    continue
+                entries = ledger.entries
+                with log_timing(
+                    logger, "convert all uromyces entries to Beancount"
+                ):
+                    entries = beancount_entries(entries)
+            with log_timing(logger, f"plugin '{plugin.name}' (Python)"):
                 mod_plugins, errors = import_plugin(plugin.name)
                 plugin_errors.extend(errors)
                 for func in mod_plugins:
-                    sig = signature(func)
                     conf_arg = (
-                        () if len(sig.parameters) == 2 else (plugin.config,)
+                        () if plugin.config is None else (plugin.config,)
                     )
                     try:
                         entries, new_errors = func(
@@ -123,7 +124,7 @@ def run(ledger: Ledger, *, convert: bool = True) -> None:
                         continue
 
     if entries is not None:
-        with log_timing(logger, "Convert any Beancount entries to uromyces"):
+        with log_timing(logger, "convert any Beancount entries to uromyces"):
             entries = uromyces_entries(entries)
         ledger.replace_entries(entries)
     for error in plugin_errors:

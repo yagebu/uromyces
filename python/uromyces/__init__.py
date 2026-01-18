@@ -92,7 +92,7 @@ try:
     abc.Price.register(Price)
     abc.Query.register(Query)
     abc.Transaction.register(Transaction)
-except ImportError:
+except ImportError:  # pragma: no cover
     # Nothing to register if Fava is not installed
     pass
 

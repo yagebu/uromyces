@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import time
 from logging import getLogger
 from pprint import pformat
@@ -39,6 +40,7 @@ def check(*, filenames: tuple[str, ...], verbose: bool) -> None:
         raise NoFileGivenError
 
     logging.basicConfig(level=logging.INFO if verbose else logging.WARNING)
+    has_errors = False
 
     for filename in filenames:
         before = time.time()
@@ -53,6 +55,10 @@ def check(*, filenames: tuple[str, ...], verbose: bool) -> None:
         for error in ledger.errors:
             msg = click.style(error.message, fg="red")
             click.echo(f"{error.filename}:{error.lineno}:{msg}", err=True)
+        has_errors = has_errors or bool(ledger.errors)
+
+    if has_errors:
+        sys.exit(1)
 
 
 @cli.command()
@@ -68,7 +74,7 @@ def check(*, filenames: tuple[str, ...], verbose: bool) -> None:
 )
 def compare(
     *, filename: str, verbose: bool, print_options: bool, diff_balances: bool
-) -> None:
+) -> None:  # pragma: no cover
     """Compare uro output for FILENAME to Beancunt.
 
     This loads the given file with both uromyces and Beancount and compares

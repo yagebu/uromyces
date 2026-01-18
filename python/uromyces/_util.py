@@ -12,7 +12,9 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def log_timing(logger: Logger, message: str) -> Generator[None]:
+def log_timing(
+    logger: Logger, message: str
+) -> Generator[None]:  # pragma: no cover
     """Log the time the wrapped block took.
 
     Args:

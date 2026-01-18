@@ -299,6 +299,7 @@ def test_entry_types(entry: Directive) -> None:
     assert isinstance(converted_entry.meta, dict)
     assert converted_entry.meta == {"filename": "<string>", "lineno": 0}
     assert beancount_to_uromyces(converted_entry)
+    assert beancount_to_uromyces(entry) is entry
 
     with pytest.raises(TypeError, match="takes 0 positional arguments"):
         assert entry._replace("")  # type: ignore[arg-type,misc]

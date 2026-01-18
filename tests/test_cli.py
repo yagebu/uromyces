@@ -28,5 +28,10 @@ def test_cli(test_ledgers_dir: Path) -> None:
     assert with_filename.exit_code == 0
     assert not with_filename.output
 
+    with_filename_errors = runner.invoke(
+        cli, ("check", str(test_ledgers_dir / "invalid-input.beancount"))
+    )
+    assert with_filename_errors.exit_code == 1
+
     compare = runner.invoke(cli, ("compare", filename))
     assert compare.exit_code == 0

@@ -27,7 +27,7 @@ lint-rust: .venv
 # Run Rust and Python tests
 test: test-rust test-py
 test-py: .venv
-	uv run pytest --cov=uromyces --cov-report=term-missing:skip-covered --cov-report=html
+	uv run pytest --cov=uromyces --cov-report=term-missing:skip-covered --cov-report=html --cov-fail-under=100
 test-rust:
 	$(CARGO) test
 test-rust-cov:
