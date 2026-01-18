@@ -19,6 +19,7 @@ pub mod display_precision;
 pub mod errors;
 pub mod inventory;
 mod ledgers;
+mod macros;
 pub mod options;
 pub mod parse;
 mod plugins;

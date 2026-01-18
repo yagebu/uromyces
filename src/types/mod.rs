@@ -1074,19 +1074,6 @@ pymethods_for_entry!(Price);
 pymethods_for_entry!(Query);
 pymethods_for_entry!(Transaction);
 
-macro_rules! as_inner_method {
-    ($method_name:ident,$variant:ident) => {
-        /// Turn the enum into the given variant.
-        pub(crate) fn $method_name(&self) -> Option<&$variant> {
-            if let Self::$variant(e) = self {
-                Some(e)
-            } else {
-                None
-            }
-        }
-    };
-}
-
 impl Entry {
     /// Get the entry metadata.
     #[must_use]
@@ -1126,12 +1113,12 @@ impl Entry {
         }
     }
 
-    as_inner_method!(as_balance, Balance);
-    as_inner_method!(as_document, Document);
-    as_inner_method!(as_pad, Pad);
+    crate::macros::as_inner_method!(as_balance, Balance);
+    crate::macros::as_inner_method!(as_document, Document);
+    crate::macros::as_inner_method!(as_pad, Pad);
     #[cfg(test)]
-    as_inner_method!(as_price, Price);
-    as_inner_method!(as_transaction, Transaction);
+    crate::macros::as_inner_method!(as_price, Price);
+    crate::macros::as_inner_method!(as_transaction, Transaction);
 
     /// Sort key for an entry.
     ///
@@ -1183,7 +1170,7 @@ impl Entry {
 
 impl RawEntry {
     #[cfg(test)]
-    as_inner_method!(as_transaction, RawTransaction);
+    crate::macros::as_inner_method!(as_transaction, RawTransaction);
 
     /// Sort key for an entry.
     ///
@@ -1219,40 +1206,23 @@ impl PartialOrd for RawEntry {
         Some(self.cmp(other))
     }
 }
-
 impl Ord for RawEntry {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.sort_key().cmp(&other.sort_key())
     }
 }
-
 impl PartialOrd for Entry {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
-
 impl Ord for Entry {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.sort_key().cmp(&other.sort_key())
     }
 }
 
-/// Macro to define the From trait for the enum for all the variants.
-/// Assumes the inner type is the same name as the variant.
-macro_rules! enum_from_inner {
-    ($enum:ident, $($variant:ident),+ $(,)?) => {
-        $(
-            impl From<$variant> for $enum {
-                fn from(e: $variant) -> Self {
-                    $enum::$variant(e)
-                }
-            }
-        )*
-    };
-}
-
-enum_from_inner!(
+crate::macros::enum_from_inner!(
     RawEntry,
     Balance,
     Close,
@@ -1267,7 +1237,7 @@ enum_from_inner!(
     Query,
     RawTransaction
 );
-enum_from_inner!(
+crate::macros::enum_from_inner!(
     Entry,
     Balance,
     Close,
