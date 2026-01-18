@@ -56,6 +56,17 @@ class Amount:
     ) -> Amount: ...
 
 @final
+class RawAmount:
+    number: Decimal | None
+    currency: str | None
+
+    def __new__(
+        cls: type[RawAmount],
+        number: Decimal | None,
+        currency: str | None,
+    ) -> RawAmount: ...
+
+@final
 class Cost:
     number: Decimal
     currency: str
@@ -69,6 +80,25 @@ class Cost:
         date: datetime.date | None,
         label: str | None,
     ) -> Cost: ...
+
+@final
+class CostSpec:
+    number_per: Decimal | None
+    number_total: Decimal | None
+    currency: str | None
+    date: datetime.date | None
+    label: str | None
+    merge: bool
+
+    def __new__(
+        cls: type[CostSpec],
+        number_per: Decimal | None,
+        number_total: Decimal | None,
+        currency: str | None,
+        date: datetime.date | None,
+        label: str | None,
+        merge: bool,
+    ) -> CostSpec: ...
 
 class CustomValue:
     value: MetaValue
@@ -463,6 +493,22 @@ class Transaction(_Directive, abc.Transaction):
         narration: str | None = None,
         postings: list[Posting] | None = None,
     ) -> Transaction: ...
+
+@final
+class RawPosting:
+    account: str
+    units: RawAmount
+    cost: CostSpec | None
+    price: RawAmount | None
+    flag: str | None
+    meta: Meta | None
+
+@final
+class RawTransaction(_Directive):
+    flag: str
+    payee: str
+    narration: str
+    postings: list[RawPosting]
 
 class RootAccounts:
     assets: str

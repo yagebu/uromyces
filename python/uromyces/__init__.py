@@ -12,6 +12,7 @@ from uromyces._uromyces import Balance
 from uromyces._uromyces import Close
 from uromyces._uromyces import Commodity
 from uromyces._uromyces import Cost
+from uromyces._uromyces import CostSpec
 from uromyces._uromyces import Custom
 from uromyces._uromyces import CustomValue
 from uromyces._uromyces import Document
@@ -25,6 +26,9 @@ from uromyces._uromyces import Posting
 from uromyces._uromyces import PostingMeta
 from uromyces._uromyces import Price
 from uromyces._uromyces import Query
+from uromyces._uromyces import RawAmount
+from uromyces._uromyces import RawPosting
+from uromyces._uromyces import RawTransaction
 from uromyces._uromyces import summarize_clamp
 from uromyces._uromyces import Transaction
 
@@ -55,6 +59,11 @@ __all__ = [  # noqa: RUF022
     "Ledger",
     "Posting",
     "PostingMeta",
+    # Unbooked entries
+    "CostSpec",
+    "RawAmount",
+    "RawPosting",
+    "RawTransaction",
     # Functions
     "convert_entries",
     "convert_options",

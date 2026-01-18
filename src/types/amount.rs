@@ -6,6 +6,7 @@ use std::str::FromStr;
 use pyo3::{intern, prelude::*};
 use serde::{Deserialize, Serialize};
 
+use crate::types::repr::PyRepresentation;
 use crate::types::{Cost, Currency, Decimal};
 
 /// An amount.
@@ -49,11 +50,7 @@ impl Amount {
         Self { number, currency }
     }
     fn __repr__(&self) -> String {
-        format!(
-            "Amount(number={}, currency='{}')",
-            self.number.__repr__(),
-            self.currency
-        )
+        self.py_repr()
     }
 }
 
@@ -120,7 +117,16 @@ impl FromStr for Amount {
 }
 
 /// An amount, where one or both of number and currency might still be missing.
-#[derive(Default, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Default, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(
+    frozen,
+    eq,
+    get_all,
+    str,
+    hash,
+    module = "uromyces",
+    skip_from_py_object
+)]
 #[allow(clippy::module_name_repetitions)]
 pub struct RawAmount {
     pub number: Option<Decimal>,
@@ -130,6 +136,17 @@ pub struct RawAmount {
 impl RawAmount {
     pub(crate) fn new(number: Option<Decimal>, currency: Option<Currency>) -> Self {
         Self { number, currency }
+    }
+}
+
+#[pymethods]
+impl RawAmount {
+    #[new]
+    fn __new__(number: Option<Decimal>, currency: Option<Currency>) -> Self {
+        Self::new(number, currency)
+    }
+    fn __repr__(&self) -> String {
+        self.py_repr()
     }
 }
 

@@ -10,7 +10,7 @@ use hashbrown::HashMap;
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Amount, Currency, Decimal, RawAmount, MetaValue, RawEntry};
+use crate::types::{Amount, Currency, Decimal, MetaValue, RawAmount, RawEntry};
 
 const MAX_PRECISION: usize = Decimal::MAX_SCALE as usize;
 const MAX_PRECISION_INDEX: usize = MAX_PRECISION + 1;

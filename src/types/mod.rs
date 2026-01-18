@@ -68,6 +68,7 @@ mod flag;
 mod interned_string;
 mod metadata;
 mod paths;
+mod repr;
 mod tags_links;
 
 pub(crate) use account::JoinAccount;
@@ -165,7 +166,8 @@ impl CustomValue {
 ///
 /// During booking, the incomplete amounts will be replaced with the actual amounts
 /// and the cost spec will turn into a cost.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
 pub struct RawPosting {
     /// Metadata for the posting.
     pub meta: EntryMeta,
@@ -201,6 +203,7 @@ impl RawPosting {
 /// After parsing, parts of the transaction might still be missing and will
 /// only be inferred during booking.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
 pub struct RawTransaction {
     pub meta: EntryMeta,
     pub date: Date,
@@ -230,26 +233,20 @@ impl RawTransaction {
 
 /// A fully booked posting.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, module = "uromyces")]
 pub struct Posting {
     /// Metadata for the posting.
-    #[pyo3(get)]
     pub meta: PostingMeta,
 
     /// The account that the posting should be booked to.
-    #[pyo3(get)]
     pub account: Account,
     /// The units of the posting.
-    #[pyo3(get)]
     pub units: Amount,
     /// An optional price for the units of the posting.
-    #[pyo3(get)]
     pub price: Option<Amount>,
     /// An optional cost for the units of the posting.
-    #[pyo3(get)]
     pub cost: Option<Cost>,
     /// An optional flag for the posting.
-    #[pyo3(get)]
     pub flag: Option<Flag>,
 }
 

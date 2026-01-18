@@ -6,8 +6,8 @@ use crate::inventory::Inventory;
 use crate::ledgers::{Ledger, RawLedger};
 use crate::tolerances::Tolerances;
 use crate::types::{
-    Account, Amount, Booking, Cost, CostSpec, Currency, Date, Decimal, Entry, RawAmount,
-    Posting, RawEntry, RawPosting, RawTransaction, Transaction,
+    Account, Amount, Booking, Cost, CostSpec, Currency, Date, Decimal, Entry, Posting, RawAmount,
+    RawEntry, RawPosting, RawTransaction, Transaction,
 };
 
 use currency_groups::group_and_fill_in_currencies;

@@ -24,8 +24,8 @@ use super::node_ids;
 use crate::types::{
     AbsoluteUTF8Path, Account, Amount, Balance, Booking, BoxStr, Close, Commodity, CostLabel,
     CostSpec, Currency, Custom, CustomValue, Date, Decimal, Document, EntryMeta, Event, Filename,
-    Flag, RawAmount, Meta, MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query,
-    RawPosting, RawTransaction, TagsLinks,
+    Flag, Meta, MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query, RawAmount, RawPosting,
+    RawTransaction, TagsLinks,
 };
 
 /// The state that all conversion node handlers have access to.

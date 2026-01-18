@@ -46,7 +46,10 @@ mod uromyces {
     #[pymodule_export]
     use crate::Ledger;
     #[pymodule_export]
-    use crate::types::{Amount, Booking, Cost, CustomValue, EntryMeta, Posting, PostingMeta};
+    use crate::types::{
+        Amount, Booking, Cost, CostSpec, CustomValue, EntryMeta, Posting, PostingMeta, RawAmount,
+        RawPosting,
+    };
     // Entry types
     #[pymodule_export]
     use crate::display_precision::Precisions;
@@ -55,7 +58,7 @@ mod uromyces {
     #[pymodule_export]
     use crate::types::{
         Balance, Close, Commodity, Custom, Document, Event, Note, Open, Pad, Price, Query,
-        Transaction,
+        RawTransaction, Transaction,
     };
 
     /// Load the Beancount ledger at the given file path.

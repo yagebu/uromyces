@@ -25,8 +25,10 @@ from uromyces import Pad
 from uromyces import Posting
 from uromyces import Price
 from uromyces import Query
+from uromyces import RawAmount
 from uromyces import Transaction
 from uromyces._convert import beancount_to_uromyces
+from uromyces._uromyces import CostSpec
 
 if TYPE_CHECKING:
     from uromyces import Directive
@@ -42,6 +44,21 @@ def test_amount() -> None:
     assert repr(amt2) == "Amount(number=Decimal('10'), currency='USD')"
     assert amt != Amount(Decimal(11), "USD")
     assert hash(amt) == hash(amt2)
+
+
+def test_raw_amount() -> None:
+    amt = RawAmount(Decimal("10.00"), "USD")
+    assert str(amt) == "10.00 USD"
+    assert repr(amt) == "RawAmount(number=Decimal('10.00'), currency='USD')"
+    amt = RawAmount(None, "USD")
+    assert str(amt) == "USD"
+    assert repr(amt) == "RawAmount(number=None, currency='USD')"
+    amt = RawAmount(None, None)
+    assert str(amt) == ""
+    assert repr(amt) == "RawAmount(number=None, currency=None)"
+    amt = RawAmount(Decimal(10), None)
+    assert str(amt) == "10"
+    assert repr(amt) == "RawAmount(number=Decimal('10'), currency=None)"
 
 
 def test_amount_decimal_edge_cases() -> None:
@@ -66,6 +83,18 @@ def test_cost() -> None:
     assert (
         repr(cost_label) == "Cost(number=Decimal('10.00'), currency='USD', "
         "date=datetime.date(2000, 1, 1), label='label')"
+    )
+
+
+def test_cost_spec() -> None:
+    cost = CostSpec(
+        Decimal("10.00"), None, "USD", date(2000, 1, 1), None, merge=False
+    )
+    assert (
+        repr(cost)
+        == "CostSpec(number_per=Decimal('10.00'), number_total=None,"
+        " currency='USD', date=datetime.date(2000, 1, 1), label=None,"
+        " merge=False)"
     )
 
 

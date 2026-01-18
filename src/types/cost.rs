@@ -4,6 +4,7 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
+use crate::types::repr::PyRepresentation;
 use crate::types::{BoxStr, Currency, Date, Decimal};
 
 #[derive(
@@ -82,22 +83,7 @@ impl Cost {
         hasher.finish()
     }
     fn __repr__(&self) -> String {
-        if let Some(label) = &self.label {
-            format!(
-                "Cost(number={}, currency='{}', date={}, label='{}')",
-                self.number.__repr__(),
-                self.currency,
-                self.date.__repr__(),
-                label
-            )
-        } else {
-            format!(
-                "Cost(number={}, currency='{}', date={}, label=None)",
-                self.number.__repr__(),
-                self.currency,
-                self.date.__repr__(),
-            )
-        }
+        self.py_repr()
     }
 }
 
@@ -150,8 +136,9 @@ mod tests {
 }
 
 /// A possibly incomplete cost as specified in the Beancount file.
-#[derive(Default, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
+#[derive(Default, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[pyclass(frozen, eq, get_all, module = "uromyces", skip_from_py_object)]
 pub struct CostSpec {
     /// The per-unit cost.
     pub number_per: Option<Decimal>,
@@ -165,6 +152,31 @@ pub struct CostSpec {
     pub label: Option<CostLabel>,
     /// Unsupported, like in Beancount v2.
     pub merge: bool,
+}
+
+#[pymethods]
+impl CostSpec {
+    #[new]
+    fn __new__(
+        number_per: Option<Decimal>,
+        number_total: Option<Decimal>,
+        currency: Option<Currency>,
+        date: Option<Date>,
+        label: Option<CostLabel>,
+        merge: Option<bool>,
+    ) -> Self {
+        Self {
+            number_per,
+            number_total,
+            currency,
+            date,
+            label,
+            merge: merge.unwrap_or(false),
+        }
+    }
+    fn __repr__(&self) -> String {
+        self.py_repr()
+    }
 }
 
 impl From<Cost> for CostSpec {
