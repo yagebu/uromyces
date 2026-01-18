@@ -122,12 +122,18 @@ impl FromStr for Amount {
 /// An amount, where one or both of number and currency might still be missing.
 #[derive(Default, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
-pub struct IncompleteAmount {
+pub struct RawAmount {
     pub number: Option<Decimal>,
     pub currency: Option<Currency>,
 }
 
-impl Display for IncompleteAmount {
+impl RawAmount {
+    pub(crate) fn new(number: Option<Decimal>, currency: Option<Currency>) -> Self {
+        Self { number, currency }
+    }
+}
+
+impl Display for RawAmount {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self {
@@ -150,12 +156,9 @@ impl Display for IncompleteAmount {
     }
 }
 
-impl From<Amount> for IncompleteAmount {
+impl From<Amount> for RawAmount {
     fn from(amount: Amount) -> Self {
-        Self {
-            number: Some(amount.number),
-            currency: Some(amount.currency),
-        }
+        Self::new(Some(amount.number), Some(amount.currency))
     }
 }
 

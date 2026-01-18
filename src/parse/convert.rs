@@ -24,7 +24,7 @@ use super::node_ids;
 use crate::types::{
     AbsoluteUTF8Path, Account, Amount, Balance, Booking, BoxStr, Close, Commodity, CostLabel,
     CostSpec, Currency, Custom, CustomValue, Date, Decimal, Document, EntryMeta, Event, Filename,
-    Flag, IncompleteAmount, Meta, MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query,
+    Flag, RawAmount, Meta, MetaKeyValuePair, MetaValue, Note, Open, Pad, Price, Query,
     RawPosting, RawTransaction, TagsLinks,
 };
 
@@ -245,17 +245,17 @@ impl TryFromNode for RawPosting {
         let flag = node.child_by_field_id(node_fields::FLAG);
         let units = node
             .child_by_field_id(node_fields::AMOUNT)
-            .map(|n| IncompleteAmount::try_from_node(n, s))
+            .map(|n| RawAmount::try_from_node(n, s))
             .transpose()?
             .unwrap_or_default();
         let price_annotation = node.child_by_field_id(node_fields::PRICE_ANNOTATION);
         let price = if let Some(price_n) = price_annotation {
             if let Some(amount_n) = price_n.child(1) {
-                let price_amt = IncompleteAmount::try_from_node(amount_n, s)?;
+                let price_amt = RawAmount::try_from_node(amount_n, s)?;
                 let total_price = price_n.kind_id() == node_ids::TOTAL_PRICE_ANNOTATION;
                 Some(if total_price {
                     match (price_amt.number, units.number) {
-                        (Some(price_num), Some(units_number)) => IncompleteAmount {
+                        (Some(price_num), Some(units_number)) => RawAmount {
                             number: Some(price_num.checked_div(units_number.abs()).ok_or_else(
                                 || {
                                     ConversionError::new(
@@ -273,7 +273,7 @@ impl TryFromNode for RawPosting {
                     price_amt
                 })
             } else {
-                Some(IncompleteAmount::default())
+                Some(RawAmount::default())
             }
         } else {
             None
@@ -299,18 +299,16 @@ impl TryFromNode for RawPosting {
     }
 }
 
-impl TryFromNode for IncompleteAmount {
+impl TryFromNode for RawAmount {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert!(node.kind() == "amount" || node.kind() == "incomplete_amount",);
-        Ok(Self {
-            number: node
-                .child_by_field_id(node_fields::NUMBER)
+        Ok(Self::new(
+            node.child_by_field_id(node_fields::NUMBER)
                 .map(|n| Decimal::try_from_node(n, s))
                 .transpose()?,
-            currency: node
-                .child_by_field_id(node_fields::CURRENCY)
+            node.child_by_field_id(node_fields::CURRENCY)
                 .map(|n| Currency::from_node(n, s)),
-        })
+        ))
     }
 }
 

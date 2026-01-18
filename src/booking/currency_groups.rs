@@ -1,4 +1,4 @@
-use crate::types::{CostSpec, Currency, IncompleteAmount, RawPosting};
+use crate::types::{CostSpec, Currency, RawAmount, RawPosting};
 
 use super::AccountBalances;
 use super::errors::{BookingError, BookingErrorKind};
@@ -21,7 +21,7 @@ fn get_posting_currency_group(posting: &RawPosting) -> Option<&Currency> {
         ) => Some(cost_currency),
         (
             _,
-            Some(IncompleteAmount {
+            Some(RawAmount {
                 currency: Some(price_currency),
                 ..
             }),

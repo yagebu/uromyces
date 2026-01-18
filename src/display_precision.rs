@@ -10,7 +10,7 @@ use hashbrown::HashMap;
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Amount, Currency, Decimal, IncompleteAmount, MetaValue, RawEntry};
+use crate::types::{Amount, Currency, Decimal, RawAmount, MetaValue, RawEntry};
 
 const MAX_PRECISION: usize = Decimal::MAX_SCALE as usize;
 const MAX_PRECISION_INDEX: usize = MAX_PRECISION + 1;
@@ -157,7 +157,7 @@ impl DisplayPrecisionsStats {
         self.update(a.number, &a.currency);
     }
 
-    fn update_from_incomplete_amount(&mut self, a: &IncompleteAmount) {
+    fn update_from_incomplete_amount(&mut self, a: &RawAmount) {
         if let Some(number) = a.number
             && let Some(currency) = &a.currency
         {

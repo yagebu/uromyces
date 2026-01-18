@@ -72,7 +72,7 @@ mod tags_links;
 
 pub(crate) use account::JoinAccount;
 pub use account::{Account, RootAccounts, SummarizationAccounts};
-pub use amount::{Amount, IncompleteAmount};
+pub use amount::{Amount, RawAmount};
 pub use booking::Booking;
 pub use box_str::BoxStr;
 pub use cost::{Cost, CostLabel, CostSpec};
@@ -172,8 +172,8 @@ pub struct RawPosting {
 
     pub account: Account,
     pub flag: Option<Flag>,
-    pub units: IncompleteAmount,
-    pub price: Option<IncompleteAmount>,
+    pub units: RawAmount,
+    pub price: Option<RawAmount>,
     pub cost: Option<CostSpec>,
 }
 

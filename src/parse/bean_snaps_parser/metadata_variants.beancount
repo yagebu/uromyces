@@ -135,7 +135,7 @@
 ;                         "Assets:US:Vanguard:Cash",
 ;                     ),
 ;                     flag: None,
-;                     units: IncompleteAmount {
+;                     units: RawAmount {
 ;                         number: Some(
 ;                             Decimal(
 ;                                 600.00,

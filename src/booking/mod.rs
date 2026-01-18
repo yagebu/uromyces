@@ -6,7 +6,7 @@ use crate::inventory::Inventory;
 use crate::ledgers::{Ledger, RawLedger};
 use crate::tolerances::Tolerances;
 use crate::types::{
-    Account, Amount, Booking, Cost, CostSpec, Currency, Date, Decimal, Entry, IncompleteAmount,
+    Account, Amount, Booking, Cost, CostSpec, Currency, Date, Decimal, Entry, RawAmount,
     Posting, RawEntry, RawPosting, RawTransaction, Transaction,
 };
 
@@ -137,7 +137,7 @@ fn close_positions(
 }
 
 /// Try to complete an incomplete amount.
-fn complete_amount(value: &IncompleteAmount) -> Result<Amount, BookingErrorKind> {
+fn complete_amount(value: &RawAmount) -> Result<Amount, BookingErrorKind> {
     let number = value.number.ok_or(BookingErrorKind::MissingAmountNumber)?;
     let currency = value
         .currency
