@@ -49,7 +49,11 @@ impl Amount {
         Self { number, currency }
     }
     fn __repr__(&self) -> String {
-        format!("{} {}", self.number, self.currency)
+        format!(
+            "Amount(number={}, currency='{}')",
+            self.number.__repr__(),
+            self.currency
+        )
     }
 }
 

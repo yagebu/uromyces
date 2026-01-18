@@ -37,9 +37,9 @@ def test_amount() -> None:
     amt = Amount(Decimal("10.00"), "USD")
     amt2 = Amount(Decimal(10), "USD")
     assert amt == amt2
-    assert repr(amt) == "10.00 USD"
+    assert repr(amt) == "Amount(number=Decimal('10.00'), currency='USD')"
     assert str(amt) == "10.00 USD"
-    assert repr(amt2) == "10 USD"
+    assert repr(amt2) == "Amount(number=Decimal('10'), currency='USD')"
     assert amt != Amount(Decimal(11), "USD")
     assert hash(amt) == hash(amt2)
 
@@ -54,9 +54,19 @@ def test_amount_decimal_edge_cases() -> None:
 def test_cost() -> None:
     cost = Cost(Decimal("10.00"), "USD", date(2000, 1, 1), None)
     cost2 = Cost(Decimal("10.00"), "USD", date(2000, 1, 1), None)
+    cost_label = Cost(Decimal("10.00"), "USD", date(2000, 1, 1), "label")
     assert cost == cost2
     assert cost != Cost(Decimal("10.00"), "USD", date(2000, 1, 2), None)
     assert hash(cost) == hash(cost2)
+
+    assert (
+        repr(cost) == "Cost(number=Decimal('10.00'), currency='USD', "
+        "date=datetime.date(2000, 1, 1), label=None)"
+    )
+    assert (
+        repr(cost_label) == "Cost(number=Decimal('10.00'), currency='USD', "
+        "date=datetime.date(2000, 1, 1), label='label')"
+    )
 
 
 def test_equals() -> None:

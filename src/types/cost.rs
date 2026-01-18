@@ -81,6 +81,24 @@ impl Cost {
         self.hash(&mut hasher);
         hasher.finish()
     }
+    fn __repr__(&self) -> String {
+        if let Some(label) = &self.label {
+            format!(
+                "Cost(number={}, currency='{}', date={}, label='{}')",
+                self.number.__repr__(),
+                self.currency,
+                self.date.__repr__(),
+                label
+            )
+        } else {
+            format!(
+                "Cost(number={}, currency='{}', date={}, label=None)",
+                self.number.__repr__(),
+                self.currency,
+                self.date.__repr__(),
+            )
+        }
+    }
 }
 
 impl<'py> FromPyObject<'_, 'py> for Cost {

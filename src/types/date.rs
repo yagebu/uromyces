@@ -60,6 +60,14 @@ impl Date {
     pub fn previous_day(self) -> Option<Self> {
         self.0.checked_sub_days(ONE_DAY).map(Self)
     }
+    pub(crate) fn __repr__(self) -> String {
+        format!(
+            "datetime.date({}, {}, {})",
+            self.year(),
+            self.month(),
+            self.day(),
+        )
+    }
 }
 
 impl Display for Date {

@@ -136,6 +136,9 @@ impl Decimal {
     pub(crate) fn from_str_exact(s: &str) -> Result<Self, DecimalError> {
         Ok(rust_decimal::Decimal::from_str_exact(s).map(Self)?)
     }
+    pub(crate) fn __repr__(&self) -> String {
+        format!("Decimal('{}')", self.0)
+    }
 }
 
 impl Display for Decimal {
