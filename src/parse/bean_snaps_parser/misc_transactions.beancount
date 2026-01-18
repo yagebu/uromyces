@@ -1,0 +1,858 @@
+;==============================================================================
+; misc transactions
+;==============================================================================
+2022-01-10 * "Investing 60% of cash in RGAGX"
+  Assets:US:Vanguard:RGAGX                          4.947 RGAGX {72.76 USD, 2022-01-10}
+  Assets:US:Vanguard:RGAGX                          4.947 TEST {*}
+  Assets:US:Vanguard:RGAGX                          4.947 TEST {20.00 # 100 USD}
+  Assets:US:Vanguard:RGAGX                          4.947 TEST {20.00 # 100 USD, "cost-label"}
+  Assets:US:Vanguard:RGAGX                          4.947 TEST {}
+  Assets:US:Vanguard:RGAGX                          4.947 TEST {1#100 USD}
+  Assets:US:Vanguard:RGAGX                          4.947 TEST {1#100 USD} @ 10 USD
+  Assets:US:Vanguard:RGAGX                          4.947 TEST {1#100 USD} @@ 10 USD
+  Assets:US:Vanguard:Cash                         -359.94 USD
+
+2022-01-21 * "payee" "narration" #tag ^link #another-tag
+  info: "Some metadata"
+  Assets:US:Vanguard:Cash                          600.00 USD
+  posting_meta: "testetss"
+  Income:US:Hooli:Match401k                       -600.00 USD
+
+pushtag #tag
+pushmeta asdf: "asdf"
+
+2022-01-21 * "narration"
+  info: "Some metadata"
+  Assets:US:Vanguard:Cash                          600.00 USD @ EUR
+  ! Income:US:Hooli:Match401k                       -400.00 EUR
+
+poptag #tag
+popmeta asdf:
+
+2022-01-21 * "narration"
+  info: "Some metadata"
+  Assets:US:Vanguard:Cash                          600.00 USD @@ 400.00 EUR
+  ! Income:US:Hooli:Match401k                       -400.00 EUR
+;------------------------------------------------------------------------------
+; entries=[
+;     RawTransaction(
+;         RawTransaction {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_transactions.beancount",
+;                 ),
+;                 lineno: 1,
+;             },
+;             date: Date(
+;                 "2022-01-10",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             flag: Flag(
+;                 '*',
+;             ),
+;             payee: None,
+;             narration: BoxStr(
+;                 "Investing 60% of cash in RGAGX",
+;             ),
+;             postings: [
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 2,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:RGAGX",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 4.947,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "RGAGX",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: Some(
+;                         CostSpec {
+;                             number_per: Some(
+;                                 Decimal(
+;                                     72.76,
+;                                 ),
+;                             ),
+;                             number_total: None,
+;                             currency: Some(
+;                                 Currency(
+;                                     "USD",
+;                                 ),
+;                             ),
+;                             date: Some(
+;                                 Date(
+;                                     "2022-01-10",
+;                                 ),
+;                             ),
+;                             label: None,
+;                             merge: false,
+;                         },
+;                     ),
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 3,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:RGAGX",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 4.947,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "TEST",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: Some(
+;                         CostSpec {
+;                             number_per: None,
+;                             number_total: None,
+;                             currency: None,
+;                             date: None,
+;                             label: None,
+;                             merge: true,
+;                         },
+;                     ),
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 4,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:RGAGX",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 4.947,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "TEST",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: Some(
+;                         CostSpec {
+;                             number_per: Some(
+;                                 Decimal(
+;                                     20.00,
+;                                 ),
+;                             ),
+;                             number_total: Some(
+;                                 Decimal(
+;                                     100,
+;                                 ),
+;                             ),
+;                             currency: Some(
+;                                 Currency(
+;                                     "USD",
+;                                 ),
+;                             ),
+;                             date: None,
+;                             label: None,
+;                             merge: false,
+;                         },
+;                     ),
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 5,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:RGAGX",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 4.947,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "TEST",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: Some(
+;                         CostSpec {
+;                             number_per: Some(
+;                                 Decimal(
+;                                     20.00,
+;                                 ),
+;                             ),
+;                             number_total: Some(
+;                                 Decimal(
+;                                     100,
+;                                 ),
+;                             ),
+;                             currency: Some(
+;                                 Currency(
+;                                     "USD",
+;                                 ),
+;                             ),
+;                             date: None,
+;                             label: Some(
+;                                 CostLabel(
+;                                     BoxStr(
+;                                         "cost-label",
+;                                     ),
+;                                 ),
+;                             ),
+;                             merge: false,
+;                         },
+;                     ),
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 6,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:RGAGX",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 4.947,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "TEST",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: Some(
+;                         CostSpec {
+;                             number_per: None,
+;                             number_total: None,
+;                             currency: None,
+;                             date: None,
+;                             label: None,
+;                             merge: false,
+;                         },
+;                     ),
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 7,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:RGAGX",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 4.947,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "TEST",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: Some(
+;                         CostSpec {
+;                             number_per: Some(
+;                                 Decimal(
+;                                     1,
+;                                 ),
+;                             ),
+;                             number_total: Some(
+;                                 Decimal(
+;                                     100,
+;                                 ),
+;                             ),
+;                             currency: Some(
+;                                 Currency(
+;                                     "USD",
+;                                 ),
+;                             ),
+;                             date: None,
+;                             label: None,
+;                             merge: false,
+;                         },
+;                     ),
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 8,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:RGAGX",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 4.947,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "TEST",
+;                             ),
+;                         ),
+;                     },
+;                     price: Some(
+;                         IncompleteAmount {
+;                             number: Some(
+;                                 Decimal(
+;                                     10,
+;                                 ),
+;                             ),
+;                             currency: Some(
+;                                 Currency(
+;                                     "USD",
+;                                 ),
+;                             ),
+;                         },
+;                     ),
+;                     cost: Some(
+;                         CostSpec {
+;                             number_per: Some(
+;                                 Decimal(
+;                                     1,
+;                                 ),
+;                             ),
+;                             number_total: Some(
+;                                 Decimal(
+;                                     100,
+;                                 ),
+;                             ),
+;                             currency: Some(
+;                                 Currency(
+;                                     "USD",
+;                                 ),
+;                             ),
+;                             date: None,
+;                             label: None,
+;                             merge: false,
+;                         },
+;                     ),
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 9,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:RGAGX",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 4.947,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "TEST",
+;                             ),
+;                         ),
+;                     },
+;                     price: Some(
+;                         IncompleteAmount {
+;                             number: Some(
+;                                 Decimal(
+;                                     2.0214271275520517485344653325,
+;                                 ),
+;                             ),
+;                             currency: Some(
+;                                 Currency(
+;                                     "USD",
+;                                 ),
+;                             ),
+;                         },
+;                     ),
+;                     cost: Some(
+;                         CostSpec {
+;                             number_per: Some(
+;                                 Decimal(
+;                                     1,
+;                                 ),
+;                             ),
+;                             number_total: Some(
+;                                 Decimal(
+;                                     100,
+;                                 ),
+;                             ),
+;                             currency: Some(
+;                                 Currency(
+;                                     "USD",
+;                                 ),
+;                             ),
+;                             date: None,
+;                             label: None,
+;                             merge: false,
+;                         },
+;                     ),
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 10,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:Cash",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 -359.94,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;             ],
+;         },
+;     ),
+;     RawTransaction(
+;         RawTransaction {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [
+;                         MetaKeyValuePair {
+;                             key: "info",
+;                             value: Some(
+;                                 String(
+;                                     "Some metadata",
+;                                 ),
+;                             ),
+;                         },
+;                     ],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_transactions.beancount",
+;                 ),
+;                 lineno: 12,
+;             },
+;             date: Date(
+;                 "2022-01-21",
+;             ),
+;             tags: TagsLinks(
+;                 [
+;                     "tag",
+;                     "another-tag",
+;                 ],
+;             ),
+;             links: TagsLinks(
+;                 [
+;                     "link",
+;                 ],
+;             ),
+;             flag: Flag(
+;                 '*',
+;             ),
+;             payee: Some(
+;                 BoxStr(
+;                     "payee",
+;                 ),
+;             ),
+;             narration: BoxStr(
+;                 "narration",
+;             ),
+;             postings: [
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [
+;                                 MetaKeyValuePair {
+;                                     key: "posting_meta",
+;                                     value: Some(
+;                                         String(
+;                                             "testetss",
+;                                         ),
+;                                     ),
+;                                 },
+;                             ],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 14,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:Cash",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 600.00,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 16,
+;                     },
+;                     account: Account(
+;                         "Income:US:Hooli:Match401k",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 -600.00,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;             ],
+;         },
+;     ),
+;     RawTransaction(
+;         RawTransaction {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [
+;                         MetaKeyValuePair {
+;                             key: "asdf",
+;                             value: Some(
+;                                 String(
+;                                     "asdf",
+;                                 ),
+;                             ),
+;                         },
+;                         MetaKeyValuePair {
+;                             key: "info",
+;                             value: Some(
+;                                 String(
+;                                     "Some metadata",
+;                                 ),
+;                             ),
+;                         },
+;                     ],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_transactions.beancount",
+;                 ),
+;                 lineno: 21,
+;             },
+;             date: Date(
+;                 "2022-01-21",
+;             ),
+;             tags: TagsLinks(
+;                 [
+;                     "tag",
+;                 ],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             flag: Flag(
+;                 '*',
+;             ),
+;             payee: None,
+;             narration: BoxStr(
+;                 "narration",
+;             ),
+;             postings: [
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 23,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:Cash",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 600.00,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: Some(
+;                         IncompleteAmount {
+;                             number: None,
+;                             currency: Some(
+;                                 Currency(
+;                                     "EUR",
+;                                 ),
+;                             ),
+;                         },
+;                     ),
+;                     cost: None,
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 24,
+;                     },
+;                     account: Account(
+;                         "Income:US:Hooli:Match401k",
+;                     ),
+;                     flag: Some(
+;                         Flag(
+;                             '!',
+;                         ),
+;                     ),
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 -400.00,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "EUR",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;             ],
+;         },
+;     ),
+;     RawTransaction(
+;         RawTransaction {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [
+;                         MetaKeyValuePair {
+;                             key: "info",
+;                             value: Some(
+;                                 String(
+;                                     "Some metadata",
+;                                 ),
+;                             ),
+;                         },
+;                     ],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_transactions.beancount",
+;                 ),
+;                 lineno: 29,
+;             },
+;             date: Date(
+;                 "2022-01-21",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             flag: Flag(
+;                 '*',
+;             ),
+;             payee: None,
+;             narration: BoxStr(
+;                 "narration",
+;             ),
+;             postings: [
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 31,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Vanguard:Cash",
+;                     ),
+;                     flag: None,
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 600.00,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: Some(
+;                         IncompleteAmount {
+;                             number: Some(
+;                                 Decimal(
+;                                     0.6666666666666666666666666667,
+;                                 ),
+;                             ),
+;                             currency: Some(
+;                                 Currency(
+;                                     "EUR",
+;                                 ),
+;                             ),
+;                         },
+;                     ),
+;                     cost: None,
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/misc_transactions.beancount",
+;                         ),
+;                         lineno: 32,
+;                     },
+;                     account: Account(
+;                         "Income:US:Hooli:Match401k",
+;                     ),
+;                     flag: Some(
+;                         Flag(
+;                             '!',
+;                         ),
+;                     ),
+;                     units: IncompleteAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 -400.00,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "EUR",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;             ],
+;         },
+;     ),
+; ]

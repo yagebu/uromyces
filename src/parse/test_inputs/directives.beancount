@@ -1,9 +1,0 @@
-option "name" "file name"
-
-option "name_assets" "AssetsRootAccount"
-
-include "./transactions.beancount"
-
-plugin "beancount.plugins.implicit_prices"
-
-plugin "another_plugin" "with_config"

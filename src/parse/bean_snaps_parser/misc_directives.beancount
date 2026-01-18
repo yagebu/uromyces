@@ -1,0 +1,46 @@
+;==============================================================================
+; misc directives
+;==============================================================================
+
+option "name" "file name"
+
+option "name_assets" "AssetsRootAccount"
+
+include "./transactions.beancount"
+
+plugin "beancount.plugins.implicit_prices"
+
+plugin "another_plugin" "with_config"
+;------------------------------------------------------------------------------
+; entries=[]
+; directives=[
+;     Option {
+;         filename: Filename(
+;             "[DIR]/misc_directives.beancount",
+;         ),
+;         lineno: 2,
+;         key: "name",
+;         value: "file name",
+;     },
+;     Option {
+;         filename: Filename(
+;             "[DIR]/misc_directives.beancount",
+;         ),
+;         lineno: 4,
+;         key: "name_assets",
+;         value: "AssetsRootAccount",
+;     },
+;     Include {
+;         pattern: "./transactions.beancount",
+;     },
+;     Plugin {
+;         name: "beancount.plugins.implicit_prices",
+;         config: None,
+;     },
+;     Plugin {
+;         name: "another_plugin",
+;         config: Some(
+;             "with_config",
+;         ),
+;     },
+; ]

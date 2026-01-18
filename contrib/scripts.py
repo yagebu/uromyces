@@ -17,7 +17,7 @@ from click import secho
 BASE_PATH = Path(__file__).parent.parent
 BEANCOUNT_PATH = BASE_PATH.parent / "beancount"
 BOOKING_TEST_PATH = (
-    BASE_PATH / "src" / "booking" / "booking_full_tests_imported"
+    BASE_PATH / "src" / "booking" / "bean_snaps_booking_imported"
 )
 
 

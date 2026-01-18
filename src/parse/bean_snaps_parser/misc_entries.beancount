@@ -1,0 +1,275 @@
+;==============================================================================
+; misc entries
+;==============================================================================
+2000-01-01 open Assets:Cash EUR
+2000-01-01 open Equity:OpeningBalances EUR
+  name: "Some account name"
+
+2001-01-01 pad Assets:Cash Equity:OpeningBalances
+  number: 20.00
+
+2001-01-01 balance Assets:Cash 1.00 EUR
+
+2002-01-01 query "query all entries" "journal"
+
+2000-01-01 custom "string" Assets:Cash FALSE TRUE 20.00 200.00 EUR
+
+2002-01-01 note Assets:Cash "string with escape\""
+;------------------------------------------------------------------------------
+; entries=[
+;     Open(
+;         Open {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_entries.beancount",
+;                 ),
+;                 lineno: 1,
+;             },
+;             date: Date(
+;                 "2000-01-01",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:Cash",
+;             ),
+;             currencies: [
+;                 Currency(
+;                     "EUR",
+;                 ),
+;             ],
+;             booking: None,
+;         },
+;     ),
+;     Open(
+;         Open {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [
+;                         MetaKeyValuePair {
+;                             key: "name",
+;                             value: Some(
+;                                 String(
+;                                     "Some account name",
+;                                 ),
+;                             ),
+;                         },
+;                     ],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_entries.beancount",
+;                 ),
+;                 lineno: 2,
+;             },
+;             date: Date(
+;                 "2000-01-01",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Equity:OpeningBalances",
+;             ),
+;             currencies: [
+;                 Currency(
+;                     "EUR",
+;                 ),
+;             ],
+;             booking: None,
+;         },
+;     ),
+;     Pad(
+;         Pad {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [
+;                         MetaKeyValuePair {
+;                             key: "number",
+;                             value: Some(
+;                                 Decimal(
+;                                     Decimal(
+;                                         20.00,
+;                                     ),
+;                                 ),
+;                             ),
+;                         },
+;                     ],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_entries.beancount",
+;                 ),
+;                 lineno: 5,
+;             },
+;             date: Date(
+;                 "2001-01-01",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:Cash",
+;             ),
+;             source_account: Account(
+;                 "Equity:OpeningBalances",
+;             ),
+;         },
+;     ),
+;     Balance(
+;         Balance {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_entries.beancount",
+;                 ),
+;                 lineno: 8,
+;             },
+;             date: Date(
+;                 "2001-01-01",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:Cash",
+;             ),
+;             amount: Amount {
+;                 number: Decimal(
+;                     1.00,
+;                 ),
+;                 currency: Currency(
+;                     "EUR",
+;                 ),
+;             },
+;             tolerance: None,
+;         },
+;     ),
+;     Query(
+;         Query {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_entries.beancount",
+;                 ),
+;                 lineno: 10,
+;             },
+;             date: Date(
+;                 "2002-01-01",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             name: "query all entries",
+;             query_string: "journal",
+;         },
+;     ),
+;     Custom(
+;         Custom {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_entries.beancount",
+;                 ),
+;                 lineno: 12,
+;             },
+;             date: Date(
+;                 "2000-01-01",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             type: "string",
+;             values: [
+;                 CustomValue(
+;                     Account(
+;                         Account(
+;                             "Assets:Cash",
+;                         ),
+;                     ),
+;                 ),
+;                 CustomValue(
+;                     Bool(
+;                         false,
+;                     ),
+;                 ),
+;                 CustomValue(
+;                     Bool(
+;                         true,
+;                     ),
+;                 ),
+;                 CustomValue(
+;                     Decimal(
+;                         Decimal(
+;                             20.00,
+;                         ),
+;                     ),
+;                 ),
+;                 CustomValue(
+;                     Amount(
+;                         Amount {
+;                             number: Decimal(
+;                                 200.00,
+;                             ),
+;                             currency: Currency(
+;                                 "EUR",
+;                             ),
+;                         },
+;                     ),
+;                 ),
+;             ],
+;         },
+;     ),
+;     Note(
+;         Note {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/misc_entries.beancount",
+;                 ),
+;                 lineno: 14,
+;             },
+;             date: Date(
+;                 "2002-01-01",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:Cash",
+;             ),
+;             comment: "string with escape\"",
+;         },
+;     ),
+; ]

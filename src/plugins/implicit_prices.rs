@@ -75,15 +75,12 @@ mod tests {
 
     use crate::load_string;
     use crate::test_utils::BeancountSnapshot;
-    use crate::types::AbsoluteUTF8Path;
 
     use super::*;
 
     fn run_implicit_prices_test(path: &Path) {
         let mut snapshot = BeancountSnapshot::load(path);
-
-        let filename: AbsoluteUTF8Path = path.try_into().unwrap();
-        let ledger = load_string(snapshot.input(), filename.into());
+        let ledger = load_string(snapshot.input(), path.try_into().unwrap());
         let (new_prices, errors) = add(&ledger);
 
         assert!(errors.is_empty());
@@ -93,12 +90,13 @@ mod tests {
             .filter_map(|e| e.as_price())
             .map(|p| {
                 format!(
-                    "date={}, currency={}, price={}, meta[\"{}\"]={}",
+                    "date={}, currency={}, price={}, meta[\"__implicit_prices__\"]={}",
                     p.date,
                     p.currency,
                     p.amount,
-                    META_KEY,
-                    p.meta.get(META_KEY).expect("__implicit_prices__ to be set")
+                    p.meta
+                        .get("__implicit_prices__")
+                        .expect("__implicit_prices__ to be set")
                 )
             })
             .collect::<Vec<_>>();
@@ -109,7 +107,7 @@ mod tests {
 
     #[test]
     fn implicit_prices_test() {
-        insta::glob!("implicit_prices_tests/*.beancount", |path| {
+        insta::glob!("bean_snaps_implicit_prices/*.beancount", |path| {
             run_implicit_prices_test(path);
         });
     }
