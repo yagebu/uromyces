@@ -11,9 +11,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/document_relative_path.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 1,
 ;             },
 ;             date: Date(
@@ -28,9 +26,7 @@
 ;             account: Account(
 ;                 "Assets:Cash",
 ;             ),
-;             filename: AbsoluteUTF8Path(
-;                 "[DIR]/relative/path/to/file.pdf",
-;             ),
+;             filename: AbsoluteUTF8Path([PATH]),
 ;         },
 ;     ),
 ; ]

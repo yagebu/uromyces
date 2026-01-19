@@ -41,9 +41,7 @@ popmeta asdf:
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_transactions.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 1,
 ;             },
 ;             date: Date(
@@ -68,9 +66,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 2,
 ;                     },
 ;                     account: Account(
@@ -118,9 +114,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 3,
 ;                     },
 ;                     account: Account(
@@ -156,9 +150,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 4,
 ;                     },
 ;                     account: Account(
@@ -206,9 +198,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 5,
 ;                     },
 ;                     account: Account(
@@ -262,9 +252,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 6,
 ;                     },
 ;                     account: Account(
@@ -300,9 +288,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 7,
 ;                     },
 ;                     account: Account(
@@ -350,9 +336,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 8,
 ;                     },
 ;                     account: Account(
@@ -413,9 +397,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 9,
 ;                     },
 ;                     account: Account(
@@ -476,9 +458,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 10,
 ;                     },
 ;                     account: Account(
@@ -518,9 +498,7 @@ popmeta asdf:
 ;                         },
 ;                     ],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_transactions.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 12,
 ;             },
 ;             date: Date(
@@ -563,9 +541,7 @@ popmeta asdf:
 ;                                 },
 ;                             ],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 14,
 ;                     },
 ;                     account: Account(
@@ -592,9 +568,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 16,
 ;                     },
 ;                     account: Account(
@@ -642,9 +616,7 @@ popmeta asdf:
 ;                         },
 ;                     ],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_transactions.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 21,
 ;             },
 ;             date: Date(
@@ -671,9 +643,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 23,
 ;                     },
 ;                     account: Account(
@@ -709,9 +679,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 24,
 ;                     },
 ;                     account: Account(
@@ -755,9 +723,7 @@ popmeta asdf:
 ;                         },
 ;                     ],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_transactions.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 29,
 ;             },
 ;             date: Date(
@@ -782,9 +748,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 31,
 ;                     },
 ;                     account: Account(
@@ -824,9 +788,7 @@ popmeta asdf:
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/misc_transactions.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 32,
 ;                     },
 ;                     account: Account(

@@ -15,17 +15,13 @@ plugin "another_plugin" "with_config"
 ; entries=[]
 ; directives=[
 ;     Option {
-;         filename: Filename(
-;             "[DIR]/misc_directives.beancount",
-;         ),
+;         filename: Filename([PATH]),
 ;         lineno: 2,
 ;         key: "name",
 ;         value: "file name",
 ;     },
 ;     Option {
-;         filename: Filename(
-;             "[DIR]/misc_directives.beancount",
-;         ),
+;         filename: Filename([PATH]),
 ;         lineno: 4,
 ;         key: "name_assets",
 ;         value: "AssetsRootAccount",

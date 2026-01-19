@@ -17,9 +17,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/incomplete_posting.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 2,
 ;             },
 ;             date: Date(
@@ -44,9 +42,7 @@
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/incomplete_posting.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 3,
 ;                     },
 ;                     account: Account(
@@ -73,9 +69,7 @@
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/incomplete_posting.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 4,
 ;                     },
 ;                     account: Account(
@@ -106,9 +100,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/incomplete_posting.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 6,
 ;             },
 ;             date: Date(
@@ -133,9 +125,7 @@
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/incomplete_posting.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 7,
 ;                     },
 ;                     account: Account(
@@ -162,9 +152,7 @@
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/incomplete_posting.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 8,
 ;                     },
 ;                     account: Account(

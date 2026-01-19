@@ -4,6 +4,7 @@ from collections.abc import ItemsView
 from collections.abc import KeysView
 from collections.abc import Mapping
 from collections.abc import ValuesView
+from pathlib import Path
 
 import pytest
 
@@ -58,7 +59,7 @@ def test_entry_meta() -> None:
         EntryMeta({"filename": "not_a_path", "lineno": 0})
 
     EntryMeta({"filename": "<dummy>", "lineno": 0})
-    EntryMeta({"filename": "/some/path", "lineno": 0})
+    EntryMeta({"filename": str(Path(__file__)), "lineno": 0})
 
 
 def test_entry_meta_mapping() -> None:
@@ -100,9 +101,10 @@ def test_entry_meta_constructor() -> None:
     header = EntryMeta({"filename": "<string>", "lineno": 0})
     # not an absolute path
     assert header.filename == "<string>"
-    header = EntryMeta({"filename": "/home", "lineno": 0, "key": "string"})
-    assert header.filename == "/home"
-    assert header["filename"] == "/home"
+    home = str(Path.home())
+    header = EntryMeta({"filename": home, "lineno": 0, "key": "string"})
+    assert header.filename == home
+    assert header["filename"] == home
     assert header["lineno"] == 0
     assert header["key"] == "string"
     assert list(header) == ["filename", "lineno", "key"]
@@ -113,5 +115,5 @@ def test_entry_meta_constructor() -> None:
         header["asdf"]
 
     header = EntryMeta(
-        {"filename": "/home", "lineno": 0, "__implicit_prices": "string"}
+        {"filename": home, "lineno": 0, "__implicit_prices": "string"}
     )

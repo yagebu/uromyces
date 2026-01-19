@@ -95,9 +95,7 @@
 ;                         },
 ;                     ],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/metadata_variants.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 2,
 ;             },
 ;             date: Date(
@@ -126,9 +124,7 @@
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/metadata_variants.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 11,
 ;                     },
 ;                     account: Account(

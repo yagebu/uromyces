@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import date
 from decimal import Decimal
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -175,6 +176,7 @@ HEADER = EntryMeta({"filename": "<string>", "lineno": 0})
 DATE = date(2022, 12, 12)
 TAGS = {"a-tag"}
 LINKS = {"a-link"}
+ABSOLUTE_PATH = str(Path(__file__))
 
 
 @pytest.mark.parametrize(
@@ -215,7 +217,7 @@ LINKS = {"a-link"}
             HEADER,
             DATE,
             "Assets:Cash",
-            "/path/to/file",
+            ABSOLUTE_PATH,
             TAGS,
             LINKS,
         ),
@@ -340,15 +342,16 @@ def test_custom_value(load_doc: Ledger) -> None:
 def test_document() -> None:
     meta = EntryMeta({"filename": "<string>", "lineno": 0})
     day = date(2022, 12, 12)
-    document = Document(meta, day, "Assets:Cash", "/path/to/file")
+    document = Document(meta, day, "Assets:Cash", ABSOLUTE_PATH)
     assert document == Document(
         meta,
         date(2022, 12, 12),
         account="Assets:Cash",
-        filename="/path/to/file",
+        filename=ABSOLUTE_PATH,
     )
-    assert document.filename == "/path/to/file"
-    assert document._replace(filename="/other/path").filename == "/other/path"
+    assert document.filename == ABSOLUTE_PATH
+    home = str(Path.home())
+    assert document._replace(filename=home).filename == home
     assert document._replace(tags={"newtag"}).tags == {"newtag"}
 
 

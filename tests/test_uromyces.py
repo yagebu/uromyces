@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from pathlib import Path
 from typing import NamedTuple
-from typing import TYPE_CHECKING
 
 import pytest
 
@@ -12,9 +12,6 @@ from uromyces import load_string
 from uromyces._uromyces import Booking
 from uromyces._uromyces import Precisions
 from uromyces._uromyces import UromycesOptions
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class _BeancountStyleError(NamedTuple):
@@ -100,7 +97,6 @@ def test_ledger_add_error(test_ledgers_dir: Path) -> None:
         ledger.add_error(
             _BeancountStyleError({"filename": "relative"}, "asdf", None)
         )
-    ledger.add_error(
-        _BeancountStyleError({"filename": "/absolute"}, "asdf", None)
-    )
+    home = str(Path.home())
+    ledger.add_error(_BeancountStyleError({"filename": home}, "asdf", None))
     assert len(ledger.errors) == 2

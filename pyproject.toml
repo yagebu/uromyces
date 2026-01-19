@@ -59,7 +59,7 @@ use-base-python = true
 # Extra dependencies that are used in tests or for linting.
 dev = [
     "uromyces[fava]",
-    "maturin[patchelf]>=1.7",
+    "maturin>=1.7",
     "mypy>=1.11",
     "pip>=24",
     "pytest-cov>=6",

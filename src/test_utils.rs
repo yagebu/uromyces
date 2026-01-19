@@ -70,15 +70,17 @@ pub struct BeancountSnapshot {
     input: String,
     snapshot: String,
     new_snapshot: String,
-    filters: Vec<(String, String)>,
+    regex_filters: Vec<(Regex, String)>,
 }
+
+const NEWLINE: &str = "\n";
+const JOINER: &str = "\n; ";
 
 impl BeancountSnapshot {
     /// Load from a path.
     pub fn load(path: &Path) -> Self {
         let input = fs::read_to_string(path).unwrap();
         let mut res = Self::from_string(input);
-        res.filter_path(path);
         res.path = Some(path.to_owned());
         res
     }
@@ -93,21 +95,11 @@ impl BeancountSnapshot {
         &self.title
     }
 
-    /// Add a filter to replace the parent directory of the given path with `[DIR]`.
-    fn filter_path(&mut self, path: &Path) {
-        if let Some(parent) = path.parent() {
-            let parent_str = parent.to_string_lossy().to_string();
-            if !parent_str.is_empty() {
-                self.filters.push((parent_str, "[DIR]".to_string()));
-            }
-        }
-    }
-
     /// Start a new output group - adds a delimiting line if there is output already.
     pub fn start_group(&mut self) {
         if !self.new_snapshot.is_empty() {
             self.new_snapshot += &"-".repeat(77);
-            self.new_snapshot += "\n";
+            self.new_snapshot += NEWLINE;
         }
     }
 
@@ -115,7 +107,7 @@ impl BeancountSnapshot {
     ///
     /// This can be called multiple times to append more output.
     pub fn add_debug_output(&mut self, name: &str, value: impl std::fmt::Debug) {
-        self.add_output(&format!("{name}={value:#?}\n"));
+        self.add_output(&format!("{name}={value:#?}{NEWLINE}"));
     }
 
     /// Add output to snapshot.
@@ -123,8 +115,8 @@ impl BeancountSnapshot {
     /// This can be called multiple times to append more output.
     pub fn add_output(&mut self, output: &str) {
         let mut filtered = output.to_string();
-        for (pattern, replacement) in &self.filters {
-            filtered = filtered.replace(pattern, replacement);
+        for (regex, replacement) in &self.regex_filters {
+            filtered = regex.replace_all(&filtered, replacement).to_string();
         }
         self.new_snapshot += &filtered;
     }
@@ -133,7 +125,8 @@ impl BeancountSnapshot {
     pub fn write(&self) {
         let path = self.path.as_ref().expect("snapshot to have a path");
         let new_contents = self.print_to_string();
-        if new_contents != self.contents {
+        // compare by lines to ignore \r\n vs \n differences
+        if !new_contents.lines().eq(self.contents.lines()) {
             if is_ci() {
                 assert_eq!(new_contents, self.contents, "snapshot failed");
             } else {
@@ -154,7 +147,7 @@ impl BeancountSnapshot {
             comment = ";",
             title = self.title,
             input = self.input,
-            output = self.new_snapshot.lines().collect::<Vec<_>>().join("\n; "),
+            output = self.new_snapshot.lines().collect::<Vec<_>>().join(JOINER),
         )
     }
 
@@ -163,13 +156,13 @@ impl BeancountSnapshot {
         static SNAPSHOT_REGEX: LazyLock<Regex> = LazyLock::new(|| {
             Regex::new(
                 r"^(?x)
-              ;={3,}\n
-              ;\ (?<title>.*?)\n
-              ;={3,}\n
-              (?<input>(.|\n)*?)
+              ;={3,}\r?\n
+              ;\ (?<title>.*?)\r?\n
+              ;={3,}\r?\n
+              (?<input>(.|\r?\n)*?)
               (
-                  ;-{3,}\n
-                  (?<snapshot>(;\ .*\n)+)
+                  ;-{3,}\r?\n
+                  (?<snapshot>(;\ .*\r?\n)+)
               )?
               $",
             )
@@ -187,6 +180,17 @@ impl BeancountSnapshot {
         let title = capture["title"].to_string();
         let input = capture["input"].to_string();
 
+        let regex_filters = vec![
+            (
+                Regex::new(r"Filename\([^)]+\)").expect("regex to compile"),
+                "Filename([PATH])".to_string(),
+            ),
+            (
+                Regex::new(r"AbsoluteUTF8Path\([^)]+\)").expect("regex to compile"),
+                "AbsoluteUTF8Path([PATH])".to_string(),
+            ),
+        ];
+
         BeancountSnapshot {
             contents,
             path: None,
@@ -194,7 +198,7 @@ impl BeancountSnapshot {
             input,
             snapshot,
             new_snapshot: String::with_capacity(current_snapshot_len),
-            filters: Vec::new(),
+            regex_filters,
         }
     }
 }
@@ -258,5 +262,35 @@ LINES
     #[should_panic(expected = "called `Result::unwrap()")]
     fn test_a_panic() {
         a("10");
+    }
+
+    #[test]
+    fn test_regex_filters() {
+        let contents = r";========================
+; TITLE
+;===============
+INPUT
+";
+        let mut snapshot = BeancountSnapshot::from_string(contents.to_string());
+
+        // Test that Unix-style Filename paths are filtered but basename is preserved
+        snapshot.add_output(r#"Filename("/some/path/to/file.beancount")"#);
+        snapshot.add_output("\n");
+
+        // Test that Unix-style AbsoluteUTF8Path paths are filtered but basename is preserved
+        snapshot.add_output(r#"AbsoluteUTF8Path("/another/path/to/file.txt")"#);
+        snapshot.add_output("\n");
+
+        // Test that Windows-style paths work too
+        snapshot.add_output(r#"Filename("C:\Users\username\Documents\ledger.beancount")"#);
+        snapshot.add_output("\n");
+
+        // Test that these work in context
+        snapshot.add_output(r#"metadata: Some(Filename("/path/main.beancount"))"#);
+
+        assert_eq!(
+            snapshot.new_snapshot,
+            "Filename([PATH])\nAbsoluteUTF8Path([PATH])\nFilename([PATH])\nmetadata: Some(Filename([PATH]))"
+        );
     }
 }

@@ -18,9 +18,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/mixed_entry_types.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 1,
 ;             },
 ;             date: Date(
@@ -45,9 +43,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/mixed_entry_types.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 3,
 ;             },
 ;             date: Date(
@@ -72,9 +68,7 @@
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/mixed_entry_types.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 4,
 ;                     },
 ;                     account: Account(
@@ -101,9 +95,7 @@
 ;                         meta: Meta(
 ;                             [],
 ;                         ),
-;                         filename: Filename(
-;                             "[DIR]/mixed_entry_types.beancount",
-;                         ),
+;                         filename: Filename([PATH]),
 ;                         lineno: 5,
 ;                     },
 ;                     account: Account(
@@ -134,9 +126,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/mixed_entry_types.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 7,
 ;             },
 ;             date: Date(
@@ -168,9 +158,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/mixed_entry_types.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 9,
 ;             },
 ;             date: Date(

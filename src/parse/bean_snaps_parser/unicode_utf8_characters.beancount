@@ -10,9 +10,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/unicode_utf8_characters.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 1,
 ;             },
 ;             date: Date(

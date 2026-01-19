@@ -7,7 +7,9 @@ fn snap_ledger(snap_name: &str, filename: &str) {
         let cwd = current_dir
             .to_str()
             .expect("this test to run in a Unicode path");
-        settings.add_filter(cwd, "[REPO_DIR]");
+        // Escape the path for use as a regex pattern (handles Windows backslashes)
+        let cwd_escaped = regex::escape(cwd);
+        settings.add_filter(&cwd_escaped, "[REPO_DIR]");
         settings.remove_input_file();
         settings
     };
@@ -23,7 +25,10 @@ fn snap_ledger(snap_name: &str, filename: &str) {
     });
 }
 
+// Since the snapshots contain paths in the JSON outputs and converting from / to windows-style
+// paths would be complicated, we do not run them on Windows right now
 #[test]
+#[cfg(not(target_os = "windows"))]
 fn test_ledger_snapshots() {
     snap_ledger("loads_example_file", "example.beancount");
     snap_ledger("errors_on_invalid_ledger", "invalid-input.beancount");

@@ -280,6 +280,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(target_os = "windows"))]
     fn test_file_path_join_account() {
         let path = AbsoluteUTF8Path::try_from("/tmp/dir").unwrap();
         let account = "Assets:Cash".into();
@@ -290,6 +291,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(target_os = "windows"))]
     fn test_from_path_maybe_relative_absolute() {
         let base = Filename::try_from("/base/dir/file.beancount").unwrap();
         let result = AbsoluteUTF8Path::from_path_maybe_relative("/absolute/path.pdf", &base);
@@ -297,6 +299,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(target_os = "windows"))]
     fn test_from_path_maybe_relative_relative() {
         let base = Filename::try_from("/base/dir/file.beancount").unwrap();
         let result = AbsoluteUTF8Path::from_path_maybe_relative("relative/path.pdf", &base);

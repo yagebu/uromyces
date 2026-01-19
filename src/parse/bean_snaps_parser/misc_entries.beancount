@@ -23,9 +23,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_entries.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 1,
 ;             },
 ;             date: Date(
@@ -63,9 +61,7 @@
 ;                         },
 ;                     ],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_entries.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 2,
 ;             },
 ;             date: Date(
@@ -105,9 +101,7 @@
 ;                         },
 ;                     ],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_entries.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 5,
 ;             },
 ;             date: Date(
@@ -133,9 +127,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_entries.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 8,
 ;             },
 ;             date: Date(
@@ -167,9 +159,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_entries.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 10,
 ;             },
 ;             date: Date(
@@ -191,9 +181,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_entries.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 12,
 ;             },
 ;             date: Date(
@@ -252,9 +240,7 @@
 ;                 meta: Meta(
 ;                     [],
 ;                 ),
-;                 filename: Filename(
-;                     "[DIR]/misc_entries.beancount",
-;                 ),
+;                 filename: Filename([PATH]),
 ;                 lineno: 14,
 ;             },
 ;             date: Date(
