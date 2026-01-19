@@ -1,0 +1,191 @@
+;==============================================================================
+; mixed_entry_types - from beancount.parser.parser_test.test_parse_doc
+;==============================================================================
+2013-01-01 open Assets:US:Cash
+
+2013-05-18 * "Nice dinner at Mermaid Inn"
+  Expenses:Restaurant         100 USD
+  Assets:US:Cash             -100 USD
+
+2013-05-19 balance  Assets:US:Cash   -100 USD
+
+2013-05-20 note  Assets:US:Cash   "Something"
+;------------------------------------------------------------------------------
+; entries=[
+;     Open(
+;         Open {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/mixed_entry_types.beancount",
+;                 ),
+;                 lineno: 1,
+;             },
+;             date: Date(
+;                 "2013-01-01",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:US:Cash",
+;             ),
+;             currencies: [],
+;             booking: None,
+;         },
+;     ),
+;     RawTransaction(
+;         RawTransaction {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/mixed_entry_types.beancount",
+;                 ),
+;                 lineno: 3,
+;             },
+;             date: Date(
+;                 "2013-05-18",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             flag: Flag(
+;                 '*',
+;             ),
+;             payee: None,
+;             narration: BoxStr(
+;                 "Nice dinner at Mermaid Inn",
+;             ),
+;             postings: [
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/mixed_entry_types.beancount",
+;                         ),
+;                         lineno: 4,
+;                     },
+;                     account: Account(
+;                         "Expenses:Restaurant",
+;                     ),
+;                     flag: None,
+;                     units: RawAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 100,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/mixed_entry_types.beancount",
+;                         ),
+;                         lineno: 5,
+;                     },
+;                     account: Account(
+;                         "Assets:US:Cash",
+;                     ),
+;                     flag: None,
+;                     units: RawAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 -100,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;             ],
+;         },
+;     ),
+;     Balance(
+;         Balance {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/mixed_entry_types.beancount",
+;                 ),
+;                 lineno: 7,
+;             },
+;             date: Date(
+;                 "2013-05-19",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:US:Cash",
+;             ),
+;             amount: Amount {
+;                 number: Decimal(
+;                     -100,
+;                 ),
+;                 currency: Currency(
+;                     "USD",
+;                 ),
+;             },
+;             tolerance: None,
+;         },
+;     ),
+;     Note(
+;         Note {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/mixed_entry_types.beancount",
+;                 ),
+;                 lineno: 9,
+;             },
+;             date: Date(
+;                 "2013-05-20",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:US:Cash",
+;             ),
+;             comment: "Something",
+;         },
+;     ),
+; ]

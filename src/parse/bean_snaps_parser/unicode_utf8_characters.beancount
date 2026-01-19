@@ -1,0 +1,33 @@
+;==============================================================================
+; unicode_utf8_characters - from beancount.parser.parser_test.test_bytes_encoded_utf8
+;==============================================================================
+2015-05-23 note Assets:Something "a¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼ z"
+;------------------------------------------------------------------------------
+; entries=[
+;     Note(
+;         Note {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/unicode_utf8_characters.beancount",
+;                 ),
+;                 lineno: 1,
+;             },
+;             date: Date(
+;                 "2015-05-23",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:Something",
+;             ),
+;             comment: "a¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼ z",
+;         },
+;     ),
+; ]

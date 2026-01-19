@@ -1,0 +1,33 @@
+;==============================================================================
+; unicode_latin1_characters - from beancount.parser.parser_test.test_latin1_string
+;==============================================================================
+2015-05-23 note Assets:Something "école Floß søllerød"
+;------------------------------------------------------------------------------
+; entries=[
+;     Note(
+;         Note {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/unicode_latin1_characters.beancount",
+;                 ),
+;                 lineno: 1,
+;             },
+;             date: Date(
+;                 "2015-05-23",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             account: Account(
+;                 "Assets:Something",
+;             ),
+;             comment: "école Floß søllerød",
+;         },
+;     ),
+; ]

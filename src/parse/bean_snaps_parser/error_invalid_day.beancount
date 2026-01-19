@@ -1,0 +1,11 @@
+;==============================================================================
+; error_invalid_day - from beancount.parser.parser_test.test_parse_doc__disabled
+;==============================================================================
+2013-05-40 * "Nice dinner at Mermaid Inn"
+  Expenses:Restaurant         100 USD
+  Assets:US:Cash
+;------------------------------------------------------------------------------
+; errors=[
+;     "Invalid date: 2013-05-40",
+; ]
+; num_entries=0

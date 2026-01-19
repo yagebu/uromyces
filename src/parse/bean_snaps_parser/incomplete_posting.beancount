@@ -1,0 +1,184 @@
+;==============================================================================
+; incomplete_posting - from beancount.parser.parser_test.test_is_entry_incomplete
+;==============================================================================
+
+2014-01-27 * "UNION MARKET"
+  Liabilities:US:Amex:BlueCash    -22.02 USD
+  Expenses:Food:Grocery            22.02 USD
+
+2014-01-27 * "UNION MARKET"
+  Liabilities:US:Amex:BlueCash    -22.02 USD
+  Expenses:Food:Grocery
+;------------------------------------------------------------------------------
+; entries=[
+;     RawTransaction(
+;         RawTransaction {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/incomplete_posting.beancount",
+;                 ),
+;                 lineno: 2,
+;             },
+;             date: Date(
+;                 "2014-01-27",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             flag: Flag(
+;                 '*',
+;             ),
+;             payee: None,
+;             narration: BoxStr(
+;                 "UNION MARKET",
+;             ),
+;             postings: [
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/incomplete_posting.beancount",
+;                         ),
+;                         lineno: 3,
+;                     },
+;                     account: Account(
+;                         "Liabilities:US:Amex:BlueCash",
+;                     ),
+;                     flag: None,
+;                     units: RawAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 -22.02,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/incomplete_posting.beancount",
+;                         ),
+;                         lineno: 4,
+;                     },
+;                     account: Account(
+;                         "Expenses:Food:Grocery",
+;                     ),
+;                     flag: None,
+;                     units: RawAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 22.02,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;             ],
+;         },
+;     ),
+;     RawTransaction(
+;         RawTransaction {
+;             meta: EntryMeta {
+;                 meta: Meta(
+;                     [],
+;                 ),
+;                 filename: Filename(
+;                     "[DIR]/incomplete_posting.beancount",
+;                 ),
+;                 lineno: 6,
+;             },
+;             date: Date(
+;                 "2014-01-27",
+;             ),
+;             tags: TagsLinks(
+;                 [],
+;             ),
+;             links: TagsLinks(
+;                 [],
+;             ),
+;             flag: Flag(
+;                 '*',
+;             ),
+;             payee: None,
+;             narration: BoxStr(
+;                 "UNION MARKET",
+;             ),
+;             postings: [
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/incomplete_posting.beancount",
+;                         ),
+;                         lineno: 7,
+;                     },
+;                     account: Account(
+;                         "Liabilities:US:Amex:BlueCash",
+;                     ),
+;                     flag: None,
+;                     units: RawAmount {
+;                         number: Some(
+;                             Decimal(
+;                                 -22.02,
+;                             ),
+;                         ),
+;                         currency: Some(
+;                             Currency(
+;                                 "USD",
+;                             ),
+;                         ),
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;                 RawPosting {
+;                     meta: EntryMeta {
+;                         meta: Meta(
+;                             [],
+;                         ),
+;                         filename: Filename(
+;                             "[DIR]/incomplete_posting.beancount",
+;                         ),
+;                         lineno: 8,
+;                     },
+;                     account: Account(
+;                         "Expenses:Food:Grocery",
+;                     ),
+;                     flag: None,
+;                     units: RawAmount {
+;                         number: None,
+;                         currency: None,
+;                     },
+;                     price: None,
+;                     cost: None,
+;                 },
+;             ],
+;         },
+;     ),
+; ]
