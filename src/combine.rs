@@ -20,6 +20,12 @@ struct PathAndResult {
     result: ParsedFile,
 }
 
+impl PathAndResult {
+    fn new(path: Filename, result: ParsedFile) -> Self {
+        Self { path, result }
+    }
+}
+
 /// Load a Beancount file.
 ///
 /// Takes a path and tries to load the given Beancount file, producing a completely
@@ -31,11 +37,7 @@ struct PathAndResult {
 pub fn load(main_path: AbsoluteUTF8Path) -> Ledger {
     let paths_and_results = load_beancount_file(main_path);
     let raw_ledger = combine_files(paths_and_results);
-
-    let mut t = SimpleTimer::new();
     let (mut ledger, _) = booking::book_entries(raw_ledger);
-    log::info!("{}", t.elapsed("booking"));
-
     crate::plugins::run_pre(&mut ledger);
     ledger
 }
@@ -50,16 +52,9 @@ pub fn load(main_path: AbsoluteUTF8Path) -> Ledger {
 #[must_use]
 pub fn load_string(string: &str, filename: Filename) -> Ledger {
     let result = parse::parse_string(string, &filename);
-    let paths_and_results = vec![PathAndResult {
-        result,
-        path: filename,
-    }];
+    let paths_and_results = vec![PathAndResult::new(filename, result)];
     let raw_ledger = combine_files(paths_and_results);
-
-    let mut t = SimpleTimer::new();
     let (mut ledger, _) = booking::book_entries(raw_ledger);
-    log::info!("{}", t.elapsed("booking"));
-
     crate::plugins::run_pre(&mut ledger);
     ledger
 }
@@ -105,10 +100,7 @@ fn load_beancount_file(main_path: AbsoluteUTF8Path) -> Vec<PathAndResult> {
                     }
                 }
             }
-            results.push(PathAndResult {
-                path: path.into(),
-                result,
-            });
+            results.push(PathAndResult::new(path.into(), result));
         }
     }
     results

@@ -9,6 +9,7 @@ use crate::types::{
     Account, Amount, Booking, Cost, CostSpec, Currency, Date, Decimal, Entry, Posting, RawAmount,
     RawEntry, RawPosting, RawTransaction, Transaction,
 };
+use crate::util::timer::SimpleTimer;
 
 use currency_groups::group_and_fill_in_currencies;
 use errors::{BookingError, BookingErrorKind};
@@ -330,6 +331,7 @@ fn update_running_balances(balances: &mut AccountBalances, transaction: &Transac
 /// Book and interpolate to fill in all missing values.
 #[must_use]
 pub(crate) fn book_entries(raw_ledger: RawLedger) -> (Ledger, AccountBalances) {
+    let mut t = SimpleTimer::new();
     let booking_methods = BookingMethods::from_ledger(&raw_ledger);
     let mut balances = AccountBalances::new();
 
@@ -385,5 +387,6 @@ pub(crate) fn book_entries(raw_ledger: RawLedger) -> (Ledger, AccountBalances) {
 
     ledger.entries = entries;
     ledger.errors.append(&mut errors);
+    log::info!("{}", t.elapsed("booking"));
     (ledger, balances)
 }

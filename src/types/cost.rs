@@ -110,31 +110,6 @@ impl<'py> FromPyObject<'_, 'py> for Cost {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_cost_to_string() {
-        let one = Decimal::ONE;
-        let eur = Currency::from("EUR");
-        let cost = Cost::new(
-            one,
-            eur.clone(),
-            Date::try_from_str("2012-12-12").unwrap(),
-            None,
-        );
-        assert_eq!(cost.to_string(), "1 EUR, 2012-12-12");
-        let cost_with_label = Cost::new(
-            one,
-            eur,
-            Date::try_from_str("2012-12-12").unwrap(),
-            Some("lot-1".into()),
-        );
-        assert_eq!(cost_with_label.to_string(), "1 EUR, 2012-12-12, lot-1");
-    }
-}
-
 /// A possibly incomplete cost as specified in the Beancount file.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Default, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -201,5 +176,30 @@ impl From<&Cost> for CostSpec {
             label: cost.label.clone(),
             merge: false,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cost_to_string() {
+        let one = Decimal::ONE;
+        let eur = Currency::from("EUR");
+        let cost = Cost::new(
+            one,
+            eur.clone(),
+            Date::try_from_str("2012-12-12").unwrap(),
+            None,
+        );
+        assert_eq!(cost.to_string(), "1 EUR, 2012-12-12");
+        let cost_with_label = Cost::new(
+            one,
+            eur,
+            Date::try_from_str("2012-12-12").unwrap(),
+            Some("lot-1".into()),
+        );
+        assert_eq!(cost_with_label.to_string(), "1 EUR, 2012-12-12, lot-1");
     }
 }
