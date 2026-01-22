@@ -498,7 +498,6 @@ pub enum RawEntry {
     Pad(Pad),
     Price(Price),
     Query(Query),
-
     RawTransaction(RawTransaction),
 }
 
@@ -519,6 +518,25 @@ pub enum Entry {
     Price(Price),
     Query(Query),
     Transaction(Transaction),
+}
+
+/// A borrowed Beancount entry - this is only used for serialisation. Via this enum, individual
+/// entries can be serialised (with the tag e.g. `"t": "Balance"`) without having to clone them.
+#[derive(Serialize)]
+#[serde(tag = "t")]
+enum BorrowedEntry<'e> {
+    Balance(&'e Balance),
+    Close(&'e Close),
+    Commodity(&'e Commodity),
+    Custom(&'e Custom),
+    Document(&'e Document),
+    Event(&'e Event),
+    Note(&'e Note),
+    Open(&'e Open),
+    Pad(&'e Pad),
+    Price(&'e Price),
+    Query(&'e Query),
+    Transaction(&'e Transaction),
 }
 
 #[pymethods]
@@ -574,7 +592,7 @@ impl Balance {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -627,7 +645,7 @@ impl Close {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -680,7 +698,7 @@ impl Commodity {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -737,7 +755,7 @@ impl Custom {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -794,7 +812,7 @@ impl Document {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -851,7 +869,7 @@ impl Event {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -908,7 +926,7 @@ impl Note {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -969,7 +987,7 @@ impl Open {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1026,7 +1044,7 @@ impl Pad {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1083,7 +1101,7 @@ impl Price {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1140,7 +1158,7 @@ impl Query {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1207,7 +1225,7 @@ impl Transaction {
         hasher.finish()
     }
     fn to_json(&self) -> PyResult<String> {
-        let entry: Entry = self.clone().into();
+        let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
     fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1380,6 +1398,21 @@ crate::macros::enum_from_inner!(
 );
 crate::macros::enum_from_inner!(
     Entry,
+    Balance,
+    Close,
+    Commodity,
+    Custom,
+    Document,
+    Event,
+    Note,
+    Open,
+    Pad,
+    Price,
+    Query,
+    Transaction
+);
+crate::macros::enum_from_inner_borrowed!(
+    BorrowedEntry,
     Balance,
     Close,
     Commodity,

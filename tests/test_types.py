@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import date
 from decimal import Decimal
+from json import loads
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -302,6 +303,17 @@ def test_entry_types(entry: Directive) -> None:
     assert converted_entry.meta == {"filename": "<string>", "lineno": 0}
     assert beancount_to_uromyces(converted_entry)
     assert beancount_to_uromyces(entry) is entry
+
+    json_loaded = loads(entry.to_json())
+    assert json_loaded["t"] == entry.__class__.__name__
+    assert json_loaded["date"] == "2022-12-12"
+    assert json_loaded["tags"] == ["a-tag"]
+    assert json_loaded["links"] == ["a-link"]
+    json_empty_tags_links = loads(
+        entry._replace(tags=set(), links=set()).to_json()
+    )
+    assert json_empty_tags_links["tags"] == []
+    assert json_empty_tags_links["links"] == []
 
     with pytest.raises(TypeError, match="takes 0 positional arguments"):
         assert entry._replace("")  # type: ignore[arg-type,misc]

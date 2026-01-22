@@ -43,6 +43,7 @@ class _Directive:
     tags: frozenset[str]
 
     def _convert(self) -> data.Directive: ...
+    def to_json(self) -> str: ...
 
 @final
 class Amount:
