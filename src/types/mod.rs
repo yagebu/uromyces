@@ -957,7 +957,8 @@ impl Open {
         }
     }
 
-    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, account=None, currencies=None))]
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (*, meta=None, date=None, tags=None, links=None, account=None, currencies=None, booking=None))]
     fn _replace(
         &self,
         meta: Option<EntryMeta>,
@@ -966,7 +967,7 @@ impl Open {
         links: Option<TagsLinks>,
         account: Option<Account>,
         currencies: Option<Vec<Currency>>,
-        // TODO: booking: Option<Booking>,
+        booking: Option<Booking>,
     ) -> Self {
         Self {
             meta: meta.unwrap_or_else(|| self.meta.clone()),
@@ -975,7 +976,7 @@ impl Open {
             links: links.unwrap_or_else(|| self.links.clone()),
             account: account.unwrap_or_else(|| self.account.clone()),
             currencies: currencies.unwrap_or_else(|| self.currencies.clone()),
-            booking: self.booking,
+            booking: booking.or(self.booking),
         }
     }
     fn __repr__(&self) -> String {
