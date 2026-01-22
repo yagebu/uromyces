@@ -51,6 +51,7 @@
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
+use pyo3::exceptions::PyTypeError;
 use pyo3::types::{PyBool, PyDate, PyInt, PyString};
 use pyo3::{PyTypeInfo, prelude::*};
 use serde::{Deserialize, Serialize};
@@ -564,6 +565,21 @@ impl Balance {
             tolerance: self.tolerance,
         }
     }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
+    }
 }
 #[pymethods]
 impl Close {
@@ -602,6 +618,21 @@ impl Close {
             account: account.unwrap_or_else(|| self.account.clone()),
         }
     }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
+    }
 }
 #[pymethods]
 impl Commodity {
@@ -639,6 +670,21 @@ impl Commodity {
             links: links.unwrap_or_else(|| self.links.clone()),
             currency: currency.unwrap_or_else(|| self.currency.clone()),
         }
+    }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
     }
 }
 #[pymethods]
@@ -682,6 +728,21 @@ impl Custom {
             values: values.unwrap_or_else(|| self.values.clone()),
         }
     }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
+    }
 }
 #[pymethods]
 impl Document {
@@ -723,6 +784,21 @@ impl Document {
             account: account.unwrap_or_else(|| self.account.clone()),
             filename: filename.unwrap_or_else(|| self.filename.clone()),
         }
+    }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
     }
 }
 #[pymethods]
@@ -766,6 +842,21 @@ impl Event {
             description: description.unwrap_or_else(|| self.description.clone()),
         }
     }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
+    }
 }
 #[pymethods]
 impl Note {
@@ -807,6 +898,21 @@ impl Note {
             account: account.unwrap_or_else(|| self.account.clone()),
             comment: comment.unwrap_or_else(|| self.comment.clone()),
         }
+    }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
     }
 }
 #[pymethods]
@@ -854,6 +960,21 @@ impl Open {
             booking: self.booking,
         }
     }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
+    }
 }
 #[pymethods]
 impl Pad {
@@ -895,6 +1016,21 @@ impl Pad {
             account: account.unwrap_or_else(|| self.account.clone()),
             source_account: source_account.unwrap_or_else(|| self.source_account.clone()),
         }
+    }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
     }
 }
 #[pymethods]
@@ -938,6 +1074,21 @@ impl Price {
             amount: amount.unwrap_or_else(|| self.amount.clone()),
         }
     }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
+    }
 }
 #[pymethods]
 impl Query {
@@ -979,6 +1130,21 @@ impl Query {
             name: name.unwrap_or_else(|| self.name.clone()),
             query_string: query_string.unwrap_or_else(|| self.query_string.clone()),
         }
+    }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
     }
 }
 #[pymethods]
@@ -1032,44 +1198,22 @@ impl Transaction {
             postings: postings.unwrap_or_else(|| self.postings.clone()),
         }
     }
+    fn __repr__(&self) -> String {
+        format!("<{self:?}>")
+    }
+    fn __hash__(&self) -> u64 {
+        let mut hasher = ahash::AHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+    fn to_json(&self) -> PyResult<String> {
+        let entry: Entry = self.clone().into();
+        serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
+    }
+    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.convert_to_beancount(py)
+    }
 }
-
-/// Since all the entry types need the same additional functions, this macro provides them.
-macro_rules! pymethods_for_entry {
-    ($a:ident) => {
-        #[pymethods]
-        impl $a {
-            fn __repr__(&self) -> String {
-                format!("<{:?}>", self)
-            }
-            fn __hash__(&self) -> u64 {
-                // use a fixed hash function here and not the Rust DefaultHasher to keep it stable
-                let mut hasher = ahash::AHasher::default();
-                self.hash(&mut hasher);
-                hasher.finish()
-            }
-            fn to_json(&self) -> String {
-                serde_json::to_string(&Into::<Entry>::into(self.clone())).unwrap()
-            }
-            fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-                self.convert_to_beancount(py)
-            }
-        }
-    };
-}
-
-pymethods_for_entry!(Balance);
-pymethods_for_entry!(Close);
-pymethods_for_entry!(Commodity);
-pymethods_for_entry!(Custom);
-pymethods_for_entry!(Document);
-pymethods_for_entry!(Event);
-pymethods_for_entry!(Note);
-pymethods_for_entry!(Open);
-pymethods_for_entry!(Pad);
-pymethods_for_entry!(Price);
-pymethods_for_entry!(Query);
-pymethods_for_entry!(Transaction);
 
 impl Entry {
     /// Get the entry metadata.
