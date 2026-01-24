@@ -1052,7 +1052,7 @@ checksum = "7264e107f553ccae879d21fbea1d6724ac785e8c3bfc762137959b5802826ef3"
 
 [[package]]
 name = "uromyces"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "ahash 0.8.12",
  "cc",

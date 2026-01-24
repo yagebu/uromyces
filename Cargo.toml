@@ -1,7 +1,7 @@
 [package]
 name = "uromyces"
 description = "uromyces implements parts of Beancount's plain text accounting functionality in Rust"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2024"
 license = "GPL-2.0-only"
 repository = "https://github.com/yagebu/uromyces/"
