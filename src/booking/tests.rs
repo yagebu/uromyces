@@ -20,7 +20,7 @@ const BOOKED: &str = "booked";
 /// Find the first transaction for the given tag.
 fn find_first_with_tag(tag: &str, txns: &[RawEntry]) -> Option<RawTransaction> {
     txns.iter()
-        .filter_map(|e| e.as_transaction())
+        .filter_map(|e| e.as_raw_transaction())
         .find(|t| t.tags.contains(tag))
         .cloned()
 }
@@ -75,7 +75,7 @@ fn run_booking_test(path: &Path) {
     let entries = &raw_ledger.entries;
     let txns_apply = entries
         .iter()
-        .filter_map(|e| e.as_transaction())
+        .filter_map(|e| e.as_raw_transaction())
         .filter(|t| t.tags.contains(APPLY))
         .cloned()
         .collect::<Vec<_>>();

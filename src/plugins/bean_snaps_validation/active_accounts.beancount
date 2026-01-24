@@ -1,0 +1,36 @@
+;==============================================================================
+; active_accounts
+;==============================================================================
+
+2000-01-01 open Assets:Cash EUR
+2000-01-01 open Equity:Opening EUR
+2000-12-31 close Assets:Cash
+
+;; Transaction to open account - OK
+2000-06-01 * "Valid transaction"
+  Assets:Cash              100 EUR
+  Equity:Opening
+
+;; Transaction to closed account - ERROR
+2001-01-01 * "After close"
+  Assets:Cash              -50 EUR
+  Equity:Opening
+
+;; Transaction to unknown account - ERROR
+2001-02-01 * "Unknown account"
+  Assets:Unknown           100 EUR
+  Equity:Opening
+
+;; Note on closed account - OK (allowed after close)
+2001-03-01 note Assets:Cash "This is allowed"
+
+;; Balance on closed account - OK (allowed after close)
+2001-04-01 balance Assets:Cash 0 EUR
+
+;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; errors=[
+;     "Invalid reference to inactive account Assets:Cash.",
+;     "Invalid reference to unknown account Assets:Unknown.",
+;     "Balance failed for 'Assets:Cash': expected 0 EUR != accumulated 50 EUR (50 too much)",
+; ]

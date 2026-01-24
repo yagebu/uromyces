@@ -1,0 +1,42 @@
+;==============================================================================
+; currency_constraints
+;==============================================================================
+
+;; Account with currency constraints
+2000-01-01 open Assets:Cash EUR,USD
+2000-01-01 open Assets:Unconstrained
+2000-01-01 open Equity:Opening
+
+;; Valid transaction with allowed currency
+2000-02-01 * "EUR transaction"
+  Assets:Cash              100 EUR
+  Equity:Opening
+
+;; Valid transaction with another allowed currency
+2000-02-02 * "USD transaction"
+  Assets:Cash              100 USD
+  Equity:Opening
+
+;; Invalid currency in transaction - ERROR
+2000-02-03 * "GBP transaction"
+  Assets:Cash              100 GBP
+  Equity:Opening
+
+;; Valid balance with allowed currency
+2000-03-01 balance Assets:Cash 100 EUR
+
+;; Invalid currency in balance - ERROR
+2000-03-02 balance Assets:Cash 0 GBP
+
+;; Unconstrained account can use any currency
+2000-04-01 * "Any currency"
+  Assets:Unconstrained     100 CHF
+  Equity:Opening
+
+;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; errors=[
+;     "Invalid currency 'GBP' for account 'Assets:Cash'",
+;     "Invalid currency 'GBP' for account 'Assets:Cash'",
+;     "Balance failed for 'Assets:Cash': expected 0 GBP != accumulated 100 GBP (100 too much)",
+; ]

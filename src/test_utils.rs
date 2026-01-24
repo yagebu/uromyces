@@ -5,7 +5,7 @@ use std::{path::Path, str::FromStr};
 
 use regex::Regex;
 
-use crate::types::{Amount, Currency, Decimal, Filename, RawEntry, RawPosting};
+use crate::types::{Amount, Currency, Decimal, Filename, RawPosting};
 
 /// Detect CI
 fn is_ci() -> bool {
@@ -32,11 +32,13 @@ pub fn postings_from_strings(postings: &[&str]) -> Vec<RawPosting> {
     let string = "2000-01-01 *\n ".to_owned() + &postings.join("\n ") + "\n";
     let mut res = crate::parse::parse_string(&string, &Filename::new_dummy("string"));
     assert_eq!(res.entries.len(), 1);
-    let entry = res.entries.pop().unwrap();
-    match entry {
-        RawEntry::RawTransaction(t) => t.postings,
-        _ => panic!("expected transaction"),
-    }
+    res.entries
+        .pop()
+        .unwrap()
+        .as_raw_transaction()
+        .cloned()
+        .unwrap()
+        .postings
 }
 
 /// Work with snapshot tests from Beancount files.

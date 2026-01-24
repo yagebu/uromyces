@@ -1,0 +1,28 @@
+;==============================================================================
+; transaction_balances
+;==============================================================================
+
+2000-01-01 open Assets:Cash EUR
+2000-01-01 open Assets:Bank EUR
+2000-01-01 open Equity:Opening EUR
+
+;; Balanced transaction - OK
+2000-02-01 * "Balanced"
+  Assets:Cash              100 EUR
+  Equity:Opening          -100 EUR
+
+;; Unbalanced transaction - ERROR
+2000-02-02 * "Unbalanced"
+  Assets:Cash              100 EUR
+  Assets:Bank               50 EUR
+
+;; Transaction with auto-posting - OK
+2000-02-03 * "Auto posting"
+  Assets:Cash              100 EUR
+  Equity:Opening
+
+;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; errors=[
+;     "Transaction does not balance",
+; ]

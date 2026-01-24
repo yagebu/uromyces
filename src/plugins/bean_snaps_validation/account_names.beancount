@@ -1,0 +1,19 @@
+;==============================================================================
+; account_names
+;==============================================================================
+
+;; Valid accounts
+2000-01-01 open Assets:Cash EUR
+2000-01-01 open Liabilities:CreditCard EUR
+2000-01-01 open Expenses:Food EUR
+2000-01-01 open Income:Salary EUR
+2000-01-01 open Equity:OpeningBalances EUR
+
+;; Invalid root account (will trigger error)
+2000-01-01 open Invalid:Account EUR
+
+;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; errors=[
+;     "Invalid account name 'Invalid:Account' (invalid root account).",
+; ]

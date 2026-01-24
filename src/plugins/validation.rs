@@ -350,3 +350,33 @@ pub fn document_files_exist(ledger: &Ledger) -> Vec<UroError> {
 
     errors
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use crate::errors::UroError;
+    use crate::load_string;
+    use crate::plugins::run_validations;
+    use crate::test_utils::BeancountSnapshot;
+
+    fn run_validation_test(path: &Path) {
+        let mut snapshot = BeancountSnapshot::load(path);
+        let ledger = load_string(snapshot.input(), path.try_into().unwrap());
+        let errors = run_validations(&ledger);
+        snapshot.add_debug_output(
+            "errors",
+            errors.iter().map(UroError::message).collect::<Vec<_>>(),
+        );
+        snapshot.write();
+    }
+
+    // skip these on windows since the path errors are different.
+    #[test]
+    #[cfg(not(target_os = "windows"))]
+    fn validation_snapshot_tests() {
+        insta::glob!("bean_snaps_validation/*.beancount", |path| {
+            run_validation_test(path);
+        });
+    }
+}

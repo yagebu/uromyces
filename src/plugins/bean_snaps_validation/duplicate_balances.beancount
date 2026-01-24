@@ -1,0 +1,25 @@
+;==============================================================================
+; duplicate_balances
+;==============================================================================
+
+2000-01-01 open Assets:Cash EUR
+2000-01-01 open Equity:Opening EUR
+
+2000-01-02 *
+  Assets:Cash              100 EUR
+  Equity:Opening
+
+;; Same balance assertion twice - OK
+2000-02-01 balance Assets:Cash 100 EUR
+2000-02-01 balance Assets:Cash 100 EUR
+
+;; Different amounts for same account/date/currency - ERROR
+2000-03-01 balance Assets:Cash 100 EUR
+2000-03-01 balance Assets:Cash 200 EUR
+
+;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; errors=[
+;     "Duplicate balance assertions with different amounts.",
+;     "Balance failed for 'Assets:Cash': expected 200 EUR != accumulated 100 EUR (100 too little)",
+; ]

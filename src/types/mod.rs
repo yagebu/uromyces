@@ -1330,7 +1330,7 @@ impl Entry {
 
 impl RawEntry {
     #[cfg(test)]
-    crate::macros::as_inner_method!(as_transaction, RawTransaction);
+    crate::macros::as_inner_method!(as_raw_transaction, RawTransaction);
 
     /// Sort key for an entry.
     ///

@@ -1,0 +1,22 @@
+;==============================================================================
+; multiple_pads_same_account
+;==============================================================================
+
+2020-01-01 open Assets:Bank
+2020-01-01 open Equity:Opening-Balances
+
+2020-01-05 pad Assets:Bank Equity:Opening-Balances
+
+2020-01-10 balance Assets:Bank 1000.00 USD
+
+;; Second pad overwrites the first
+2020-02-01 pad Assets:Bank Equity:Opening-Balances
+
+2020-02-10 balance Assets:Bank 1500.00 USD
+
+;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; pad_transactions=[
+;     "date=2020-01-05, narration=(Padding inserted for Balance of 1000.00 USD for difference 1000.00 USD), postings=[\"Assets:Bank 1000.00 USD\", \"Equity:Opening-Balances -1000.00 USD\"]",
+;     "date=2020-02-01, narration=(Padding inserted for Balance of 1500.00 USD for difference 500.00 USD), postings=[\"Assets:Bank 500.00 USD\", \"Equity:Opening-Balances -500.00 USD\"]",
+; ]

@@ -1,0 +1,21 @@
+;==============================================================================
+; duplicate_commodities
+;==============================================================================
+
+;; First declaration is fine
+2000-01-01 commodity USD
+  name: "US Dollar"
+
+;; Duplicate - ERROR
+2000-06-01 commodity USD
+  name: "United States Dollar"
+
+;; Different commodity is fine
+2000-01-01 commodity EUR
+  name: "Euro"
+
+;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; errors=[
+;     "Duplicate commodity directive for USD.",
+; ]

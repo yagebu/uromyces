@@ -1,0 +1,21 @@
+;==============================================================================
+; pad_negative_difference
+;==============================================================================
+
+2020-01-01 open Assets:Bank
+2020-01-01 open Equity:Opening-Balances
+
+2020-01-02 *
+  Assets:Bank     2000.00 USD
+  Equity:Opening-Balances
+
+2020-01-05 pad Assets:Bank Equity:Opening-Balances
+
+;; Balance check is less than actual, so padding removes money
+2020-01-10 balance Assets:Bank 1500.00 USD
+
+;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; pad_transactions=[
+;     "date=2020-01-05, narration=(Padding inserted for Balance of 1500.00 USD for difference -500.00 USD), postings=[\"Assets:Bank -500.00 USD\", \"Equity:Opening-Balances 500.00 USD\"]",
+; ]

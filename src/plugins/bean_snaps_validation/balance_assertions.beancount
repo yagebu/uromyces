@@ -1,0 +1,29 @@
+;==============================================================================
+; balance_assertions
+;==============================================================================
+
+2000-01-01 open Assets:Cash EUR
+2000-01-01 open Equity:Opening EUR
+
+2000-02-01 * "Initial deposit"
+  Assets:Cash              100 EUR
+  Equity:Opening
+
+;; Correct balance - OK
+2000-03-01 balance Assets:Cash 100 EUR
+
+;; Incorrect balance - ERROR
+2000-04-01 balance Assets:Cash 200 EUR
+
+2000-05-01 * "Withdraw"
+  Assets:Cash              -30 EUR
+  Equity:Opening
+
+;; Correct balance after withdraw - OK
+2000-06-01 balance Assets:Cash 70 EUR
+
+;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; errors=[
+;     "Balance failed for 'Assets:Cash': expected 200 EUR != accumulated 100 EUR (100 too little)",
+; ]

@@ -154,3 +154,46 @@ pub fn transactions_for_pad_entries(ledger: &Ledger) -> (Vec<Entry>, Vec<UroErro
         Vec::new(),
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use crate::load_string;
+    use crate::test_utils::BeancountSnapshot;
+
+    fn run_pad_test(path: &Path) {
+        let mut snapshot = BeancountSnapshot::load(path);
+        // load_string already runs the pad plugin via run_pre
+        let ledger = load_string(snapshot.input(), path.try_into().unwrap());
+
+        // Find padding transactions (flag P) that were added by the pad plugin
+        let pad_transactions = ledger
+            .entries
+            .iter()
+            .filter_map(|e| e.as_transaction())
+            .filter(|t| t.flag == super::Flag::PADDING)
+            .map(|t| {
+                let postings = t
+                    .postings
+                    .iter()
+                    .map(|p| format!("{} {}", p.account, p.units))
+                    .collect::<Vec<_>>();
+                format!(
+                    "date={}, narration={}, postings={:?}",
+                    t.date, t.narration, postings
+                )
+            })
+            .collect::<Vec<_>>();
+
+        snapshot.add_debug_output("pad_transactions", pad_transactions);
+        snapshot.write();
+    }
+
+    #[test]
+    fn pad_test() {
+        insta::glob!("bean_snaps_pad/*.beancount", |path| {
+            run_pad_test(path);
+        });
+    }
+}
