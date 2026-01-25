@@ -18,6 +18,7 @@ extension-module = ["pyo3/extension-module"]
 [dependencies]
 ahash = { version = "0.8" }
 chrono = { version = "0.4", features = ["serde"] }
+dunce = "1.0.5"
 glob = { version = "0.3" }
 hashbrown = { version = "0.16", features = ["serde"] }
 indexmap = { version = "2.2" }

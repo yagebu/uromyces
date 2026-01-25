@@ -78,8 +78,7 @@ impl AbsoluteUTF8Path {
         // self is absolute and Unicode-only, so the parent and joined path is as well
         let joined = dir.join(path);
         Self::from_ref(
-            joined
-                .canonicalize()
+            dunce::canonicalize(&joined)
                 .unwrap_or(joined)
                 .to_str()
                 .expect("valid UTF-8"),

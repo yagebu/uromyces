@@ -62,7 +62,7 @@ pub fn glob_include(
         .map_err(|e| GlobIncludeError::InvalidGlobPattern(e.msg.to_owned()))?
         .map(|glob_result| match glob_result {
             Err(_) => Err(GlobIncludeError::GlobReadError),
-            Ok(path) => match path.canonicalize() {
+            Ok(path) => match dunce::canonicalize(path) {
                 Ok(p) => p
                     .as_path()
                     .try_into()
