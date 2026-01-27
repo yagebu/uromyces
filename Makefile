@@ -34,9 +34,13 @@ test-rust: .venv
 test-rust-cov: .venv
 	LLVM_COV=llvm-cov LLVM_PROFDATA=llvm-profdata $(CARGO) llvm-cov --html
 
-# Generate Rust documentation
-doc: .venv
+# Generate Rust documentation and mdbook
+docs: .venv
 	$(CARGO) doc --document-private-items
+	cd docs && mdbook build
+# Serve mdbook on localhost:3000 and re-build on changes.
+serve-docs:
+	cd docs && mdbook serve --open
 
 # Update lockfiles
 update: .venv
@@ -69,4 +73,4 @@ clean:
 	find . -type f -name '*.py[c0]' -delete
 	find . -type d -name "__pycache__" -delete
 
-.PHONY: clean dev doc insta lint lint-py lint-rust maturin-generate-ci test test-py test-rust test-rust-cov update
+.PHONY: clean dev docs insta lint lint-py lint-rust maturin-generate-ci serve-docs test test-py test-rust test-rust-cov update
