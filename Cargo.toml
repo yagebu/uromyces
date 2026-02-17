@@ -24,7 +24,7 @@ hashbrown = { version = "0.16", features = ["serde"] }
 indexmap = { version = "2.2" }
 internment = { version = "0.8", default-features = false, features = ["arc", "serde"] }
 log = { version = "0.4" }
-pyo3 = { version = "0.27", features = ["abi3-py310"] }
+pyo3 = { version = "0.28", features = ["abi3-py310"] }
 pyo3-log = { version = "0.13" }
 regex = { version = "1" }
 rust_decimal = { version = "1" }

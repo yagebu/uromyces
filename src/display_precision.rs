@@ -73,7 +73,7 @@ struct DisplayPrecisionsStats {
 
 /// Precisions for a currency.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Precisions {
     has_sign: bool,
     max: u8,

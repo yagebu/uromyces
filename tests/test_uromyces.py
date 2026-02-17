@@ -91,7 +91,7 @@ def test_ledger_add_error(test_ledgers_dir: Path) -> None:
     with pytest.raises(AttributeError):
         ledger.add_error(None)
     ledger.add_error(_BeancountStyleError(None, "asdf", None))
-    with pytest.raises(TypeError, match=r"int.*as.*str"):
+    with pytest.raises(TypeError, match=r"int.*not an instance.*str"):
         ledger.add_error(_BeancountStyleError({"filename": 12}, "asdf", None))
     with pytest.raises(ValueError, match=r"not absolute"):
         ledger.add_error(

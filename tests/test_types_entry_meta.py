@@ -42,7 +42,7 @@ def test_posting_meta() -> None:
 
     assert dict(empty) == {}
     assert dict(**empty) == {}
-    assert dict(empty, key="value") == {"key": "value"}  # ty:ignore[no-matching-overload]
+    assert dict(empty, key="value") == {"key": "value"}
 
     assert dict(other_key) == {"some_key": "test"}
     assert dict(**other_key) == {"some_key": "test"}

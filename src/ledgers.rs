@@ -58,7 +58,7 @@ impl RawLedger {
 
 /// The result of parsing a Beancount file and all its includes and running booking.
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[pyclass(module = "uromyces")]
+#[pyclass(skip_from_py_object, module = "uromyces")]
 pub struct Ledger {
     /// The main filename.
     #[pyo3(get)]

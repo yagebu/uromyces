@@ -122,7 +122,7 @@ impl JoinAccount for &RootAccount {
 
 /// The five root accounts.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, skip_from_py_object, module = "uromyces")]
 pub struct RootAccounts {
     /// The root account for assets.
     pub assets: RootAccount,

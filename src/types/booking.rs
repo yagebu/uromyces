@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 /// The various booking methods.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces", eq, eq_int)]
+#[pyclass(frozen, from_py_object, module = "uromyces", eq, eq_int)]
 pub enum Booking {
     #[pyo3(name = "STRICT")]
     #[default]

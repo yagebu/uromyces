@@ -6,17 +6,18 @@ RUST_SOURCES := $(shell find src tree-sitter-beancount -type f)
 #       avoid rebuilds: https://github.com/PyO3/pyo3/issues/1708
 CARGO = uv run --no-project cargo
 
-# Create and sync a dev environment, making sure to recompile the Rust module.
-.venv: uv.lock pyproject.toml $(RUST_SOURCES)
-	uv sync --reinstall-package uromyces
+# Create and sync a dev environment.
+.venv: uv.lock pyproject.toml
+	uv sync
 	touch -m .venv
-# Rebuild Rust module (should normally not be needed).
-dev:
+# Rebuild Rust module.
+python/uromyces/_uromyces.abi3.so: .venv $(RUST_SOURCES)
 	uv sync --reinstall-package uromyces
+dev: python/uromyces/_uromyces.abi3.so
 
 # Run linters
 lint: lint-rust lint-py
-lint-py: .venv
+lint-py: dev
 	pre-commit run -a
 	uv run mypy python tests contrib
 	uv run ty check python tests contrib
@@ -26,11 +27,11 @@ lint-rust: .venv
 
 # Run Rust and Python tests
 test: test-rust test-py
-test-py: .venv
+test-py: dev
 	uv run pytest --cov=uromyces --cov-report=term-missing:skip-covered --cov-report=html --cov-fail-under=100
-test-rust:
+test-rust: .venv
 	$(CARGO) test
-test-rust-cov:
+test-rust-cov: .venv
 	LLVM_COV=llvm-cov LLVM_PROFDATA=llvm-profdata $(CARGO) llvm-cov --html
 
 # Generate Rust documentation
@@ -44,7 +45,7 @@ update: .venv
 	$(CARGO) update
 	$(CARGO) outdated
 
-maturin-generate-ci:
+maturin-generate-ci: .venv
 	uv run maturin generate-ci github --output=.github/workflows/maturin.yml --platform manylinux --platform windows --platform macos
 
 # Update snapshot tests
@@ -53,7 +54,7 @@ insta: .venv
 	$(CARGO) insta review
 
 # Import Beancount booking_full_test DSL-based tests
-import-booking-tests:
+import-booking-tests: .venv
 	rm -f src/booking/test_inputs/*.beancount
 	uv run contrib/scripts.py import-booking-tests
 

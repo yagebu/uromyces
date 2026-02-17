@@ -115,7 +115,7 @@ pub enum RawDirective {
 
 /// A plugin directive.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Plugin {
     /// The plugin name - name of a Python module that contains plugin functions in `__plugins__`.
     pub name: String,
@@ -125,7 +125,7 @@ pub struct Plugin {
 
 /// A custom value - a value and associated type.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces")]
+#[pyclass(frozen, from_py_object, module = "uromyces")]
 #[serde(transparent)]
 pub struct CustomValue(pub(crate) MetaValue);
 
@@ -168,7 +168,7 @@ impl CustomValue {
 /// During booking, the incomplete amounts will be replaced with the actual amounts
 /// and the cost spec will turn into a cost.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct RawPosting {
     /// Metadata for the posting.
     pub meta: EntryMeta,
@@ -204,7 +204,7 @@ impl RawPosting {
 /// After parsing, parts of the transaction might still be missing and will
 /// only be inferred during booking.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct RawTransaction {
     pub meta: EntryMeta,
     pub date: Date,
@@ -234,7 +234,7 @@ impl RawTransaction {
 
 /// A fully booked posting.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Posting {
     /// Metadata for the posting.
     pub meta: PostingMeta,
@@ -310,7 +310,7 @@ impl Posting {
 // -----------------------------------------------------------------
 /// A balance entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Balance {
     pub meta: EntryMeta,
     pub date: Date,
@@ -323,7 +323,7 @@ pub struct Balance {
 
 /// An account close entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Close {
     pub meta: EntryMeta,
     pub date: Date,
@@ -334,7 +334,7 @@ pub struct Close {
 
 /// A commodity entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Commodity {
     pub meta: EntryMeta,
     pub date: Date,
@@ -345,7 +345,7 @@ pub struct Commodity {
 
 /// A custom entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Custom {
     pub meta: EntryMeta,
     pub date: Date,
@@ -357,7 +357,7 @@ pub struct Custom {
 
 /// An document entry for an account.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Document {
     pub meta: EntryMeta,
     pub date: Date,
@@ -369,7 +369,7 @@ pub struct Document {
 
 /// An event for an account.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Event {
     pub meta: EntryMeta,
     pub date: Date,
@@ -381,7 +381,7 @@ pub struct Event {
 
 /// An account open entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Open {
     pub meta: EntryMeta,
     pub date: Date,
@@ -394,7 +394,7 @@ pub struct Open {
 
 /// A note entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Note {
     pub meta: EntryMeta,
     pub date: Date,
@@ -406,7 +406,7 @@ pub struct Note {
 
 /// A pad entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Pad {
     pub meta: EntryMeta,
     pub date: Date,
@@ -418,7 +418,7 @@ pub struct Pad {
 
 /// A price entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Price {
     pub meta: EntryMeta,
     pub date: Date,
@@ -430,7 +430,7 @@ pub struct Price {
 
 /// A query entry.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Query {
     pub meta: EntryMeta,
     pub date: Date,
@@ -442,7 +442,7 @@ pub struct Query {
 
 /// A transaction.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[pyclass(frozen, eq, get_all, module = "uromyces")]
+#[pyclass(frozen, eq, get_all, from_py_object, module = "uromyces")]
 pub struct Transaction {
     pub meta: EntryMeta,
     pub date: Date,

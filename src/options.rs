@@ -45,7 +45,12 @@ impl std::fmt::Display for BeancountOptionError {
 
 /// Beancount's options.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[pyclass(frozen, module = "uromyces", name = "UromycesOptions")]
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "uromyces",
+    name = "UromycesOptions"
+)]
 #[allow(clippy::module_name_repetitions)]
 pub struct BeancountOptions {
     /// Title of the Beancount ledger.
