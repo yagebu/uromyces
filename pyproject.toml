@@ -84,6 +84,7 @@ unused-type-ignore-comment = "ignore"
 testpaths = ["tests"]
 
 [tool.uv]
+exclude-newer = "7 days"
 python-preference = "system"
 
 [tool.ruff]

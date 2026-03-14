@@ -63,13 +63,13 @@ def convert_options(ledger: Ledger) -> BeancountOptions:
     opts["name_equity"] = root_accounts.equity
     opts["name_income"] = root_accounts.income
     opts["name_expenses"] = root_accounts.expenses
-    return opts  # type: ignore[return-value]
+    return opts  # type: ignore[return-value]  # ty:ignore[invalid-return-type]
 
 
 @singledispatch
 def beancount_to_uromyces(entry: Directive | data.Directive) -> Directive:
     """Convert a Beancount Entry to a uromyces entry."""
-    return entry  # type: ignore[return-value]
+    return entry  # type: ignore[return-value]  # ty:ignore[invalid-return-type]
 
 
 @beancount_to_uromyces.register(data.Balance)
@@ -172,7 +172,7 @@ def _(entry: data.Price) -> Price:
         entry.meta,
         entry.date,
         entry.currency,
-        entry.amount,  # type: ignore[arg-type]
+        entry.amount,  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
     )
 
 
@@ -193,13 +193,13 @@ def _(entry: data.Transaction) -> Transaction:
         entry.date,
         entry.flag or "*",
         entry.payee or "",
-        entry.narration,  # type: ignore[arg-type]
+        entry.narration,  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
         [
             Posting(
                 p.account,
-                p.units,  # type: ignore[arg-type]
-                p.cost,  # type: ignore[arg-type]
-                p.price,  # type: ignore[arg-type]
+                p.units,  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
+                p.cost,  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
+                p.price,  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
                 p.flag,
                 p.meta,
             )

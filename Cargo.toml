@@ -20,7 +20,7 @@ ahash = { version = "0.8" }
 chrono = { version = "0.4", features = ["serde"] }
 dunce = "1.0.5"
 glob = { version = "0.3" }
-hashbrown = { version = "0.16", features = ["serde"] }
+hashbrown = { version = "0.17", features = ["serde"] }
 indexmap = { version = "2.2" }
 internment = { version = "0.8", default-features = false, features = ["arc", "serde"] }
 log = { version = "0.4" }

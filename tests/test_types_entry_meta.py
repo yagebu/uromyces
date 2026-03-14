@@ -16,14 +16,14 @@ def test_posting_meta() -> None:
     with pytest.raises(ValueError, match="Invalid filename"):
         PostingMeta({"filename": "not_a_path", "lineno": 0})
     with pytest.raises(TypeError, match="failed to extract enum MetaValue"):
-        PostingMeta({"key": object()})  # type: ignore[dict-item]
+        PostingMeta({"key": object()})  # type: ignore[dict-item]  # ty:ignore[invalid-argument-type]
 
     empty = PostingMeta({})
     assert empty == PostingMeta({})
     assert empty.filename is None
     assert empty.lineno is None
     with pytest.raises(AttributeError):
-        assert empty.not_an_attribute  # type: ignore[attr-defined]
+        assert empty.not_an_attribute  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
     with pytest.raises(TypeError):
         assert PostingMeta(empty)
 

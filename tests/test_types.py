@@ -316,7 +316,7 @@ def test_entry_types(entry: Directive) -> None:
     assert json_empty_tags_links["links"] == []
 
     with pytest.raises(TypeError, match="takes 0 positional arguments"):
-        assert entry._replace("")  # type: ignore[arg-type,misc]
+        assert entry._replace("")  # type: ignore[arg-type,misc]  # ty:ignore[too-many-positional-arguments]
 
 
 def test_custom_value(load_doc: Ledger) -> None:
@@ -382,7 +382,7 @@ def test_transaction() -> None:
     assert posting == Posting("Assets:A1", units)
     assert posting == Posting(
         "Assets:A1",
-        amount.Amount(Decimal("10.00"), "USD"),  # type: ignore[arg-type]
+        amount.Amount(Decimal("10.00"), "USD"),  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
     )
     t = transaction._replace(postings=postings)
     assert t.postings == postings
