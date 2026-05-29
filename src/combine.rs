@@ -90,7 +90,7 @@ fn load_beancount_file(main_path: AbsoluteUTF8Path) -> Vec<PathAndResult> {
             for directive in &result.directives {
                 if let RawDirective::Include { pattern } = directive {
                     match paths::glob_include(&path, pattern) {
-                        Ok(included_paths) => path_queue.extend(included_paths.into_iter()),
+                        Ok(included_paths) => path_queue.extend(included_paths),
                         Err(glob_include_error) => result.errors.push(
                             UroError::new(format!(
                                 "Include pattern '{pattern}' failed: {glob_include_error}"
