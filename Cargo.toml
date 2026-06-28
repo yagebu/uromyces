@@ -39,7 +39,7 @@ regex = { version = "1" }
 
 [dev-dependencies]
 insta = { version = "1", features = ["glob", "json", "filters"] }
-itertools = { version = "0.14" }
+itertools = { version = "0.15" }
 
 [profile.dev.package]
 insta.opt-level = 3
