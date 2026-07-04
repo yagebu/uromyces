@@ -316,7 +316,7 @@ def test_entry_types(entry: Directive) -> None:
     assert json_empty_tags_links["links"] == []
 
     with pytest.raises(TypeError, match="takes 0 positional arguments"):
-        assert entry._replace("")  # type: ignore[arg-type,misc]  # ty:ignore[too-many-positional-arguments]
+        assert entry._replace("")  # type: ignore[arg-type,call-arg]  # ty:ignore[too-many-positional-arguments]
 
 
 def test_custom_value(load_doc: Ledger) -> None:

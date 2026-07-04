@@ -97,6 +97,7 @@ extend-select = [
 extend-ignore = [
     "C901",        # Ignore over-zealous complexity warnings
     "COM812",      # Handled by formatter
+    "CPY001",      # No copyright notices in all files
     "ANN401",      # Allow typing.Any
     "PLR2004",     # allow magic constants in comparisons
     "TD",          # Allow TODOs

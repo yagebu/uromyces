@@ -78,7 +78,7 @@ def _(entry: data.Balance) -> Balance:
         entry.meta,
         entry.date,
         entry.account,
-        entry.amount,  # type: ignore[arg-type]
+        entry.amount,  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
         entry.tolerance,
     )
 

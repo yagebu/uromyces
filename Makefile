@@ -18,7 +18,7 @@ dev: python/uromyces/_uromyces.abi3.so
 # Run linters
 lint: lint-rust lint-py
 lint-py: dev
-	pre-commit run -a
+	prek -a
 	uv run mypy python tests contrib
 	uv run ty check python tests contrib
 lint-rust: .venv
@@ -45,7 +45,7 @@ serve-docs:
 # Update lockfiles
 update: .venv
 	uv lock --upgrade
-	pre-commit autoupdate
+	prek update --cooldown-days 7
 	$(CARGO) update
 	$(CARGO) outdated
 

@@ -18,7 +18,7 @@ fn update_consts(path: &Path, kind: &str) {
             let const_name = caps.get(1).unwrap().as_str();
             let num_match = caps.get(2).unwrap();
             let num = num_match.as_str();
-            let re = &format!(r" {}_{} = (\d+)", kind, &const_name.to_ascii_lowercase());
+            let re = &format!(r" {}_{} = (\d+)", kind, const_name.to_ascii_lowercase());
             let new_num = Regex::new(re)
                 .unwrap()
                 .captures(parser_contents)
