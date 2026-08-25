@@ -49,8 +49,9 @@
 //! - [`Amount`] - an amount, a number of some currency
 
 use std::fmt::Debug;
-use std::hash::{Hash, Hasher};
+use std::hash::{BuildHasher, Hash};
 
+use foldhash::fast::FixedState;
 use pyo3::exceptions::PyTypeError;
 use pyo3::types::{PyBool, PyDate, PyInt, PyString};
 use pyo3::{PyTypeInfo, prelude::*};
@@ -587,9 +588,7 @@ impl Balance {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -640,9 +639,7 @@ impl Close {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -693,9 +690,7 @@ impl Commodity {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -750,9 +745,7 @@ impl Custom {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -807,9 +800,7 @@ impl Document {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -864,9 +855,7 @@ impl Event {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -921,9 +910,7 @@ impl Note {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -983,9 +970,7 @@ impl Open {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -1040,9 +1025,7 @@ impl Pad {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -1097,9 +1080,7 @@ impl Price {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -1154,9 +1135,7 @@ impl Query {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();
@@ -1221,9 +1200,7 @@ impl Transaction {
         format!("<{self:?}>")
     }
     fn __hash__(&self) -> u64 {
-        let mut hasher = ahash::AHasher::default();
-        self.hash(&mut hasher);
-        hasher.finish()
+        FixedState::default().hash_one(self)
     }
     fn to_json(&self) -> PyResult<String> {
         let entry: BorrowedEntry = self.into();

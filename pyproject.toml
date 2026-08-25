@@ -65,6 +65,7 @@ dev = [
     "pytest-cov>=6",
     "pytest>=8",
     "ty>=0.0.8",
+    "prek>=0.4.14",
 ]
 
 [tool.black]
@@ -86,6 +87,7 @@ testpaths = ["tests"]
 [tool.uv]
 exclude-newer = "7 days"
 python-preference = "system"
+config-settings = { build-args = "--profile pydev" }
 
 [tool.ruff]
 line-length = 79

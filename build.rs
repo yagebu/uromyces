@@ -9,7 +9,7 @@ use regex::{Captures, Regex};
 fn update_consts(path: &Path, kind: &str) {
     let parser: PathBuf = ["tree-sitter-beancount", "parser.c"].iter().collect();
     let parser_contents = &read_to_string(parser).unwrap();
-    let find_consts = Regex::new(r"const ([A-Z_]+): u16 = (\d+);").unwrap();
+    let find_consts = Regex::new(r"const ([A-Z_]+): u16 = ([0-9]+);").unwrap();
 
     // Update the constants for all node fields.
     let mut changed = false;
@@ -18,7 +18,7 @@ fn update_consts(path: &Path, kind: &str) {
             let const_name = caps.get(1).unwrap().as_str();
             let num_match = caps.get(2).unwrap();
             let num = num_match.as_str();
-            let re = &format!(r" {}_{} = (\d+)", kind, const_name.to_ascii_lowercase());
+            let re = &format!(r" {}_{} = ([0-9]+)", kind, const_name.to_ascii_lowercase());
             let new_num = Regex::new(re)
                 .unwrap()
                 .captures(parser_contents)

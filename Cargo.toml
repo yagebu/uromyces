@@ -16,17 +16,17 @@ crate-type = ["lib", "cdylib"]
 extension-module = ["pyo3/extension-module"]
 
 [dependencies]
-ahash = { version = "0.8" }
-chrono = { version = "0.4", features = ["serde"] }
-dunce = "1.0.5"
+chrono = { version = "0.4", default-features = false, features = ["std", "serde"] }
+dunce = "1"
+foldhash = { version = "0.2" }
 glob = { version = "0.3" }
 hashbrown = { version = "0.17", features = ["serde"] }
-indexmap = { version = "2.2" }
+indexmap = { version = "2" }
 internment = { version = "0.8", default-features = false, features = ["arc", "serde"] }
 log = { version = "0.4" }
 pyo3 = { version = "0.29", features = ["abi3-py310"] }
 pyo3-log = { version = "0.13" }
-regex = { version = "1" }
+regex = { version = "1", default-features = false, features = ["std", "perf", "unicode-gencat"] }
 rust_decimal = { version = "1" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
@@ -35,12 +35,23 @@ tree-sitter = { version = "0.26" }
 
 [build-dependencies]
 cc = { version = "1" }
-regex = { version = "1" }
+regex = { version = "1", default-features = false, features = ["std", "perf"] }
 
 [dev-dependencies]
 insta = { version = "1", features = ["glob", "json", "filters"] }
 itertools = { version = "0.15" }
 
+[profile.dev]
+debug = "line-tables-only"
+
 [profile.dev.package]
 insta.opt-level = 3
 similar.opt-level = 3
+
+[profile.pydev]
+inherits = "release"
+opt-level = 1
+lto = false
+codegen-units = 256
+debug = "line-tables-only"
+incremental = true

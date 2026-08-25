@@ -265,8 +265,6 @@ impl<'py> IntoPyObject<'py> for &Decimal {
 
 #[cfg(test)]
 mod tests {
-    use pyo3::prelude::*;
-
     use super::*;
 
     #[test]
