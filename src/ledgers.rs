@@ -1,5 +1,6 @@
 //!  Ledgers encompass all the data from parsed and booked input Beancount journals.
 use pyo3::prelude::*;
+use pyo3::types::PyDict;
 use serde::{Deserialize, Serialize};
 
 use crate::errors::UroError;
@@ -7,7 +8,7 @@ use crate::options::BeancountOptions;
 #[cfg(test)]
 use crate::parse::ParsedFile;
 use crate::plugins::{run_named_plugin, run_validations};
-use crate::types::{Entry, Filename, Plugin, RawEntry};
+use crate::types::{ConvertFromBeancount, ConvertToBeancount, Entry, Filename, Plugin, RawEntry};
 
 /// The result of parsing a Beancount file and all its includes.
 #[derive(Debug, Clone)]
@@ -111,9 +112,22 @@ impl Ledger {
         py.detach(|| self.run_validations());
     }
 
-    /// Replace the entries of this ledger.
-    fn replace_entries(&mut self, entries: Vec<Entry>) {
-        self.entries = entries;
+    /// Replace the entries of this ledger, converting any Beancount entries.
+    fn replace_entries(&mut self, entries: &Bound<'_, PyAny>) -> PyResult<()> {
+        self.entries = Vec::<Entry>::convert_from_beancount(entries)?;
+        Ok(())
+    }
+
+    /// Convert this ledger's entries to a `list` of Beancount entries, without going through the
+    /// `entries` property first (which would wrap each entry in an intermediate Python object).
+    fn entries_as_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        self.entries.convert_to_beancount(py)
+    }
+
+    /// Convert this ledger's options to a Beancount `OPTIONS_DEFAULTS`-shaped dict.
+    fn options_to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
+        self.options
+            .convert_to_beancount(py, &self.filename, &self.includes)
     }
 
     /// Append some error (from the Python side).

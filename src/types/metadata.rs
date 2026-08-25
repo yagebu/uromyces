@@ -543,7 +543,9 @@ impl<'py> FromPyObject<'_, 'py> for PostingMeta {
     type Error = PyErr;
 
     fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
-        if let Ok(meta) = obj.cast::<Self>() {
+        if obj.is_none() {
+            Ok(Self::default())
+        } else if let Ok(meta) = obj.cast::<Self>() {
             Ok(meta.get().clone())
         } else {
             let meta = obj.cast::<PyDict>()?;

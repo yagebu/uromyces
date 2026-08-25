@@ -29,7 +29,6 @@ from uromyces import Price
 from uromyces import Query
 from uromyces import RawAmount
 from uromyces import Transaction
-from uromyces._convert import beancount_to_uromyces
 from uromyces._uromyces import CostSpec
 
 if TYPE_CHECKING:
@@ -184,103 +183,19 @@ ABSOLUTE_PATH = str(Path(__file__))
     "entry",
     [
         Balance(
-            HEADER,
-            DATE,
-            "A:C",
-            Amount(Decimal(1), "USD"),
-            None,
-            TAGS,
-            LINKS,
+            HEADER, DATE, "A:C", Amount(Decimal(1), "USD"), None, TAGS, LINKS
         ),
-        Close(
-            HEADER,
-            DATE,
-            "A:C",
-            TAGS,
-            LINKS,
-        ),
-        Commodity(
-            HEADER,
-            DATE,
-            "USD",
-            TAGS,
-            LINKS,
-        ),
-        Custom(
-            HEADER,
-            DATE,
-            "custom-type",
-            [],
-            TAGS,
-            LINKS,
-        ),
-        Document(
-            HEADER,
-            DATE,
-            "Assets:Cash",
-            ABSOLUTE_PATH,
-            TAGS,
-            LINKS,
-        ),
-        Event(
-            HEADER,
-            DATE,
-            "event-type",
-            "event-name",
-            TAGS,
-            LINKS,
-        ),
-        Note(
-            HEADER,
-            DATE,
-            "A:C",
-            "account note",
-            TAGS,
-            LINKS,
-        ),
-        Open(
-            HEADER,
-            DATE,
-            "A:C",
-            ["USD"],
-            None,
-            TAGS,
-            LINKS,
-        ),
-        Pad(
-            HEADER,
-            DATE,
-            "A:C",
-            "A:Source",
-            TAGS,
-            LINKS,
-        ),
-        Price(
-            HEADER,
-            DATE,
-            "A:C",
-            Amount(Decimal(1), "USD"),
-            TAGS,
-            LINKS,
-        ),
-        Query(
-            HEADER,
-            DATE,
-            "name",
-            "query",
-            TAGS,
-            LINKS,
-        ),
-        Transaction(
-            HEADER,
-            DATE,
-            "*",
-            "payee",
-            "narration",
-            [],
-            TAGS,
-            LINKS,
-        ),
+        Close(HEADER, DATE, "A:C", TAGS, LINKS),
+        Commodity(HEADER, DATE, "USD", TAGS, LINKS),
+        Custom(HEADER, DATE, "custom-type", [], TAGS, LINKS),
+        Document(HEADER, DATE, "Assets:Cash", ABSOLUTE_PATH, TAGS, LINKS),
+        Event(HEADER, DATE, "event-type", "event-name", TAGS, LINKS),
+        Note(HEADER, DATE, "A:C", "account note", TAGS, LINKS),
+        Open(HEADER, DATE, "A:C", ["USD"], None, TAGS, LINKS),
+        Pad(HEADER, DATE, "A:C", "A:Source", TAGS, LINKS),
+        Price(HEADER, DATE, "A:C", Amount(Decimal(1), "USD"), TAGS, LINKS),
+        Query(HEADER, DATE, "name", "query", TAGS, LINKS),
+        Transaction(HEADER, DATE, "*", "payee", "narration", [], TAGS, LINKS),
     ],
 )
 def test_entry_types(entry: Directive) -> None:
@@ -297,12 +212,11 @@ def test_entry_types(entry: Directive) -> None:
 
     assert isinstance(entry.meta, EntryMeta)
     assert isinstance(entry.meta, Mapping)
-    converted_entry = entry._convert()  # noqa: SLF001
+    converted_entry = entry._to_beancount()
     assert isinstance(converted_entry, data.ALL_DIRECTIVES)
     assert isinstance(converted_entry.meta, dict)
     assert converted_entry.meta == {"filename": "<string>", "lineno": 0}
-    assert beancount_to_uromyces(converted_entry)
-    assert beancount_to_uromyces(entry) is entry
+    assert type(entry)._from_beancount(converted_entry)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
 
     json_loaded = loads(entry.to_json())
     assert json_loaded["t"] == entry.__class__.__name__

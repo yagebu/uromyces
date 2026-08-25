@@ -186,7 +186,6 @@ python/uromyces/
 ├── __init__.py             # Public API
 ├── _uromyces.pyi           # Type stubs for the compiled module
 ├── _plugins.py             # Python plugin orchestration
-├── _convert.py             # Type conversion (uromyces ↔ Beancount)
 └── _cli.py                 # CLI commands (check, compare)
 ```
 
@@ -216,19 +215,16 @@ Python extension module.
 
 ### Type Conversion
 
-Each entry type has a `._convert()` method (defined in Rust via PyO3) to
-convert to Beancount namedtuples. The `_convert.py` module handles
-bidirectional conversion:
+Bidirectional conversion between uromyces types and Beancount's
+`beancount.core.data` namedtuples is implemented in Rust (see
+`src/types/convert_to_beancount.rs` and `src/types/convert_from_beancount.rs`):
 
 ```python
-# Uromyces → Beancount
-def beancount_entries(entries):
-    return [entry._convert() for entry in entries]
+# Uromyces -> Beancount, without materializing intermediate Python objects
+entries = ledger.entries_as_beancount()
 
-# Beancount → Uromyces (via singledispatch)
-@beancount_to_uromyces.register(data.Balance)
-def _(entry: data.Balance) -> Balance:
-    return Balance(entry.meta, entry.date, entry.account, ...)
+# Beancount -> Uromyces, replacing the ledger's entries in one call
+ledger.replace_entries(entries)
 ```
 
 ### Plugin Execution

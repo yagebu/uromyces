@@ -61,6 +61,7 @@ mod account;
 mod amount;
 mod booking;
 mod box_str;
+mod convert_from_beancount;
 mod convert_to_beancount;
 mod cost;
 mod currency;
@@ -87,7 +88,8 @@ pub use metadata::{EntryMeta, Meta, MetaKeyValuePair, MetaValue, PostingMeta};
 pub use paths::{AbsoluteUTF8Path, Filename};
 pub use tags_links::TagsLinks;
 
-use convert_to_beancount::ConvertToBeancount;
+pub(crate) use convert_from_beancount::ConvertFromBeancount;
+pub(crate) use convert_to_beancount::ConvertToBeancount;
 use decimal::get_decimal_decimal;
 
 /// The type to use for line numbers in file positions.
@@ -133,7 +135,11 @@ pub struct CustomValue(pub(crate) MetaValue);
 #[pymethods]
 impl CustomValue {
     #[new]
-    fn __new__(py: Python<'_>, value: MetaValue, dtype: &Bound<'_, PyAny>) -> PyResult<Self> {
+    pub(crate) fn __new__(
+        py: Python<'_>,
+        value: MetaValue,
+        dtype: &Bound<'_, PyAny>,
+    ) -> PyResult<Self> {
         if let MetaValue::String(s) = &value {
             let account_dtype = pyo3::intern!(py, "<AccountDummy>");
             if dtype.eq(account_dtype)? {
@@ -505,7 +511,7 @@ pub enum RawEntry {
 /// The Beancount entries.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(tag = "t")]
-#[derive(FromPyObject, IntoPyObject)]
+#[derive(IntoPyObject)]
 pub enum Entry {
     Balance(Balance),
     Close(Close),
@@ -519,6 +525,41 @@ pub enum Entry {
     Price(Price),
     Query(Query),
     Transaction(Transaction),
+}
+
+impl<'py> FromPyObject<'_, 'py> for Entry {
+    type Error = PyErr;
+
+    /// Extract an [`Entry`] by downcasting to its concrete pyclass and cloning out of it.
+    ///
+    /// This tries variants in assumed real-world frequency order and, unlike
+    /// `#[derive(FromPyObject)]`, uses the cheaper `.cast::<T>()` instead of `.extract::<T>()`.
+    fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
+        macro_rules! try_variant {
+            ($variant:ident) => {
+                if let Ok(entry) = obj.cast::<$variant>() {
+                    return Ok(Self::$variant(entry.get().clone()));
+                }
+            };
+        }
+        try_variant!(Transaction);
+        try_variant!(Price);
+        try_variant!(Document);
+        try_variant!(Balance);
+        try_variant!(Open);
+        try_variant!(Close);
+        try_variant!(Pad);
+        try_variant!(Note);
+        try_variant!(Commodity);
+        try_variant!(Event);
+        try_variant!(Custom);
+        try_variant!(Query);
+
+        Err(PyTypeError::new_err(format!(
+            "not a uromyces entry: {}",
+            obj.get_type()
+        )))
+    }
 }
 
 /// A borrowed Beancount entry - this is only used for serialisation. Via this enum, individual
@@ -594,8 +635,12 @@ impl Balance {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -645,8 +690,12 @@ impl Close {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -696,8 +745,12 @@ impl Commodity {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -751,8 +804,12 @@ impl Custom {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -806,8 +863,12 @@ impl Document {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -861,8 +922,12 @@ impl Event {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -916,8 +981,12 @@ impl Note {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -976,8 +1045,12 @@ impl Open {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -1031,8 +1104,12 @@ impl Pad {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -1086,8 +1163,12 @@ impl Price {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -1141,8 +1222,12 @@ impl Query {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 #[pymethods]
@@ -1206,8 +1291,12 @@ impl Transaction {
         let entry: BorrowedEntry = self.into();
         serde_json::to_string(&entry).map_err(|e| PyTypeError::new_err(e.to_string()))
     }
-    fn _convert<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn _to_beancount<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         self.convert_to_beancount(py)
+    }
+    #[staticmethod]
+    fn _from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
+        Self::convert_from_beancount(entry)
     }
 }
 

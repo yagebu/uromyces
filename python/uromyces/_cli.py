@@ -13,8 +13,6 @@ import click
 from uromyces import load_file
 from uromyces._compare import compare_entries
 from uromyces._compat import load_beancount
-from uromyces._convert import beancount_entries
-from uromyces._convert import convert_options
 
 logger = getLogger(__name__)
 
@@ -109,7 +107,7 @@ def compare(
         else:
             click.echo(f"{msg}", err=True)
 
-    entries_uromyces = data.sorted(beancount_entries(ledger.entries))
+    entries_uromyces = data.sorted(ledger.entries_as_beancount())
 
     if diff_balances:
         balances_beancount = {
@@ -137,7 +135,7 @@ def compare(
         click.echo(click.style("Beancount options:", fg="green"))
         click.echo(pformat(options_beancount))
         click.echo(click.style("uromyces options:", fg="green"))
-        click.echo(pformat(convert_options(ledger)))
+        click.echo(pformat(ledger.options_to_beancount()))
 
     diff_count = 0
     for bc, uro in zip(entries_beancount, entries_uromyces, strict=True):

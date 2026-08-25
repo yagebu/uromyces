@@ -18,6 +18,7 @@ from fava.beans import abc
 from fava.beans import protocols
 from fava.beans.abc import Meta
 from fava.beans.abc import MetaValue
+from fava.beans.types import BeancountOptions
 
 from uromyces._types import Directive
 
@@ -42,7 +43,7 @@ class _Directive:
     links: frozenset[str]
     tags: frozenset[str]
 
-    def _convert(self) -> data.Directive: ...
+    def _to_beancount(self) -> data.Directive: ...
     def to_json(self) -> str: ...
 
 @final
@@ -191,6 +192,8 @@ class Balance(_Directive, abc.Balance):
         account: str | None = None,
         amount: protocols.Amount | None = None,
     ) -> Balance: ...
+    @staticmethod
+    def _from_beancount(entry: data.Balance) -> Balance: ...
 
 @final
 class Close(_Directive, abc.Close):
@@ -213,6 +216,8 @@ class Close(_Directive, abc.Close):
         links: set[str] | frozenset[str] | None = None,
         account: str | None = None,
     ) -> Close: ...
+    @staticmethod
+    def _from_beancount(entry: data.Close) -> Close: ...
 
 @final
 class Commodity(_Directive, abc.Commodity):
@@ -235,6 +240,8 @@ class Commodity(_Directive, abc.Commodity):
         links: set[str] | frozenset[str] | None = None,
         currency: str | None = None,
     ) -> Commodity: ...
+    @staticmethod
+    def _from_beancount(entry: data.Commodity) -> Commodity: ...
 
 # workaround type-checkers confusing 'type' with the function param below:
 _CustomType: TypeAlias = type[Custom]
@@ -264,6 +271,8 @@ class Custom(_Directive, abc.Custom):
         type: str | None = None,  # noqa: A002
         value: list[CustomValue] | None = None,
     ) -> Custom: ...
+    @staticmethod
+    def _from_beancount(entry: data.Custom) -> Custom: ...
 
 @final
 class Document(_Directive, abc.Document):
@@ -289,6 +298,8 @@ class Document(_Directive, abc.Document):
         account: str | None = None,
         filename: str | None = None,
     ) -> Document: ...
+    @staticmethod
+    def _from_beancount(entry: data.Document) -> Document: ...
 
 @final
 class Event(_Directive, abc.Event):
@@ -315,6 +326,8 @@ class Event(_Directive, abc.Event):
         type: str | None = None,  # noqa: A002
         description: str | None = None,
     ) -> Event: ...
+    @staticmethod
+    def _from_beancount(entry: data.Event) -> Event: ...
 
 @final
 class Note(_Directive, abc.Note):
@@ -340,6 +353,8 @@ class Note(_Directive, abc.Note):
         account: str | None = None,
         comment: str | None = None,
     ) -> Note: ...
+    @staticmethod
+    def _from_beancount(entry: data.Note) -> Note: ...
 
 @final
 class Open(_Directive, abc.Open):
@@ -368,6 +383,8 @@ class Open(_Directive, abc.Open):
         currencies: list[str] | None = None,
         booking: Booking | None = None,
     ) -> Open: ...
+    @staticmethod
+    def _from_beancount(entry: data.Open) -> Open: ...
 
 @final
 class Pad(_Directive, abc.Pad):
@@ -393,6 +410,8 @@ class Pad(_Directive, abc.Pad):
         account: str | None = None,
         source_account: str | None = None,
     ) -> Pad: ...
+    @staticmethod
+    def _from_beancount(entry: data.Pad) -> Pad: ...
 
 @final
 class Price(_Directive, abc.Price):
@@ -418,6 +437,8 @@ class Price(_Directive, abc.Price):
         currency: str | None = None,
         amount: Amount | None = None,
     ) -> Price: ...
+    @staticmethod
+    def _from_beancount(entry: data.Price) -> Price: ...
 
 @final
 class Query(_Directive, abc.Query):
@@ -444,6 +465,8 @@ class Query(_Directive, abc.Query):
         name: str | None = None,
         query_string: str | None = None,
     ) -> Query: ...
+    @staticmethod
+    def _from_beancount(entry: data.Query) -> Query: ...
 
 @final
 class Posting(abc.Posting):
@@ -494,6 +517,8 @@ class Transaction(_Directive, abc.Transaction):
         narration: str | None = None,
         postings: list[Posting] | None = None,
     ) -> Transaction: ...
+    @staticmethod
+    def _from_beancount(entry: data.Transaction) -> Transaction: ...
 
 @final
 class RawPosting:
@@ -551,7 +576,11 @@ class Ledger:
     options: UromycesOptions
     plugins: list[Plugin]
 
-    def replace_entries(self: Ledger, entries: list[Directive]) -> None: ...
+    def replace_entries(
+        self: Ledger, entries: Sequence[Directive | data.Directive]
+    ) -> None: ...
+    def entries_as_beancount(self: Ledger) -> list[data.Directive]: ...
+    def options_to_beancount(self: Ledger) -> BeancountOptions: ...
     def add_error(self: Ledger, error: Any) -> None: ...
     def run_validations(self: Ledger) -> None: ...
     def run_plugin(self: Ledger, name: str) -> bool: ...

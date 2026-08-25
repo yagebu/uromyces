@@ -124,4 +124,4 @@ max-args = 10
 "contrib/scripts.py" = ["S101"]
 "uromyces/uromyces.pyi" = ["PYI034"]
 "tests/conftest.py" = ["S101"]
-"tests/test_*.py" = ["D", "S101"]
+"tests/test_*.py" = ["D", "S101", "SLF001"]

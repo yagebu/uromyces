@@ -1,13 +1,16 @@
 //! Options that allow users to change the base accounts for instance.
 
 use pyo3::prelude::*;
+use pyo3::sync::PyOnceLock;
+use pyo3::types::PyDict;
 use serde::{Deserialize, Serialize};
 
 use crate::display_precision::DisplayPrecisions;
 use crate::errors::UroError;
 use crate::tolerances::Tolerances;
 use crate::types::{
-    Booking, Currency, Decimal, JoinAccount, RawDirective, RootAccounts, SummarizationAccounts,
+    Booking, ConvertToBeancount, Currency, Decimal, Filename, JoinAccount, RawDirective,
+    RootAccounts, SummarizationAccounts,
 };
 
 #[derive(Debug)]
@@ -227,6 +230,58 @@ impl BeancountOptions {
             }
         }
         errors
+    }
+
+    /// Convert to a Beancount `OPTIONS_DEFAULTS`-shaped dict, as used by Beancount's plugins
+    /// and printers. Any option not explicitly set below keeps its Beancount default value.
+    pub(crate) fn convert_to_beancount<'py>(
+        &self,
+        py: Python<'py>,
+        filename: &Filename,
+        includes: &[Filename],
+    ) -> PyResult<Bound<'py, PyDict>> {
+        static OPTIONS_DEFAULTS: PyOnceLock<Py<PyDict>> = PyOnceLock::new();
+
+        let defaults = OPTIONS_DEFAULTS.get_or_try_init(py, || -> PyResult<Py<PyDict>> {
+            let defaults = py
+                .import("beancount.parser.options")?
+                .getattr("OPTIONS_DEFAULTS")?
+                .cast_into()?;
+            Ok(defaults.unbind())
+        })?;
+        let opts = defaults.bind(py).copy()?;
+
+        opts.set_item("filename", filename)?;
+        opts.set_item("include", includes)?;
+
+        opts.set_item("title", &self.title)?;
+        opts.set_item("name_assets", &self.root_accounts.assets)?;
+        opts.set_item("name_liabilities", &self.root_accounts.liabilities)?;
+        opts.set_item("name_equity", &self.root_accounts.equity)?;
+        opts.set_item("name_income", &self.root_accounts.income)?;
+        opts.set_item("name_expenses", &self.root_accounts.expenses)?;
+        opts.set_item(
+            "account_current_conversions",
+            &self.account_current_conversions,
+        )?;
+        opts.set_item("account_current_earnings", &self.account_current_earnings)?;
+        opts.set_item("account_previous_balances", &self.account_previous_balances)?;
+        opts.set_item(
+            "account_previous_conversions",
+            &self.account_previous_conversions,
+        )?;
+        opts.set_item("account_previous_earnings", &self.account_previous_earnings)?;
+        opts.set_item("render_commas", self.render_commas)?;
+        opts.set_item("operating_currency", &self.operating_currency)?;
+        opts.set_item("conversion_currency", &self.conversion_currency)?;
+        opts.set_item("documents", &self.documents)?;
+        opts.set_item(
+            "booking_method",
+            self.booking_method.convert_to_beancount(py)?,
+        )?;
+        opts.set_item("insert_pythonpath", self.insert_pythonpath)?;
+
+        Ok(opts)
     }
 }
 

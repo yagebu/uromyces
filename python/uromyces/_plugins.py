@@ -9,9 +9,6 @@ from traceback import format_exc
 from typing import NamedTuple
 from typing import TYPE_CHECKING
 
-from uromyces._convert import beancount_entries
-from uromyces._convert import convert_options
-from uromyces._convert import uromyces_entries
 from uromyces._util import insert_sys_path
 from uromyces._util import log_timing
 
@@ -76,7 +73,6 @@ def run(ledger: Ledger) -> None:
 
     Args:
         ledger: The ledger to run the plugins on.
-        convert: Whether to convert the entries to Beancount namedtuples.
     """
     plugins = ledger.plugins
     plugin_errors = []
@@ -84,7 +80,7 @@ def run(ledger: Ledger) -> None:
         logger.info("No plugins to run.")
         return
     entries: Sequence[Directive | data.Directive] | None = None
-    options_map = convert_options(ledger)
+    options_map = ledger.options_to_beancount()
 
     with insert_sys_path(
         Path(ledger.filename).parent
@@ -96,11 +92,10 @@ def run(ledger: Ledger) -> None:
                 if ledger.run_plugin(plugin.name):
                     # Rust implementation of the plugin
                     continue
-                entries = ledger.entries
                 with log_timing(
                     logger, "convert all uromyces entries to Beancount"
                 ):
-                    entries = beancount_entries(entries)
+                    entries = ledger.entries_as_beancount()
             with log_timing(logger, f"plugin '{plugin.name}' (Python)"):
                 mod_plugins, errors = import_plugin(plugin.name)
                 plugin_errors.extend(errors)
@@ -124,8 +119,7 @@ def run(ledger: Ledger) -> None:
                         continue
 
     if entries is not None:
-        with log_timing(logger, "convert any Beancount entries to uromyces"):
-            entries = uromyces_entries(entries)
-        ledger.replace_entries(entries)
+        with log_timing(logger, "convert and replace ledger entries"):
+            ledger.replace_entries(entries)
     for error in plugin_errors:
         ledger.add_error(error)
