@@ -2,9 +2,8 @@
 use pyo3::exceptions::PyValueError;
 use pyo3::intern;
 use pyo3::prelude::*;
-use pyo3::pybacked::PyBackedStr;
 use pyo3::sync::PyOnceLock;
-use pyo3::types::{PyAnyMethods, PyType};
+use pyo3::types::{PyAnyMethods, PyString, PyType};
 
 use crate::types::{
     Balance, Booking, BoxStr, Close, Commodity, Currency, Custom, CustomValue, Document, Entry,
@@ -207,8 +206,9 @@ impl ConvertFromBeancount for Note {
 impl ConvertFromBeancount for Booking {
     fn convert_from_beancount(entry: &Bound<'_, PyAny>) -> PyResult<Self> {
         let py = entry.py();
-        let value: PyBackedStr = entry.getattr(intern!(py, "value"))?.extract()?;
-        Booking::try_from(&*value)
+        let py_value = entry.getattr(intern!(py, "value"))?;
+        let value = py_value.cast::<PyString>()?.to_str()?;
+        Booking::try_from(value)
             .map_err(|()| PyValueError::new_err(format!("Invalid booking value: {value}")))
     }
 }

@@ -6,7 +6,6 @@ use std::str::FromStr;
 
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use pyo3::pybacked::PyBackedStr;
 use pyo3::sync::PyOnceLock;
 use pyo3::types::{PyAnyMethods, PyTuple, PyType};
 use serde::{Deserialize, Serialize};
@@ -224,7 +223,8 @@ impl<'a, 'py> FromPyObject<'a, 'py> for Decimal {
     type Error = PyErr;
 
     fn extract(obj: Borrowed<'a, 'py, PyAny>) -> Result<Self, Self::Error> {
-        let str = &obj.str()?.extract::<PyBackedStr>()?;
+        let py_string = obj.str()?;
+        let str = py_string.to_str()?;
         let dec = rust_decimal::Decimal::from_str(str).or_else(|_| {
             rust_decimal::Decimal::from_scientific(str)
                 .map_err(|e| PyValueError::new_err(e.to_string()))

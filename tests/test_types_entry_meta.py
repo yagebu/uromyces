@@ -4,10 +4,13 @@ from collections.abc import ItemsView
 from collections.abc import KeysView
 from collections.abc import Mapping
 from collections.abc import ValuesView
+from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
+from uromyces import Amount
 from uromyces import EntryMeta
 from uromyces import PostingMeta
 
@@ -15,7 +18,7 @@ from uromyces import PostingMeta
 def test_posting_meta() -> None:
     with pytest.raises(ValueError, match="Invalid filename"):
         PostingMeta({"filename": "not_a_path", "lineno": 0})
-    with pytest.raises(TypeError, match="failed to extract enum MetaValue"):
+    with pytest.raises(TypeError, match="not a valid metadata value"):
         PostingMeta({"key": object()})  # type: ignore[dict-item]  # ty:ignore[invalid-argument-type]
 
     empty = PostingMeta({})
@@ -117,3 +120,46 @@ def test_entry_meta_constructor() -> None:
     header = EntryMeta(
         {"filename": home, "lineno": 0, "__implicit_prices": "string"}
     )
+
+
+def test_entry_meta_value_types() -> None:
+    """Metadata values keep their Python type if there is a variant for it."""
+    header = EntryMeta(
+        {
+            "filename": "<string>",
+            "lineno": 0,
+            "int": 5,
+            "bool": True,
+            "decimal": Decimal("5.50"),
+            "date": date(2020, 1, 1),
+            "string": "x",
+            "amount": Amount(Decimal("1.00"), "USD"),
+        }
+    )
+    for key, expected in (
+        ("int", 5),
+        ("bool", True),
+        ("decimal", Decimal("5.50")),
+        ("date", date(2020, 1, 1)),
+        ("string", "x"),
+        ("amount", Amount(Decimal("1.00"), "USD")),
+    ):
+        assert header[key] == expected
+        assert type(header[key]) is type(expected)
+
+    # integers that do not fit into an i64 fall back to being decimals
+    too_large = EntryMeta({"filename": "<string>", "lineno": 0, "int": 2**80})
+    assert too_large["int"] == Decimal(2**80)
+
+    # a key without a value (`key:` in a Beancount file) is `None`
+    no_value = EntryMeta(
+        {"filename": "<string>", "lineno": 0, "key": None}  # type: ignore[dict-item]  # ty:ignore[invalid-argument-type]
+    )
+    assert no_value["key"] is None
+    assert no_value.get("key") is None
+    assert "key" in no_value
+    assert dict(no_value) == {
+        "filename": "<string>",
+        "lineno": 0,
+        "key": None,
+    }

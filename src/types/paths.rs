@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use pyo3::pybacked::PyBackedStr;
+use pyo3::types::PyString;
 use serde::{Deserialize, Serialize};
 
 use crate::types::Account;
@@ -235,16 +235,14 @@ impl<'py> FromPyObject<'_, 'py> for AbsoluteUTF8Path {
     type Error = PyErr;
 
     fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
-        let str = obj.extract::<PyBackedStr>()?;
-        Ok(Self::try_from(&*str)?)
+        Ok(Self::try_from(obj.cast::<PyString>()?.to_str()?)?)
     }
 }
 impl<'py> FromPyObject<'_, 'py> for Filename {
     type Error = PyErr;
 
     fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
-        let str = obj.extract::<PyBackedStr>()?;
-        Ok(Self::try_from(&*str)?)
+        Ok(Self::try_from(obj.cast::<PyString>()?.to_str()?)?)
     }
 }
 

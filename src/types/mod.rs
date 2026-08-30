@@ -164,8 +164,8 @@ impl CustomValue {
             MetaValue::Account(_) => pyo3::intern!(py, "<AccountDummy>").clone().into_any(),
             MetaValue::Bool(_) => PyBool::type_object(py).into_any(),
             MetaValue::Amount(_) => Amount::type_object(py).into_any(),
-            MetaValue::Decimal(_) => get_decimal_decimal(py)?.clone().into_any(),
             MetaValue::Integer(_) => PyInt::type_object(py).into_any(),
+            MetaValue::Decimal(_) => get_decimal_decimal(py)?.clone().into_any(),
         })
     }
 }

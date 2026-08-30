@@ -2,7 +2,6 @@ use std::convert::Infallible;
 use std::fmt::{Debug, Display};
 
 use pyo3::prelude::*;
-use pyo3::pybacked::PyBackedStr;
 use pyo3::{exceptions::PyValueError, types::PyString};
 use serde::{Deserialize, Serialize, de};
 
@@ -116,8 +115,8 @@ impl<'py> FromPyObject<'_, 'py> for Flag {
     type Error = PyErr;
 
     fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
-        let str = obj.extract::<PyBackedStr>()?;
-        Self::try_from(&*str).map_err(|_e| PyValueError::new_err("Invalid flag"))
+        let str = obj.cast::<PyString>()?;
+        Self::try_from(str.to_str()?).map_err(|_e| PyValueError::new_err("Invalid flag"))
     }
 }
 

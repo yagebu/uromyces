@@ -3,7 +3,6 @@ use std::fmt::Display;
 use std::hash::Hash;
 
 use pyo3::prelude::*;
-use pyo3::pybacked::PyBackedStr;
 use pyo3::types::PyString;
 use serde::{Deserialize, Serialize};
 
@@ -47,7 +46,6 @@ impl<'py> FromPyObject<'_, 'py> for BoxStr {
     type Error = PyErr;
 
     fn extract(obj: Borrowed<'_, 'py, PyAny>) -> Result<Self, Self::Error> {
-        let str = obj.extract::<PyBackedStr>()?;
-        Ok((&*str).into())
+        Ok(obj.cast::<PyString>()?.to_str()?.into())
     }
 }
