@@ -1,7 +1,9 @@
 allow-unwrap-in-tests = true
 allowed-duplicate-crates = [
-    "ahash",
-    "foldhash",
     "hashbrown",
     "syn",
 ]
+disallowed-types = ["std::collections::HashMap", "std::collections::HashSet"]
+# Interned values cache a Python `str` in a `PyOnceLock`, which is interior mutability that the
+# `Eq`/`Hash` impls do not observe - so interned strings are perfectly fine as map keys.
+ignore-interior-mutability = ["uromyces::interning::InternedValue"]

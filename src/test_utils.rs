@@ -14,7 +14,7 @@ fn is_ci() -> bool {
 
 /// Test helper to create a Currency from a string like `EUR`
 pub fn c(cur: &str) -> Currency {
-    cur.into()
+    Currency::new(cur)
 }
 
 /// Test helper to create a Decimal from a string like `4.00`
@@ -247,7 +247,7 @@ LINES
 
     #[test]
     fn test_c() {
-        assert_eq!(c("EUR"), Currency::from("EUR"));
+        assert_eq!(c("EUR"), Currency::new("EUR"));
     }
 
     #[test]

@@ -208,7 +208,7 @@ impl DisplayPrecisionsStats {
 
 #[cfg(test)]
 mod tests {
-    use crate::test_utils::{a, d};
+    use crate::test_utils::{a, c, d};
 
     use super::*;
 
@@ -257,7 +257,7 @@ mod tests {
         p.update_from_amount(&c_eur2);
         p.update_from_amount(&c_eur2);
         p.update_from_amount(&c_eur2);
-        let eur: Currency = "EUR".into();
+        let eur = c("EUR");
         assert_eq!(p.map.get(&eur).unwrap().get_common(), 2);
     }
 }

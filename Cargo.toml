@@ -22,8 +22,8 @@ foldhash = { version = "0.2" }
 glob = { version = "0.3" }
 hashbrown = { version = "0.17", features = ["serde"] }
 indexmap = { version = "2" }
-internment = { version = "0.8", default-features = false, features = ["arc", "serde"] }
 log = { version = "0.4" }
+papaya = { version = "0.2" }
 pyo3 = { version = "0.29", features = ["abi3-py310"] }
 pyo3-log = { version = "0.13" }
 regex = { version = "1", default-features = false, features = ["std", "perf", "unicode-gencat"] }

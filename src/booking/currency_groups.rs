@@ -198,15 +198,12 @@ mod tests {
         t("Assets:Cash        USD {   ASDF} @    EUR", Some("ASDF"));
     }
 
-    fn check_single_group(
-        currency: impl Into<Currency>,
-        posting_strings: &[&str],
-    ) -> Vec<RawPosting> {
+    fn check_single_group(currency: &str, posting_strings: &[&str]) -> Vec<RawPosting> {
         let posting = &postings_from_strings(posting_strings);
         let groups = group_and_fill_in_currencies(posting, &AccountBalances::new()).unwrap();
         assert_eq!(groups.len(), 1);
         let group = groups.into_iter().next().unwrap();
-        assert_eq!(group.0, currency.into());
+        assert_eq!(group.0, Currency::new(currency));
         group.1
     }
 

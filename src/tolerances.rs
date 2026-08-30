@@ -71,7 +71,7 @@ impl Tolerances {
             if currency == "*" {
                 self.default = tolerance;
             } else {
-                self.map.insert(currency.into(), tolerance);
+                self.map.insert(Currency::new(currency), tolerance);
             }
             return Ok(());
         }

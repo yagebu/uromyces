@@ -17,6 +17,7 @@ mod combine;
 mod conversions;
 pub mod display_precision;
 pub mod errors;
+mod interning;
 pub mod inventory;
 mod ledgers;
 mod macros;

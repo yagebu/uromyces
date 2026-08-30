@@ -111,7 +111,7 @@ impl FromStr for Amount {
         }
         Ok(Self {
             number: Decimal::from_str_exact(raw_number).map_err(|_| ())?,
-            currency: raw_currency.into(),
+            currency: Currency::new(raw_currency),
         })
     }
 }
@@ -186,7 +186,7 @@ mod tests {
     #[test]
     fn test_amount_from_string() {
         let one = Decimal::ONE;
-        let eur = Currency::from("EUR");
+        let eur = Currency::new("EUR");
         assert_eq!(Amount::from_str("1 EUR"), Ok(Amount::new(one, eur.clone())));
         assert_eq!(
             Amount::from_str("1    EUR"),

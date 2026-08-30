@@ -3,15 +3,12 @@ use std::fmt::{Debug, Display};
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::types::interned_string::InternedString;
+use crate::interning::CurrencyInternedString;
 
 /// A currency name.
-///
-/// This is a newtype wrapper so that we can transparently swap out the inner type
-/// for a more fitting String-like type, make it immutable and avoid mixing them up with
-/// other strings like account names.
 #[derive(
     Clone,
+    Debug,
     PartialEq,
     Eq,
     PartialOrd,
@@ -22,12 +19,13 @@ use crate::types::interned_string::InternedString;
     FromPyObject,
     IntoPyObjectRef,
 )]
-pub struct Currency(InternedString);
+pub struct Currency(CurrencyInternedString);
 
-impl Debug for Currency {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str: &str = &self.0;
-        f.debug_tuple("Currency").field(&str).finish()
+impl Currency {
+    /// Create a currency name instance.
+    #[must_use]
+    pub fn new(s: &str) -> Self {
+        Self(CurrencyInternedString::new(s))
     }
 }
 
@@ -38,14 +36,13 @@ impl Display for Currency {
 }
 
 #[cfg(test)]
-impl PartialEq<str> for Currency {
-    fn eq(&self, other: &str) -> bool {
-        &*self.0 == other
-    }
-}
+mod tests {
+    use super::*;
 
-impl From<&str> for Currency {
-    fn from(s: &str) -> Self {
-        Self(s.into())
+    #[test]
+    fn test_currency_display_and_debug() {
+        let currency = Currency::new("USD");
+        assert_eq!(format!("{currency}"), "USD");
+        assert_eq!(format!("{currency:?}"), "Currency(\"USD\")");
     }
 }

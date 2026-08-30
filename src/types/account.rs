@@ -5,7 +5,7 @@ use pyo3::prelude::*;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use crate::types::interned_string::InternedString;
+use crate::interning::AccountInternedString;
 
 /// Components of the account are separated by colons.
 const SEPARATOR: char = ':';
@@ -20,6 +20,7 @@ const SEPARATOR: char = ':';
 /// interner.
 #[derive(
     Clone,
+    Debug,
     PartialEq,
     Eq,
     PartialOrd,
@@ -30,15 +31,21 @@ const SEPARATOR: char = ':';
     FromPyObject,
     IntoPyObjectRef,
 )]
-pub struct Account(InternedString);
+pub struct Account(AccountInternedString);
 
 impl Account {
+    /// Create an account name instance.
+    #[must_use]
+    pub fn new(s: &str) -> Self {
+        Self(AccountInternedString::new(s))
+    }
+
     /// The parent account, if there is one.
     #[must_use]
     pub fn parent(&self) -> Option<Self> {
         self.0
             .rfind(SEPARATOR)
-            .map(|index| Self::from(&self.0[0..index]))
+            .map(|index| Self::new(&self.0[0..index]))
     }
 
     /// The account components.
@@ -83,22 +90,9 @@ static ACCOUNT_RE: LazyLock<Regex> = LazyLock::new(|| {
         .expect("valid account regex")
 });
 
-impl Debug for Account {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str: &str = &self.0;
-        f.debug_tuple("Account").field(&str).finish()
-    }
-}
-
 impl Display for Account {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         Display::fmt(&self.0, f)
-    }
-}
-
-impl From<&str> for Account {
-    fn from(s: &str) -> Self {
-        Self(s.into())
     }
 }
 
@@ -116,7 +110,7 @@ impl JoinAccount for &RootAccount {
         let mut self_str = (*self).clone();
         self_str.push(SEPARATOR);
         self_str.push_str(child);
-        Account(self_str.into())
+        Account::new(&self_str)
     }
 }
 
@@ -185,46 +179,53 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_account_display_and_debug() {
+        let acc = Account::new("Income:Cash");
+        assert_eq!(format!("{acc}"), "Income:Cash");
+        assert_eq!(format!("{acc:?}"), "Account(\"Income:Cash\")");
+    }
+
+    #[test]
     fn test_account_filters() {
         let roots = RootAccounts::default();
-        let acc: Account = "Income:Cash".into();
+        let acc = Account::new("Income:Cash");
         assert!(!roots.is_balance_sheet_account(&acc));
         assert!(roots.is_income_statement_account(&acc));
-        let acc: Account = "Equity:Opening".into();
+        let acc = Account::new("Equity:Opening");
         assert!(roots.is_balance_sheet_account(&acc));
         assert!(!roots.is_income_statement_account(&acc));
     }
 
     #[test]
     fn test_account_parent() {
-        let root: Account = "Assets".into();
+        let root = Account::new("Assets");
         assert_eq!(root.parent(), None);
-        let acc: Account = "Assets:Cash".into();
+        let acc = Account::new("Assets:Cash");
         assert_eq!(acc.parent(), Some(root));
     }
 
     #[test]
     fn test_account_root() {
-        let root: Account = "Assets".into();
+        let root = Account::new("Assets");
         assert_eq!(root.root(), "Assets");
-        let acc: Account = "Assets:Cash".into();
+        let acc = Account::new("Assets:Cash");
         assert_eq!(acc.root(), "Assets");
     }
 
     #[test]
     fn test_account_is_valid() {
         let roots = RootAccounts::default();
-        let acc: Account = "Assets:Cash".into();
+        let acc = Account::new("Assets:Cash");
         assert!(acc.has_valid_root(&roots));
-        let acc: Account = "Expenses:Cash".into();
+        let acc = Account::new("Expenses:Cash");
         assert!(acc.has_valid_root(&roots));
-        let acc: Account = "NotARoot:Cash".into();
+        let acc = Account::new("NotARoot:Cash");
         assert!(!acc.has_valid_root(&roots));
     }
 
     #[test]
     fn test_account_components() {
-        let acc: Account = "Assets:US:Bank:Checking".into();
+        let acc = Account::new("Assets:US:Bank:Checking");
         let components: Vec<_> = acc.components().collect();
         assert_eq!(components, vec!["Assets", "US", "Bank", "Checking"]);
     }
@@ -232,45 +233,56 @@ mod tests {
     #[test]
     fn test_account_join() {
         let root = &"Assets".to_string();
-        let acc: Account = "Assets:Cash".into();
-        let acc_sub: Account = "Assets:Cash:Sub".into();
+        let acc = Account::new("Assets:Cash");
+        let acc_sub = Account::new("Assets:Cash:Sub");
         assert_eq!(root.join_account("Cash"), acc);
         assert_eq!(root.join_account("Cash:Sub"), acc_sub);
     }
 
     #[test]
-    fn test_has_valid_name() {
+    fn test_has_valid_name_for_valid_names() {
         // Valid account names
-        assert!(Account::from("Assets:Cash").has_valid_name());
-        assert!(Account::from("Assets:US:RBS:Checking").has_valid_name());
-        assert!(Account::from("Equity:Opening-Balances").has_valid_name());
-        assert!(Account::from("Income:US:ETrade:Dividends-USD").has_valid_name());
-        assert!(Account::from("Assets:401k").has_valid_name()); // digit in subaccount start
-        assert!(Account::from("Assets:2024-Savings").has_valid_name()); // digit start with hyphen
+        for value in [
+            "Assets:Cash",
+            "Assets:US:RBS:Checking",
+            "Equity:Opening-Balances",
+            "Income:US:ETrade:Dividends-USD",
+            "Assets:401k",         // digit in subaccount start
+            "Assets:2024-Savings", // digit start with hyphen
+            "Активы:Наличные",     // Russian
+            "Vermögen:Bank",       // German umlaut in middle
+            "Assets:Épargne",      // French É
+        ] {
+            assert!(
+                Account::new(value).has_valid_name(),
+                "expected '{value}' to be valid"
+            );
+        }
+    }
 
-        // Invalid: only one component (no subaccount)
-        assert!(!Account::from("Assets").has_valid_name());
-        assert!(!Account::from("Income").has_valid_name());
-
-        // Invalid: lowercase in component start
-        assert!(!Account::from("Assets:cash").has_valid_name());
-        assert!(!Account::from("Assets:US:rbs").has_valid_name());
-
-        // Invalid: lowercase root
-        assert!(!Account::from("assets:Cash").has_valid_name());
-
-        // Invalid: special characters
-        assert!(!Account::from("Assets:US*RBS").has_valid_name());
-        assert!(!Account::from("Assets:US.RBS").has_valid_name());
-        assert!(!Account::from("Assets:US_RBS").has_valid_name());
-
-        // Valid: Unicode uppercase letters
-        assert!(Account::from("Активы:Наличные").has_valid_name()); // Russian
-        assert!(Account::from("Vermögen:Bank").has_valid_name()); // German umlaut in middle
-        assert!(Account::from("Assets:Épargne").has_valid_name()); // French É
-
-        // Invalid: Unicode lowercase start
-        assert!(!Account::from("Assets:наличные").has_valid_name()); // Russian lowercase
-        assert!(!Account::from("Assets:épargne").has_valid_name()); // French lowercase é
+    #[test]
+    fn test_has_valid_name_for_invalid_names() {
+        for value in [
+            // only one component (no subaccount)
+            "Assets",
+            "Income",
+            // lowercase in component start
+            "Assets:cash",
+            "Assets:US:rbs",
+            // lowercase root
+            "assets:Cash",
+            // special characters
+            "Assets:US*RBS",
+            "Assets:US.RBS",
+            "Assets:US_RBS",
+            // Invalid: Unicode lowercase start
+            "Assets:наличные", // Russian lowercase
+            "Assets:épargne",  // French lowercase é
+        ] {
+            assert!(
+                !Account::new(value).has_valid_name(),
+                "expected '{value}' to be invalid"
+            );
+        }
     }
 }

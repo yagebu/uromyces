@@ -1,6 +1,7 @@
 use std::convert::Infallible;
 use std::fmt::Display;
 use std::hash::Hash;
+use std::ops::Deref;
 
 use pyo3::prelude::*;
 use pyo3::types::PyString;
@@ -13,6 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Default, Hash, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct BoxStr(Box<str>);
+
+impl Deref for BoxStr {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl Display for BoxStr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

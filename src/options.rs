@@ -119,7 +119,7 @@ impl Default for BeancountOptions {
             account_previous_earnings: "Earnings:Previous".into(),
             render_commas: false,
             operating_currency: Vec::new(),
-            conversion_currency: "NOTHING".into(),
+            conversion_currency: Currency::new("NOTHING"),
             documents: Vec::new(),
             booking_method: Booking::default(),
             inferred_tolerance_default: Tolerances::default(),
@@ -156,7 +156,7 @@ impl BeancountOptions {
 
             "render_commas" => self.render_commas = check_boolean_option(value),
             "operating_currency" => {
-                self.operating_currency.push(value.into());
+                self.operating_currency.push(Currency::new(value));
             }
             "documents" => {
                 self.documents.push(value.into());
@@ -166,7 +166,7 @@ impl BeancountOptions {
                     .map_err(|()| BeancountOptionError::InvalidBookingMethod(value.to_owned()))?;
             }
             "conversion_currency" => {
-                self.conversion_currency = value.into();
+                self.conversion_currency = Currency::new(value);
             }
             // tolerance options
             "inferred_tolerance_default" => self

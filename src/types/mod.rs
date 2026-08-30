@@ -68,7 +68,6 @@ mod currency;
 mod date;
 mod decimal;
 mod flag;
-mod interned_string;
 mod metadata;
 mod paths;
 mod repr;
@@ -143,7 +142,7 @@ impl CustomValue {
         if let MetaValue::String(s) = &value {
             let account_dtype = pyo3::intern!(py, "<AccountDummy>");
             if dtype.eq(account_dtype)? {
-                return Ok(Self(MetaValue::Account(s.as_str().into())));
+                return Ok(Self(MetaValue::Account(Account::new(s.as_str()))));
             }
         }
         Ok(Self(value))
@@ -509,9 +508,8 @@ pub enum RawEntry {
 }
 
 /// The Beancount entries.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, IntoPyObject)]
 #[serde(tag = "t")]
-#[derive(IntoPyObject)]
 pub enum Entry {
     Balance(Balance),
     Close(Close),

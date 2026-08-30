@@ -186,7 +186,7 @@ mod tests {
     #[test]
     fn test_cost_to_string() {
         let one = Decimal::ONE;
-        let eur = Currency::from("EUR");
+        let eur = Currency::new("EUR");
         let cost = Cost::new(
             one,
             eur.clone(),

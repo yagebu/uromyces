@@ -39,7 +39,7 @@ pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
     if document_paths.is_empty() {
         return (Vec::new(), Vec::new());
     }
-    let Ok(base_path): Result<AbsoluteUTF8Path, _> = ledger.filename.clone().try_into() else {
+    let Ok(base_path): Result<AbsoluteUTF8Path, _> = (&ledger.filename).try_into() else {
         return (Vec::new(), Vec::new());
     };
 

@@ -119,14 +119,14 @@ impl FromNode for CostLabel {
 impl FromNode for Account {
     fn from_node(node: Node, s: &ConversionState) -> Self {
         debug_assert_eq!(node.kind(), "account",);
-        s.get_str(node).into()
+        Account::new(s.get_str(node))
     }
 }
 
 impl FromNode for Currency {
     fn from_node(node: Node, s: &ConversionState) -> Self {
         debug_assert_eq!(node.kind(), "currency",);
-        s.get_str(node).into()
+        Currency::new(s.get_str(node))
     }
 }
 

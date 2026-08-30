@@ -19,7 +19,8 @@ pub fn get_weight(posting: &Posting) -> Amount {
 
 #[cfg(test)]
 mod tests {
-    use crate::{test_utils::a, types::Filename};
+    use crate::test_utils::a;
+    use crate::types::{Account, Filename};
 
     use super::*;
 
@@ -27,7 +28,7 @@ mod tests {
     fn test_get_weight_units() {
         let pos = Posting::new_simple(
             Filename::new_dummy("string"),
-            "Assets:Cash".into(),
+            Account::new("Assets:Cash"),
             a("10 EUR"),
         );
         assert_eq!(get_weight(&pos), a("10 EUR"));

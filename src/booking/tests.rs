@@ -125,7 +125,7 @@ fn run_booking_test(path: &Path) {
             );
         }
 
-        let account: Account = "Assets:Account".into();
+        let account = Account::new("Assets:Account");
         let balance = balances.get(&account).cloned().unwrap_or_default();
         snapshot.add_debug_output(
             "ex_balances",
