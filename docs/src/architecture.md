@@ -232,8 +232,8 @@ ledger.replace_entries(entries)
 ```python
 def load_file(filename):
     ledger = _uromyces.load_file(filename)  # Rust: Parse + Combine + Booking
-    run(ledger)                              # Python: Plugin orchestration
-    ledger.run_validations()                 # Rust: Built-in validators
+    run(ledger)  # Python: Plugin orchestration
+    ledger.run_validations()  # Rust: Built-in validators
     return ledger
 ```
 

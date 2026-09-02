@@ -1,6 +1,8 @@
 allow-unwrap-in-tests = true
 allowed-duplicate-crates = [
-    "hashbrown",
+    "rand",
+    "rand_chacha",
+    "rand_core",
     "syn",
 ]
 disallowed-types = ["std::collections::HashMap", "std::collections::HashSet"]

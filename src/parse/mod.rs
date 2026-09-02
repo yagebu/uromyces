@@ -150,7 +150,7 @@ pub fn convert_syntax_tree(parsed_tree: &ParsedTree, filename: &Filename) -> Par
     let state = &mut ConversionState::new(parsed_tree.string, filename);
     // this is the cursor we use to iterate over all entries.
     let root_node = parsed_tree.tree.root_node();
-    let mut result = ParsedFile::with_entries_capacity(root_node.child_count());
+    let mut result = ParsedFile::with_entries_capacity(root_node.child_count() as usize);
 
     for node in root_node.children(&mut root_node.walk()) {
         if node.has_error() {

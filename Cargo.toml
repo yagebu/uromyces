@@ -31,7 +31,7 @@ rust_decimal = { version = "1" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
 thin-vec = { version = "0.2", features = ["serde"] }
-tree-sitter = { version = "0.26" }
+tree-sitter = { version = "0.27" }
 
 [build-dependencies]
 cc = { version = "1" }
