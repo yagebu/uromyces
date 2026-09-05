@@ -6,8 +6,7 @@ use crate::ledgers::RawLedger;
 use crate::parse::parse_string;
 use crate::test_utils;
 use crate::types::{
-    AbsoluteUTF8Path, Account, Booking, Entry, MIN_DATE, Posting, RawEntry, RawPosting,
-    RawTransaction,
+    AbsoluteUTF8Path, Account, Booking, Date, Entry, Posting, RawEntry, RawPosting, RawTransaction,
 };
 
 use super::book_entries;
@@ -40,7 +39,7 @@ fn compare_postings(expected: &[RawPosting], booked: &[Posting]) {
             posting_booked.units.to_string()
         );
         if let Some(expected_cost) = &posting_expected.cost {
-            let expected = complete_cost_spec(expected_cost, MIN_DATE, None).unwrap();
+            let expected = complete_cost_spec(expected_cost, Date::MIN_DATE, None).unwrap();
             assert_eq!(Some(expected), posting_booked.cost);
         } else {
             assert!(posting_booked.cost.is_none());

@@ -6,6 +6,6 @@
   Assets:US:Cash
 ;------------------------------------------------------------------------------
 ; errors=[
-;     "Invalid date: 2013-05-40",
+;     "Invalid date '2013-05-40': invalid date: failed to parse two digit integer as day: parameter 'day' is not in the required range of 1..=31",
 ; ]
 ; num_entries=0

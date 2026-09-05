@@ -1,5 +1,5 @@
 use crate::errors::UroError;
-use crate::types::{Decimal, Filename, LineNumber};
+use crate::types::{DateParseError, Decimal, Filename, LineNumber};
 
 use super::NodeGetters;
 use super::convert::ConversionState;
@@ -48,7 +48,7 @@ impl ConversionError {
 #[derive(Debug)]
 pub enum ConversionErrorKind {
     InvalidBookingMethod(String),
-    InvalidDate(String),
+    InvalidDate(String, DateParseError),
     InvalidDecimal(String, String),
     InvalidDocumentFilename(String),
     UnsupportedTotalCost,
@@ -65,7 +65,7 @@ impl std::fmt::Display for ConversionError {
 
         match &self.kind {
             K::InvalidBookingMethod(m) => write!(f, "Invalid booking method: {m}"),
-            K::InvalidDate(m) => write!(f, "Invalid date: {m}"),
+            K::InvalidDate(m, e) => write!(f, "Invalid date '{m}': {e}"),
             K::InvalidDecimal(m, decimal_error) => {
                 write!(f, "Invalid decimal number '{m}': {decimal_error}")
             }

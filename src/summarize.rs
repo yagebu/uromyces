@@ -229,8 +229,8 @@ mod tests {
         let ledger = load_string(input, "<string>".try_into().unwrap());
         let clamped_entries = clamp(
             &ledger.entries,
-            Date::from_ymd_opt(2012, 6, 1).unwrap(),
-            Date::from_ymd_opt(2012, 9, 1).unwrap(),
+            Date::new(2012, 6, 1).unwrap(),
+            Date::new(2012, 9, 1).unwrap(),
             &ledger.options.get_summarization_accounts(),
         );
         insta::assert_json_snapshot!(clamped_entries, @r#"

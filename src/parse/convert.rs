@@ -143,7 +143,7 @@ impl TryFromNode for Date {
     fn try_from_node(node: Node, s: &ConversionState) -> ConversionResult<Self> {
         debug_assert_eq!(node.kind(), "date");
         Self::try_from_str(s.get_str(node))
-            .map_err(|()| ConversionError::new(InvalidDate(s.get_str(node).into()), &node, s))
+            .map_err(|e| ConversionError::new(InvalidDate(s.get_str(node).into(), e), &node, s))
     }
 }
 

@@ -80,7 +80,7 @@ pub use booking::Booking;
 pub use box_str::BoxStr;
 pub use cost::{Cost, CostLabel, CostSpec};
 pub use currency::Currency;
-pub use date::{Date, MIN_DATE};
+pub(crate) use date::{Date, DateParseError};
 pub use decimal::Decimal;
 pub use flag::Flag;
 pub use metadata::{EntryMeta, Meta, MetaKeyValuePair, MetaValue, PostingMeta};

@@ -86,7 +86,7 @@ pub fn find(ledger: &Ledger) -> (Vec<Entry>, Vec<UroError>) {
             account_files.sort_unstable();
 
             new_documents.extend(&mut account_files.iter().filter_map(|file_name| {
-                if let Ok(date) = Date::try_from_str(file_name) {
+                if let Ok(date) = Date::try_from_str(file_name.as_ref()) {
                     Some(Document {
                         date,
                         tags: TagsLinks::default(),

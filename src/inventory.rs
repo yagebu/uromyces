@@ -344,7 +344,7 @@ mod tests {
 
     use crate::{
         test_utils::{a, c, d},
-        types::MIN_DATE,
+        types::Date,
     };
 
     use super::*;
@@ -374,7 +374,10 @@ mod tests {
     fn test_inventory_get_currencies() {
         let mut inv = Inventory::new();
         inv.add_position(&a("2.0 EUR"));
-        inv.add_position(&(a("2.0 EUR"), Cost::new(d("3"), c("USD"), MIN_DATE, None)));
+        inv.add_position(&(
+            a("2.0 EUR"),
+            Cost::new(d("3"), c("USD"), Date::MIN_DATE, None),
+        ));
         itertools::assert_equal(inv.currencies(), vec![&c("EUR")]);
         itertools::assert_equal(inv.cost_currencies(), vec![&c("USD")]);
         inv.add_position(&a("2.0 USD"));

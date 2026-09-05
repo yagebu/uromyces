@@ -5,6 +5,6 @@
 
 ;------------------------------------------------------------------------------
 ; errors=[
-;     "Invalid date: 2000-02-31",
+;     "Invalid date '2000-02-31': invalid date: parsed date is not valid: parameter 'day' for `2000-02` is invalid, must be in range `1..=29`",
 ; ]
 ; num_entries=0

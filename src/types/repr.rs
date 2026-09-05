@@ -111,7 +111,7 @@ mod tests {
     fn test_various_types_repr() {
         assert_eq!(Decimal::new(100, 3).py_repr(), "Decimal('0.100')");
         assert_eq!(
-            Date::from_ymd_opt(2012, 12, 31).unwrap().py_repr(),
+            Date::new(2012, 12, 31).unwrap().py_repr(),
             "datetime.date(2012, 12, 31)"
         );
         assert_eq!(c("EUR").py_repr(), "'EUR'");
@@ -163,7 +163,7 @@ mod tests {
 
     #[test]
     fn test_cost_repr() {
-        let date = Date::from_ymd_opt(2024, 1, 15).unwrap();
+        let date = Date::new(2024, 1, 15).unwrap();
         let cost = Cost::new(d("10.50"), c("USD"), date, Some(CostLabel::from("lot1")));
         assert_eq!(
             cost.py_repr(),
@@ -178,7 +178,7 @@ mod tests {
 
     #[test]
     fn test_cost_spec_repr() {
-        let date = Date::from_ymd_opt(2024, 6, 30).unwrap();
+        let date = Date::new(2024, 6, 30).unwrap();
         let cost_spec = CostSpec {
             number_per: Some(d("5.00")),
             number_total: Some(d("100.00")),
