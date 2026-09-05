@@ -50,10 +50,6 @@ bool tree_sitter_beancount_external_scanner_scan(
   TSLexer *lexer,
   const bool *valid_symbols
 ) {
-  if (lexer->eof(lexer)) {
-    lexer->result_symbol = EOL;
-    return true;
-  }
   // Skip initial whitespace
   while (is_whitespace(lexer->lookahead)) {
     skip(lexer);
